@@ -1,0 +1,1 @@
+{"aliases":[],"id":"aa30124d67c24d8bb61fc814d0ee51ee","identity_claim":{"id":"calcit-ploc-2023-language-identity","kind":"claim","revision":1},"kind":"dialect","name":"Calcit","relations":[{"claim":{"id":"calcit-ploc-2023-dialect-of-clojurescript","kind":"claim","revision":1},"target":{"id":"202641d67c4e44bdb95738dc9bed9755"},"type":"dialect-of"}],"state":"active"}
