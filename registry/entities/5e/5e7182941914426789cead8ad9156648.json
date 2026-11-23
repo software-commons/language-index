@@ -1,0 +1,1 @@
+{"aliases":[],"id":"5e7182941914426789cead8ad9156648","identity_claim":{"id":"verilog-ams-2023-language-identity","kind":"claim","revision":1},"kind":"dialect","name":"Verilog-AMS","relations":[{"claim":{"id":"verilog-ams-2023-dialect-of-verilog","kind":"claim","revision":1},"target":{"id":"19bfa118ceba5b069fedf21491890b3b"},"type":"dialect-of"}],"state":"active"}
