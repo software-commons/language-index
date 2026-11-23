@@ -1,0 +1,1 @@
+{"basis":{"id":"vb-lineage-vba-spec-24","kind":"source","revision":1},"citation":{"locator":"§5.4.3.9 Set Statement runtime variable branch, pp.95–96.","modality":"required"},"claim":{"id":"vba-ms-vbal-24-withevents-set-rebinding","kind":"claim","revision":1},"id":"supports-vba-ms-vbal-24-withevents-set-rebinding","kind":"dependency","relation":"support","revision":1}
