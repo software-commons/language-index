@@ -1,0 +1,1 @@
+{"basis":{"id":"npm-1142-npmrc-manual","kind":"source","revision":1},"citation":{"locator":"The npm config files, Description, Files, and Per-project config file. Physical lines 7–44, 60–73.","modality":"descriptive"},"claim":{"id":"npm-ini-scope-identity","kind":"claim","revision":1},"id":"supports-npm-ini-scope-identity","kind":"dependency","relation":"support","revision":1}
