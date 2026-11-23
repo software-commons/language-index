@@ -1,0 +1,5 @@
+# Dart, Elixir, Julia, and Perl 5 host boundaries
+
+Four original STRling planning entries describe regular-expression facilities associated with these languages. First-party documents independently support the scoped host identity for each lead. The planning inventory remains the source of the lead association. Each language and facility statement cites its own publisher documentation. [Pinned discovery inventory](https://github.com/strling-lang/regex-conformance/blob/62084ca0ef9b05a28711dd28bf10885c6ed0cb5d/registries/universe/full-known-universe-2026-08-15.v1.json) · [Independent lead decisions](../../sces/artifacts/predecessor-host-ambiguities-origin-review.json)
+
+The documentary profile uses Dart SDK 3.7.2, Elixir 1.18.4, Julia 1.11.7, and the Perl 5.42.2 documentation. The claims preserve the boundary between host-language constructs, facility interfaces, and underlying engines. Their evidence does not extend to runtime testing, rolling versions, or compatibility with an external engine. [Source witnesses](../../sces/artifacts/predecessor-host-ambiguities-source-witnesses.json)

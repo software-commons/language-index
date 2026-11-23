@@ -1,0 +1,1 @@
+{"basis":{"id":"perl5-pinned-regex-facility-document","kind":"source","revision":1},"citation":{"locator":"perlop, Regexp Quote-Like Operators, qr/STRING/. Physical lines 2106–2117.","modality":"descriptive"},"claim":{"id":"perl5-5422-qr-regexp-value","kind":"claim","revision":1},"id":"supports-perl5-5422-qr-regexp-value","kind":"dependency","relation":"support","revision":1}
