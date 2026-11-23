@@ -1,0 +1,87 @@
+{
+  "policy": "SCES-1.0",
+  "policy_sha256": "14da3f31f697ab828d4a4560f060dbe511861020db54bea7bc531e20ea0855ce",
+  "repository": "software-commons/language-index",
+  "mode": "index",
+  "predicates": {
+    "identity-boundary": {
+      "categories": [
+        "documented",
+        "historical",
+        "derived"
+      ],
+      "targeted_review": true,
+      "scope_dimensions": [
+        "authority",
+        "revision"
+      ]
+    },
+    "normative-semantics": {
+      "categories": [
+        "normative"
+      ],
+      "targeted_review": true,
+      "scope_dimensions": [
+        "edition"
+      ]
+    },
+    "language-design": {
+      "categories": [
+        "documented",
+        "reported"
+      ],
+      "targeted_review": false,
+      "scope_dimensions": [
+        "edition"
+      ]
+    },
+    "language-history": {
+      "categories": [
+        "historical",
+        "descriptive",
+        "reported"
+      ],
+      "targeted_review": false,
+      "scope_dimensions": [
+        "period"
+      ]
+    },
+    "implementation-behavior": {
+      "categories": [
+        "implemented",
+        "observed"
+      ],
+      "targeted_review": false,
+      "scope_dimensions": [
+        "implementation",
+        "version",
+        "profile"
+      ]
+    },
+    "compatibility": {
+      "categories": [
+        "documented",
+        "observed",
+        "derived",
+        "normative"
+      ],
+      "targeted_review": true,
+      "scope_dimensions": [
+        "edition",
+        "implementation",
+        "version"
+      ]
+    },
+    "cross-index-relationship": {
+      "categories": [
+        "documented",
+        "derived"
+      ],
+      "targeted_review": true,
+      "scope_dimensions": [
+        "owning-revision",
+        "target-revision"
+      ]
+    }
+  }
+}
