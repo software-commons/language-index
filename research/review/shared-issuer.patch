@@ -207,10 +207,10 @@ index 1863d1130f1e65e59a85d98cf28dc0caea911682..1362af915de4c2d8ae94fbd49e8189e9
          for update in ({"integration_id": ACTIONS_APP_ID}, {"integration_id": None}):
 diff --git a/tests/test_review_evidence.py b/tests/test_review_evidence.py
 new file mode 100644
-index 0000000000000000000000000000000000000000..c66637cac88b2c8f40a52517df0a6aa8dfb54bba
+index 0000000000000000000000000000000000000000..a4786ae97e13d1285b44bb64706f734ecd2ecaf6
 --- /dev/null
 +++ b/tests/test_review_evidence.py
-@@ -0,0 +1,723 @@
+@@ -0,0 +1,756 @@
 +"""Synthetic Git-object fixtures for the protected SCES review inputs."""
 +
 +from base64 import b64encode
@@ -571,6 +571,7 @@ index 0000000000000000000000000000000000000000..c66637cac88b2c8f40a52517df0a6aa8
 +        _, _, latest_advice = archive("newest", "2026-10-02T00:00:00Z", first_link)
 +        (self.root / SELECTION).unlink()
 +        partial = self.commit(latest_advice, "leave an older unadvised release without an active selection")
++        # Pinned SCES-1.0's unadvised-withdrawal gate applies to every retained release.
 +        with self.assertRaisesRegex(DataError, "inactive publication retains a qualification without a withdrawal advisory"):
 +            self.capture(partial)
 +        _git(self.root, "switch", "--quiet", "--detach", unadvised)
@@ -604,6 +605,38 @@ index 0000000000000000000000000000000000000000..c66637cac88b2c8f40a52517df0a6aa8
 +        candidate = self.commit(successor, "try reactivation with two protected lineage tips")
 +        with self.assertRaisesRegex(DataError, "no unique successor tip"):
 +            self.capture(candidate)
++
++    def test_reactivation_checks_large_archive_without_staging_its_entire_history(self):
++        inputs, publication = fixture()
++        source = self.commit(inputs, "freeze evidence")
++        publication = pin_source(publication, source)
++        history, sizes, previous = {}, [], None
++        for serial in range(5):
++            slug = f"archive-{serial}"
++            files = select_release(publication, slug, previous)
++            del files[SELECTION]
++            report_path = f"sces/releases/{slug}/qualification.json"
++            if serial < 4:
++                files[report_path] = _canonical({**decode(files[report_path]), "limitations": ["x" * 4000]})
++            previous = {"path": report_path, "sha256": digest(files[report_path])}
++            advisory_path = f"sces/advisories/{slug}.json"
++            files[advisory_path] = _canonical({"report": previous, "affected": [ref("claim", "selected")],
++                                                "reason": "Synthetic withdrawal", "recorded": "2026-10-01T00:00:00Z"})
++            history.update(files)
++            sizes.append(sum(map(len, files.values())))
++
++        self.commit(history, "retain an inactive archive of individually bounded releases")
++        candidate = self.commit(select_release(publication, "test-release", previous), "reactivate the qualified tip")
++        expected = self.capture(candidate)
++        staging_limit = sum(map(len, expected.values())) + 1024
++        self.assertLess(max(sizes), staging_limit)
++        self.assertGreater(sum(sizes), staging_limit)
++        with patch("tools.review_evidence._MAX_EVIDENCE", staging_limit):
++            captured = self.capture(candidate)
++        self.assertEqual(captured, expected)
++        self.assertEqual(captured[report_path], history[report_path])
++        self.assertEqual(captured[advisory_path], history[advisory_path])
++        self.assertNotIn("sces/releases/archive-0/qualification.json", captured)
 +
 +    def test_another_datasets_advised_archive_cannot_hide_replaced_claims_bytes(self):
 +        inputs, publication = fixture()
@@ -935,7 +968,7 @@ index 0000000000000000000000000000000000000000..c66637cac88b2c8f40a52517df0a6aa8
 +            with self.assertRaisesRegex(DataError, "retrieval could not complete"):
 +                _fetch_frozen_records(REPOSITORY, commit, expected, len(raw))
 diff --git a/tests/test_review_gate.py b/tests/test_review_gate.py
-index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..6338672730074ccfe79746cfbc700d5045ce1003 100644
+index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..cc83ef5fa71bdc09a382ee12b12b52b2245aed59 100644
 --- a/tests/test_review_gate.py
 +++ b/tests/test_review_gate.py
 @@ -2,7 +2,7 @@
@@ -1036,7 +1069,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..6338672730074ccfe79746cfbc700d50
              "required_status_checks": [*checks, {"context": CHECK_NAME, "integration_id": 123}],
              "strict_required_status_checks_policy": True,
              "do_not_enforce_on_create": False,
-@@ -66,7 +93,140 @@ def active_queue_rules():
+@@ -66,7 +93,143 @@ def active_queue_rules():
      ]
  
  
@@ -1057,6 +1090,9 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..6338672730074ccfe79746cfbc700d50
 +        selected = patch("tools.review_gate.capture_selected_evidence", return_value={})
 +        self.capture_selected = selected.start()
 +        self.addCleanup(selected.stop)
++        checks = patch("tools.review_gate.successful_checks", return_value=[])
++        self.successful_checks = checks.start()
++        self.addCleanup(checks.stop)
 +        controls = patch("tools.review_gate.capture_control_paths", return_value=[])
 +        controls.start()
 +        self.addCleanup(controls.stop)
@@ -1177,7 +1213,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..6338672730074ccfe79746cfbc700d50
      def test_accepts_only_complete_bound_verdicts(self):
          execution, verdict = review_result(make_trace(), BINDING, "abc", PATCH)
          self.assertEqual(execution, EXECUTION)
-@@ -79,6 +239,34 @@ class ReviewGateTests(unittest.TestCase):
+@@ -79,6 +242,34 @@ class ReviewGateTests(unittest.TestCase):
          _, verdict = review_result(make_trace(verdict={"decision": "inconclusive"}, inspect=False), BINDING, "abc", PATCH)
          self.assertEqual(verdict["decision"], "inconclusive")
  
@@ -1212,7 +1248,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..6338672730074ccfe79746cfbc700d50
      def test_installation_token_accepts_supported_formats_without_header_delimiters(self):
          for token in (LEGACY_TOKEN, STATELESS_TOKEN):
              self.assertIsNotNone(APP_TOKEN.fullmatch(token))
-@@ -86,40 +274,304 @@ class ReviewGateTests(unittest.TestCase):
+@@ -86,40 +277,304 @@ class ReviewGateTests(unittest.TestCase):
              self.assertIsNone(APP_TOKEN.fullmatch(token))
  
      def test_issuer_refuses_unverified_repository_scope_before_writing(self):
@@ -1545,7 +1581,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..6338672730074ccfe79746cfbc700d50
              def respond(_, payload, *, check_id=None):
                  return api_check({"name": CHECK_NAME, "head_sha": QUEUE["merge"],
                                    "external_id": publisher.call_args_list[-2].args[1]["external_id"],
-@@ -142,7 +594,7 @@ class ReviewGateTests(unittest.TestCase):
+@@ -142,7 +597,7 @@ class ReviewGateTests(unittest.TestCase):
                    patch("tools.review_gate.launch_review", side_effect=fake_launch)):
                  result = run(args, github, token_input=lambda: STATELESS_TOKEN, publisher=publisher)
                  self.assertEqual(result["status"], "check-issued")
@@ -1554,7 +1590,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..6338672730074ccfe79746cfbc700d50
                  scope._get_json.assert_called_once_with(SCOPE_PATH)
                  first, last = publisher.call_args_list
                  self.assertEqual(first.args[0], STATELESS_TOKEN)
-@@ -186,49 +638,54 @@ class ReviewGateTests(unittest.TestCase):
+@@ -186,49 +641,54 @@ class ReviewGateTests(unittest.TestCase):
                  publisher.assert_not_called()
  
      def test_queue_admission_targets_only_the_head_and_records_its_purpose(self):
@@ -1636,7 +1672,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..6338672730074ccfe79746cfbc700d50
  
      def test_wrong_source_and_stale_returned_checks_are_rejected(self):
          payload = {"name": CHECK_NAME, "head_sha": SNAPSHOT.merge,
-@@ -257,9 +714,9 @@ class ReviewGateTests(unittest.TestCase):
+@@ -257,9 +717,9 @@ class ReviewGateTests(unittest.TestCase):
              state = Path(directory)
              args = SimpleNamespace(state_dir=state, mode="review", pull=1, model="fixture", codex=Path("fixture"),
                                     app_id=123, reviewer=Reviewer(4001, 4002, state / "reviewer-home"),
@@ -1648,7 +1684,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..6338672730074ccfe79746cfbc700d50
              github.get_pull.return_value = SNAPSHOT
              credential = Mock()
              publisher = Mock()
-@@ -277,9 +734,9 @@ class ReviewGateTests(unittest.TestCase):
+@@ -277,9 +737,9 @@ class ReviewGateTests(unittest.TestCase):
              state = Path(directory)
              args = SimpleNamespace(state_dir=state, mode="review", pull=1, model="fixture", codex=Path("fixture"),
                                     app_id=123, reviewer=Reviewer(4001, 4002, state / "reviewer-home"),
@@ -1660,7 +1696,46 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..6338672730074ccfe79746cfbc700d50
              github.get_pull.return_value = SNAPSHOT
              credential = Mock()
              publisher = Mock()
-@@ -352,7 +809,8 @@ class ReviewGateTests(unittest.TestCase):
+@@ -305,6 +765,38 @@ class ReviewGateTests(unittest.TestCase):
+             credential.assert_not_called()
+             publisher.assert_not_called()
+ 
++    def test_same_head_adverse_review_revokes_old_success_before_launch(self):
++        with TemporaryDirectory() as directory:
++            state = Path(directory)
++            args = SimpleNamespace(state_dir=state, mode="review", pull=1, model="fixture", codex=Path("fixture"),
++                                   app_id=123, reviewer=Reviewer(4001, 4002, state / "reviewer-home"),
++                                   queue_admission=True, commissioning_policy=LICENSE_POLICY)
++            github = Mock()
++            use_queue_rules(github)
++            github.get_pull.return_value = SNAPSHOT
++            prior = api_check({"name": CHECK_NAME, "head_sha": SNAPSHOT.head, "external_id": "a" * 64,
++                               "status": "completed", "conclusion": "success"})
++            self.successful_checks.side_effect = [[prior], [prior], []]
++            publisher = Mock(return_value={**prior, "conclusion": "failure"})
++
++            def negative(_codex, _model, input_dir, _schema, _audit, *, reviewer):
++                publisher.assert_called_once()
++                self.assertEqual(publisher.call_args.kwargs["check_id"], prior["id"])
++                self.assertEqual(publisher.call_args.args[1]["conclusion"], "failure")
++                token = json.loads((input_dir / "review-input.json").read_bytes())["inspection_token"]
++                self.assertNotEqual(token, LEGACY_TOKEN)
++                return make_trace(token, verdict={"decision": "changes-required", "findings": ["Fixture finding"]})
++
++            with (patch("tools.review_gate.capture_diff", return_value=("e" * 40, PATCH)),
++                  patch("tools.review_gate.protected_staging", return_value=state),
++                  patch("tools.review_gate.share_reviewer_inputs"),
++                  patch("tools.review_gate.token_is_target_only", return_value=True),
++                  patch("tools.review_gate.launch_review", side_effect=negative)):
++                result = run(args, github, token_input=lambda: LEGACY_TOKEN, publisher=publisher)
++            self.assertEqual(result["status"], "changes-required")
++            self.assertEqual(json.loads((Path(result["audit"]) / "superseded-checks.json").read_bytes()), [prior])
++            self.assertFalse((Path(result["audit"]) / "issued-check.json").exists())
++
+     def test_protected_launcher_uses_separate_identity_and_scoped_filesystem(self):
+         with TemporaryDirectory() as directory:
+             root = Path(directory)
+@@ -352,7 +844,8 @@ class ReviewGateTests(unittest.TestCase):
                  token = json.loads((input_dir / "review-input.json").read_bytes())["inspection_token"]
                  return make_trace(token)
  
@@ -1670,7 +1745,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..6338672730074ccfe79746cfbc700d50
                    patch("tools.review_gate.GitHub", return_value=github),
                    patch("tools.review_gate.capture_diff", return_value=("e" * 40, PATCH)) as capture,
                    patch("tools.review_gate.protected_staging", return_value=root),
-@@ -378,6 +836,46 @@ class ReviewGateTests(unittest.TestCase):
+@@ -378,6 +871,46 @@ class ReviewGateTests(unittest.TestCase):
              self.assertEqual(result["decision_sha256"], sha256(decision).hexdigest())
              self.assertFalse((Path(result["audit"]) / "issued-check.json").exists())
  
@@ -1705,19 +1780,19 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..6338672730074ccfe79746cfbc700d50
 +        with (patch("tools.review_gate.load_issuer", return_value=runtime),
 +              patch("tools.review_gate.GitHub") as github,
 +              patch("tools.review_commission.OwnerGitHub") as owner,
-+              patch("tools.review_gate.run", return_value={"status": "check-issued"}) as review,
++              patch("tools.review_gate.run_serialized", return_value={"status": "check-issued"}) as review,
 +              patch("tools.review_gate.sys.stdout", SimpleNamespace(buffer=BytesIO()))):
 +            args = ["review", "1", "--issuer-config", str(root / "private.json"), "--queue-admission"]
 +            self.assertEqual(main(args), 0)
 +        github.assert_not_called()
 +        owner.assert_called_once_with(target=LICENSE)
 +        self.assertIs(review.call_args.args[1], owner.return_value)
-+        self.assertTrue(callable(review.call_args.kwargs["token_input"]))
++        self.assertTrue(callable(review.call_args.args[2]))
 +
      @unittest.skipUnless(os.name == "posix", "issuer deployment requires POSIX permissions")
      def test_protected_issuer_config_rejects_unpinned_runner_and_shared_permissions(self):
          with TemporaryDirectory() as directory:
-@@ -387,6 +885,7 @@ class ReviewGateTests(unittest.TestCase):
+@@ -387,6 +920,7 @@ class ReviewGateTests(unittest.TestCase):
              config = root / "review.json"
              settings = {
                  "app_id": 123, "audit_dir": str(root), "codex": str(codex), "model": "fixture",
@@ -1725,7 +1800,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..6338672730074ccfe79746cfbc700d50
                  "codex_sha256": sha256(codex.read_bytes()).hexdigest(),
                  "reviewer_uid": 4001, "reviewer_gid": 4002, "reviewer_home": str(root / "reviewer-home"),
              }
-@@ -394,9 +893,47 @@ class ReviewGateTests(unittest.TestCase):
+@@ -394,9 +928,47 @@ class ReviewGateTests(unittest.TestCase):
              config.chmod(0o600)
              reviewer = Reviewer(4001, 4002, root / "reviewer-home")
              with patch("tools.review_gate.load_reviewer", return_value=reviewer):
@@ -1774,7 +1849,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..6338672730074ccfe79746cfbc700d50
                  config.chmod(0o640)
                  with self.assertRaisesRegex(DataError, "must be private"):
                      load_issuer(config)
-@@ -410,8 +947,10 @@ class ReviewGateTests(unittest.TestCase):
+@@ -410,8 +982,10 @@ class ReviewGateTests(unittest.TestCase):
                      load_issuer(config)
                  codex.write_bytes(b"synthetic executable")
                  del settings["app_id"]
@@ -2365,10 +2440,10 @@ index d213d62143ea097a48f01697f606e7c61a21ee10..f4e6d504992e6e3dcee47ebfe9bdb873
  
 diff --git a/tools/review_evidence.py b/tools/review_evidence.py
 new file mode 100644
-index 0000000000000000000000000000000000000000..8d76db7aceadc7401be07c5b98080f085df00213
+index 0000000000000000000000000000000000000000..3769ba069014c0e1aa09dd2f950f26bb70aef855
 --- /dev/null
 +++ b/tools/review_evidence.py
-@@ -0,0 +1,622 @@
+@@ -0,0 +1,634 @@
 +"""Capture the active SCES publication inputs as inert bytes from a reviewed Git tree."""
 +
 +from base64 import b64decode, b64encode
@@ -2758,8 +2833,8 @@ index 0000000000000000000000000000000000000000..8d76db7aceadc7401be07c5b98080f08
 +            "SCES archived claims payload does not match the exact qualification artifact descriptor")
 +
 +
-+def _check_withdrawal(advisory, report_path, report_bytes, report):
-+    require(advisory["report"] == {"path": report_path, "sha256": _digest(report_bytes)},
++def _check_withdrawal(advisory, report_path, report_digest, report):
++    require(advisory["report"] == {"path": report_path, "sha256": report_digest},
 +            "SCES withdrawal advisory does not bind the exact verified base qualification")
 +    require(_timestamp(advisory["recorded"], "withdrawal advisory") <= datetime.now(timezone.utc),
 +            "SCES withdrawal advisory timestamp is in the future")
@@ -2781,6 +2856,7 @@ index 0000000000000000000000000000000000000000..8d76db7aceadc7401be07c5b98080f08
 +            require(f"sces/advisories/{slug}.json" in new,
 +                    "SCES active publication removal requires a new withdrawal advisory for the verified base release")
 +    if not selection_tree:
++        # Pinned SCES-1.0 tools/sces/validate.py, validate_publication (unadvised-withdrawal).
 +        require(all(f"sces/advisories/{path.split('/')[2]}.json" in candidate
 +                    for path in candidate if path.endswith("/qualification.json")),
 +                "SCES inactive publication retains a qualification without a withdrawal advisory")
@@ -2805,11 +2881,30 @@ index 0000000000000000000000000000000000000000..8d76db7aceadc7401be07c5b98080f08
 +        report = decode(report_bytes)
 +        _qualification_identity(report, slug, target)
 +        _check_archived_claims(report, report_path, staged)
-+        _check_withdrawal(decode(staged[advisory]), report_path, report_bytes, report)
++        _check_withdrawal(decode(staged[advisory]), report_path, _digest(report_bytes), report)
 +        if base_selection is not None and slug == base_selection["release"]:
 +            _bind_base_qualification(report, base_selection, base_bytes)
 +            staged[_BASE_SELECTION_REVIEW_PATH] = base_bytes
 +    return staged
++
++
++def _read_withdrawn_archive(directory, inherited, report_path, target):
++    match = re.fullmatch(r"sces/releases/([a-z][a-z0-9-]*)/qualification\.json", report_path)
++    require(match is not None and _SLUG.fullmatch(match[1]), "invalid protected SCES qualification report path")
++    slug = match[1]
++    advisory = f"sces/advisories/{slug}.json"
++    require(advisory in inherited, "SCES inactive base contains a qualification without its withdrawal advisory")
++    # Bound each independently validated triplet, including Git's small per-blob header.
++    blobs = _blobs(directory, inherited, [report_path, _claims_path(report_path), advisory],
++                   limit=3 * (_MAX_BLOB + 64))
++    report = decode(blobs[report_path])
++    _qualification_identity(report, slug, target)
++    require(isinstance(report["dataset"], str) and _SLUG.fullmatch(report["dataset"]),
++            "invalid protected SCES qualification dataset")
++    _check_archived_claims(report, report_path, blobs)
++    report_digest = _digest(blobs[report_path])
++    _check_withdrawal(decode(blobs[advisory]), report_path, report_digest, report)
++    return blobs, report, report_digest
 +
 +
 +def _withdrawn_predecessor(directory, inherited, selection, target):
@@ -2818,38 +2913,32 @@ index 0000000000000000000000000000000000000000..8d76db7aceadc7401be07c5b98080f08
 +    report_paths = sorted(path for path in release_paths if path.endswith("/qualification.json"))
 +    expected_paths = {artifact for path in report_paths for artifact in (path, _claims_path(path))}
 +    require(release_paths == expected_paths, "SCES inactive base contains an incomplete archived release bundle")
-+    release_blobs = _blobs(directory, inherited, sorted(release_paths), limit=_MAX_EVIDENCE)
-+    archived = {path: decode(release_blobs[path]) for path in report_paths}
-+    advisory_paths = {}
-+    for path, report in archived.items():
-+        advisory_path = f"sces/advisories/{report['release']}.json"
-+        slug, canonical = _archived_report_path(advisory_path)
-+        require(path == canonical, "invalid protected SCES qualification report path")
-+        _qualification_identity(report, slug, target)
-+        require(isinstance(report["dataset"], str) and _SLUG.fullmatch(report["dataset"]),
-+                "invalid protected SCES qualification dataset")
-+        require(advisory_path in inherited, "SCES inactive base contains a qualification without its withdrawal advisory")
-+        _check_archived_claims(report, path, release_blobs)
-+        advisory_paths[path] = advisory_path
-+    advisories = _blobs(directory, inherited, sorted(advisory_paths.values()),
-+                       limit=_MAX_EVIDENCE - sum(map(len, release_blobs.values())))
-+    for path, advisory_path in advisory_paths.items():
-+        _check_withdrawal(decode(advisories[advisory_path]), path, release_blobs[path], archived[path])
-+    rows = {path: report for path, report in archived.items() if report["dataset"] == selection["dataset"]}
-+    if not rows:
++    requested = selection.get("previous_report")
++    digests, predecessors, staged = {}, {}, {}
++    for path in report_paths:
++        blobs, report, report_digest = _read_withdrawn_archive(directory, inherited, path, target)
++        if report["dataset"] != selection["dataset"]:
++            continue
++        digests[path] = report_digest
++        if "previous_report" in report:
++            previous = report["previous_report"]
++            require(isinstance(previous, dict) and previous.keys() == {"path", "sha256"}
++                    and previous["path"] in release_paths and re.fullmatch(r"[0-9a-f]{64}", previous["sha256"]),
++                    "SCES withdrawn qualification lineage has a broken predecessor")
++            predecessors[path] = (previous["path"], previous["sha256"])
++        # The request only selects bytes to retain. The lineage below independently authorizes the tip.
++        if isinstance(requested, dict) and requested.get("path") == path:
++            staged = blobs
++    if not digests:
 +        require("previous_report" not in selection,
 +                "SCES archived predecessor requires an unchanged withdrawal advisory for the dataset on the verified pull-request base")
 +        return {}
 +    parents = {}
-+    for path, report in rows.items():
-+        previous = report.get("previous_report")
-+        if "previous_report" not in report:
-+            continue
-+        parent = previous["path"]
-+        require(parent in rows and previous == {"path": parent, "sha256": _digest(release_blobs[parent])},
++    for path, (parent, parent_digest) in predecessors.items():
++        require(digests.get(parent) == parent_digest,
 +                "SCES withdrawn qualification lineage has a broken predecessor")
 +        parents[path] = parent
-+    tips = rows.keys() - set(parents.values())
++    tips = digests.keys() - set(parents.values())
 +    require(len(tips) == 1, "SCES withdrawn qualification lineage has no unique successor tip")
 +    tip, = tips
 +    seen = set()
@@ -2858,14 +2947,12 @@ index 0000000000000000000000000000000000000000..8d76db7aceadc7401be07c5b98080f08
 +        require(cursor not in seen, "SCES withdrawn qualification lineage contains a cycle")
 +        seen.add(cursor)
 +        cursor = parents.get(cursor)
-+    require(seen == rows.keys(), "SCES withdrawn qualification lineage is disconnected or cyclic")
-+    expected = {"path": tip, "sha256": _digest(release_blobs[tip])}
-+    require(selection.get("previous_report") == expected,
++    require(seen == digests.keys(), "SCES withdrawn qualification lineage is disconnected or cyclic")
++    expected = {"path": tip, "sha256": digests[tip]}
++    require(requested == expected,
 +            "SCES reactivation must identify the verified dataset's latest withdrawn qualification report")
 +    require(tip != f"sces/releases/{selection['release']}/qualification.json", "invalid SCES previous report path")
-+    advisory_path = advisory_paths[tip]
-+    claims = _claims_path(tip)
-+    return {tip: release_blobs[tip], claims: release_blobs[claims], advisory_path: advisories[advisory_path]}
++    return staged
 +
 +
 +def _previous_report(directory, paths, base, base_selection_tree, inherited, selection, selection_bytes, target):
@@ -2992,7 +3079,7 @@ index 0000000000000000000000000000000000000000..8d76db7aceadc7401be07c5b98080f08
 +            raise
 +        raise DataError(f"could not capture the SCES publication evidence: {error}") from error
 diff --git a/tools/review_gate.py b/tools/review_gate.py
-index 46c36046f0bc7015d9fef4bb287659a424941a21..01e3920f96d1145d97304d216b04c95c2ad34585 100644
+index 46c36046f0bc7015d9fef4bb287659a424941a21..209640270c989053dd73c8b9cbf2469a73c7f2e2 100644
 --- a/tools/review_gate.py
 +++ b/tools/review_gate.py
 @@ -5,6 +5,7 @@ from __future__ import annotations
@@ -3003,7 +3090,12 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..01e3920f96d1145d97304d216b04c95c
  from hashlib import file_digest, sha256
  import json
  import os
-@@ -20,8 +21,14 @@ from urllib.request import Request, build_opener
+@@ -16,12 +17,19 @@ import subprocess
+ import sys
+ from tempfile import TemporaryDirectory
+ from urllib.error import URLError
++from urllib.parse import urlencode
+ from urllib.request import Request, build_opener
  from uuid import UUID, uuid4
  
  from .records import DataError, NoRedirects, decode, encode, require
@@ -3019,7 +3111,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..01e3920f96d1145d97304d216b04c95c
  
  CHECK_NAME = "Software Commons / Codex technical review"
  ACTIONS_APP_ID = 15368
-@@ -46,6 +53,7 @@ REVIEWER_ENV = {
+@@ -46,6 +54,7 @@ REVIEWER_ENV = {
      "SYSTEMROOT", "TEMP", "TMP", "TMPDIR", "USERPROFILE", "WINDIR",
  }
  MAX_TRACE_BYTES = 32 * 1024 * 1024
@@ -3027,7 +3119,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..01e3920f96d1145d97304d216b04c95c
  APP_TOKEN = re.compile(r"ghs_[A-Za-z0-9._-]{36,}")
  RUNTIME_KEYS = {"audit_dir", "codex", "codex_sha256", "model", "reviewer_uid", "reviewer_gid", "reviewer_home"}
  
-@@ -57,6 +65,12 @@ class Reviewer:
+@@ -57,6 +66,12 @@ class Reviewer:
      home: Path
  
  
@@ -3040,7 +3132,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..01e3920f96d1145d97304d216b04c95c
  def save(path, data):
      with path.open("xb") as file:
          file.write(data)
-@@ -69,7 +83,38 @@ def valid_execution(value):
+@@ -69,7 +84,38 @@ def valid_execution(value):
          return False
  
  
@@ -3080,7 +3172,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..01e3920f96d1145d97304d216b04c95c
      """Accept a verdict only from one complete captured Codex execution."""
      require(len(trace) <= MAX_TRACE_BYTES, "review trace exceeds the configured limit")
      events = [decode(line) for line in trace.splitlines() if line.strip()]
-@@ -85,10 +130,13 @@ def review_result(trace, binding, inspection_token, diff):
+@@ -85,10 +131,13 @@ def review_result(trace, binding, inspection_token, diff):
      require(messages, "Codex review did not return a verdict")
      final_position = messages[-1]
      verdict = decode(items[final_position]["text"].encode("utf-8"))
@@ -3096,7 +3188,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..01e3920f96d1145d97304d216b04c95c
              "review verdict does not bind the exact inspected inputs")
      require(verdict["decision"] in {"approve", "changes-required", "inconclusive"}
              and isinstance(verdict["findings"], list)
-@@ -96,18 +144,19 @@ def review_result(trace, binding, inspection_token, diff):
+@@ -96,18 +145,19 @@ def review_result(trace, binding, inspection_token, diff):
              and isinstance(verdict["rationale"], str) and verdict["rationale"].strip(), "invalid review verdict")
      if verdict["decision"] == "inconclusive":
          return execution, verdict
@@ -3124,7 +3216,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..01e3920f96d1145d97304d216b04c95c
      require(verdict["decision"] != "approve" or not verdict["findings"], "approval contains material findings")
      return execution, verdict
  
-@@ -139,13 +188,23 @@ def launch_review(codex, model, input_dir, schema, audit_dir, *, reviewer=None):
+@@ -139,13 +189,23 @@ def launch_review(codex, model, input_dir, schema, audit_dir, *, reviewer=None):
          "Open review-input.json and inspect the exact patch through read-only tools. "
          "In a successful command mentioning review.diff, read its exact bytes and print the lowercase SHA-256 "
          "of the ASCII inspection_token concatenated with the complete review.diff bytes. "
@@ -3150,7 +3242,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..01e3920f96d1145d97304d216b04c95c
          "in the rationale. This is technical review only. You have no authority to verify scientific claims or "
          "authorize a release."
      )
-@@ -165,10 +224,11 @@ def verify_issued_check(check, merge, app_id, external_id, status, conclusion=No
+@@ -165,10 +225,11 @@ def verify_issued_check(check, merge, app_id, external_id, status, conclusion=No
              "GitHub returned a stale, failed, or wrong-source review check")
  
  
@@ -3164,7 +3256,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..01e3920f96d1145d97304d216b04c95c
                        headers={"Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json",
                                 "Content-Type": "application/json", "User-Agent": "Software-Commons-Review-Gate",
                                 "X-GitHub-Api-Version": "2022-11-28"})
-@@ -179,8 +239,9 @@ def write_check(token, payload, *, check_id=None):
+@@ -179,8 +240,9 @@ def write_check(token, payload, *, check_id=None):
          raise DataError(f"GitHub check API failed: {error.reason}") from None
  
  
@@ -3176,7 +3268,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..01e3920f96d1145d97304d216b04c95c
      require(isinstance(rules, list) and len(rules) < 100 and all(isinstance(item, dict) for item in rules),
              "GitHub did not return a complete active branch rules view")
      by_type = {}
-@@ -188,6 +249,9 @@ def require_queue_rules(github, app_id):
+@@ -188,6 +250,9 @@ def require_queue_rules(github, app_id):
          by_type.setdefault(item.get("type"), []).append(item)
      require({"pull_request", "deletion", "non_fast_forward"} <= by_type.keys(),
              "mandatory pull requests, branch deletion protection and force-push protection are required")
@@ -3186,7 +3278,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..01e3920f96d1145d97304d216b04c95c
      queue = by_type.get("merge_queue", [])
      require(len(queue) == 1, "App issuance requires a mandatory merge queue")
      parameters = queue[0].get("parameters")
-@@ -212,17 +276,29 @@ def require_queue_rules(github, app_id):
+@@ -212,17 +277,29 @@ def require_queue_rules(github, app_id):
                  bindings[name].append(integration if strict and type(integration) is int else None)
      require(all(bindings[name] == [source] for name, source in expected.items()),
              "required review and CI contexts must each bind their exact integration and enforce strict checks")
@@ -3217,7 +3309,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..01e3920f96d1145d97304d216b04c95c
      pending = publisher(token, {"name": CHECK_NAME, "head_sha": target,
                                  "status": "in_progress", "external_id": decision_digest})
      verify_issued_check(pending, target, app_id, decision_digest, "in_progress")
-@@ -236,7 +312,7 @@ def create_check(snapshot, app_id, token, decision, publisher, verify_fresh, *,
+@@ -236,7 +313,7 @@ def create_check(snapshot, app_id, token, decision, publisher, verify_fresh, *,
              "summary": (
                  f"PR #{snapshot.number}\n\nHead: `{snapshot.head}`\n\nBase: `{snapshot.base}`\n\n"
                  f"Reviewed merge: `{snapshot.merge}`\n\nExecution: `{decision['execution']}`\n\n"
@@ -3226,16 +3318,51 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..01e3920f96d1145d97304d216b04c95c
              ),
          },
      }, check_id=check_id)
-@@ -245,7 +321,7 @@ def create_check(snapshot, app_id, token, decision, publisher, verify_fresh, *,
+@@ -245,7 +322,42 @@ def create_check(snapshot, app_id, token, decision, publisher, verify_fresh, *,
      return result
  
  
 -def run(args, github, *, token_input=None, publisher=write_check):
++def successful_checks(github, snapshot, target, app_id):
++    query = urlencode({"check_name": CHECK_NAME, "app_id": app_id, "filter": "all", "per_page": 100})
++    response = github._get_json(f"/repos/{snapshot.target.repository}/commits/{target}/check-runs?{query}")
++    rows = response.get("check_runs") if isinstance(response, dict) else None
++    require(isinstance(rows, list) and type(response.get("total_count")) is int
++            and response["total_count"] == len(rows) <= 100 and all(isinstance(row, dict) for row in rows),
++            "could not confirm the complete history of the exact review check")
++    selected = [row for row in rows if row.get("name") == CHECK_NAME and (row.get("app") or {}).get("id") == app_id]
++    require(all(row.get("head_sha") == target and type(row.get("id")) is int and row["id"] > 0 for row in selected)
++            and len({row["id"] for row in selected}) == len(selected), "GitHub returned invalid exact review checks")
++    return [row for row in selected if row.get("conclusion") == "success"]
++
++
++def supersede_checks(github, snapshot, target, app_id, token, previous, publisher, verify_fresh):
++    require(APP_TOKEN.fullmatch(token), "expected a dedicated GitHub App installation token")
++    scope = GitHub(bearer=token, target=snapshot.target)
++    require(token_is_target_only(scope, snapshot.repository_id, snapshot.target.repository),
++            "the installation token must list only the configured review repository")
++    require(successful_checks(github, snapshot, target, app_id) == previous,
++            "prior review changes during the supersession preflight")
++    for check in previous:
++        digest = check.get("external_id")
++        require(isinstance(digest, str) and re.fullmatch(r"[0-9a-f]{64}", digest), "invalid prior review digest")
++        verify_issued_check(check, target, app_id, digest, "completed", "success")
++    for check in previous:
++        verify_fresh()
++        result = publisher(token, {"status": "completed", "conclusion": "failure", "output": {
++            "title": "Superseded by a new independent Codex review",
++            "summary": "A new exact review has started. This older decision no longer authorizes queue progress.",
++        }}, check_id=check["id"])
++        verify_issued_check(result, target, app_id, check["external_id"], "completed", "failure")
++        require(result.get("id") == check["id"], "GitHub superseded a different review check")
++    require(not successful_checks(github, snapshot, target, app_id), "a superseded success remains visible on GitHub")
++
++
 +def run(args, github, *, token_input=None, publisher=None):
      state = args.state_dir.resolve()
      require(state.is_dir(), "configure an existing issuer-owned state directory")
      reviewer = getattr(args, "reviewer", None)
-@@ -254,13 +330,17 @@ def run(args, github, *, token_input=None, publisher=write_check):
+@@ -254,13 +366,17 @@ def run(args, github, *, token_input=None, publisher=write_check):
      admission = getattr(args, "queue_admission", False)
      run_id = getattr(args, "queue_run", None)
      require(not (admission and run_id is not None), "select one review phase")
@@ -3255,7 +3382,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..01e3920f96d1145d97304d216b04c95c
      snapshot = pull
      capture_options = {"linear_head": True} if admission else {}
      if run_id is not None:
-@@ -268,31 +348,88 @@ def run(args, github, *, token_input=None, publisher=write_check):
+@@ -268,31 +384,114 @@ def run(args, github, *, token_input=None, publisher=write_check):
          snapshot = replace(pull, merge=observation["merge"])
          capture_options["queue_ref"] = observation["queue_ref"]
      with TemporaryDirectory(prefix="git-", dir=state) as directory:
@@ -3316,6 +3443,32 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..01e3920f96d1145d97304d216b04c95c
 +        save(audit / "binding.json", encode(binding))
      if args.mode == "inspect":
          return {"audit": str(audit), "binding": binding, "status": "inspection-only"}
++
++    def verify_fresh():
++        if authorization is not None:
++            current_authorization = validate_control_authorization(
++                github, binding, paths.record, paths.grant_state, protected_path,
++            )
++            require(current_authorization == authorization, "protected owner authorization changed after review")
++        require(github.get_pull(pull.number) == pull, "pull request changed after review")
++        if args.app_id is not None:
++            current = require_queue_rules(github, args.app_id, target=pull.target, policy=policy)
++            require(current == approval, "live approval rules changed after review")
++        if observation is not None:
++            current = capture_queue_observation(github, pull, run_id, actions_app_id=ACTIONS_APP_ID)
++            require(current == observation, "merge queue candidate or CI evidence changed after review")
++
++    installation_token = None
++    if args.app_id is not None:
++        if publisher is None:
++            publisher = partial(write_check, target=snapshot.target)
++        check_target = snapshot.head if admission else snapshot.merge
++        previous = successful_checks(github, snapshot, check_target, args.app_id)
++        if previous:
++            save(audit / "superseded-checks.json", encode(previous))
++            installation_token = token_input().strip()
++            supersede_checks(github, snapshot, check_target, args.app_id, installation_token, previous, publisher, verify_fresh)
++
      token = secrets.token_hex(32)
 +    verdict_schema = VERDICT_SCHEMA
 +    if evidence is not None:
@@ -3350,33 +3503,29 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..01e3920f96d1145d97304d216b04c95c
      decision = {"binding": binding, "execution": execution, "model": args.model,
                  "started_at": started_at, "completed_at": completed_at,
                  "trace_sha256": sha256(trace).hexdigest(), "decision": verdict["decision"],
-@@ -308,9 +445,15 @@ def run(args, github, *, token_input=None, publisher=write_check):
+@@ -307,19 +506,13 @@ def run(args, github, *, token_input=None, publisher=write_check):
+         result["rehearsal"] = True
      if verdict["decision"] != "approve":
          return {**result, "status": verdict["decision"], "findings": verdict["findings"], "rationale": verdict["rationale"]}
-     def verify_fresh():
-+        if authorization is not None:
-+            current_authorization = validate_control_authorization(
-+                github, binding, paths.record, paths.grant_state, protected_path,
-+            )
-+            require(current_authorization == authorization, "protected owner authorization changed after review")
-         require(github.get_pull(pull.number) == pull, "pull request changed after review")
-         if args.app_id is not None:
+-    def verify_fresh():
+-        require(github.get_pull(pull.number) == pull, "pull request changed after review")
+-        if args.app_id is not None:
 -            require_queue_rules(github, args.app_id)
-+            current = require_queue_rules(github, args.app_id, target=pull.target, policy=policy)
-+            require(current == approval, "live approval rules changed after review")
-         if observation is not None:
-             current = capture_queue_observation(github, pull, run_id, actions_app_id=ACTIONS_APP_ID)
-             require(current == observation, "merge queue candidate or CI evidence changed after review")
-@@ -320,6 +463,8 @@ def run(args, github, *, token_input=None, publisher=write_check):
+-        if observation is not None:
+-            current = capture_queue_observation(github, pull, run_id, actions_app_id=ACTIONS_APP_ID)
+-            require(current == observation, "merge queue candidate or CI evidence changed after review")
+ 
+     verify_fresh()
+     result["status"] = "protected-rehearsal" if rehearsal else "reviewed-locally"
      if args.app_id is not None:
          # A protected caller, not the reviewer, provides a short-lived installation token.
-         installation_token = token_input().strip()
-+        if publisher is None:
-+            publisher = partial(write_check, target=snapshot.target)
+-        installation_token = token_input().strip()
++        if installation_token is None:
++            installation_token = token_input().strip()
          check = create_check(snapshot, args.app_id, installation_token, decision, publisher, verify_fresh,
                               admission=admission)
          save(audit / "issued-check.json", encode(check))
-@@ -378,13 +523,38 @@ def load_issuer(path, *, rehearsal=False):
+@@ -378,13 +571,38 @@ def load_issuer(path, *, rehearsal=False):
      protected_path(path.parent, directory=True)
      protected_path(path, directory=False)
      settings = decode(path.read_bytes())
@@ -3417,7 +3566,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..01e3920f96d1145d97304d216b04c95c
      audit = Path(settings["audit_dir"])
      protected_path(audit, directory=True)
      reviewer = load_reviewer(settings)
-@@ -393,7 +563,7 @@ def load_issuer(path, *, rehearsal=False):
+@@ -393,7 +611,7 @@ def load_issuer(path, *, rehearsal=False):
      with codex.open("rb") as executable:
          require(file_digest(executable, "sha256").hexdigest() == settings["codex_sha256"],
                  "Codex executable differs from the protected issuer pin")
@@ -3426,7 +3575,31 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..01e3920f96d1145d97304d216b04c95c
  
  
  def load_reviewer(settings):
-@@ -426,24 +596,36 @@ def main(argv=None):
+@@ -413,6 +631,23 @@ def load_reviewer(settings):
+     return Reviewer(uid, gid, home)
+ 
+ 
++def run_serialized(args, github, token_input):
++    """Hold the issuer's per-repository writer lock through review and issuance."""
++    import fcntl
++
++    protected_path(args.state_dir, directory=True)
++    path = args.state_dir / "issuer-write.lock"
++    with os.fdopen(os.open(path, os.O_CREAT | os.O_NOFOLLOW | os.O_RDWR, 0o600), "rb") as lock:
++        info = os.fstat(lock.fileno())
++        require(stat.S_ISREG(info.st_mode) and info.st_uid == os.geteuid() and not info.st_mode & 0o077,
++                "issuer writer lock has untrusted ownership or permissions")
++        try:
++            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
++        except BlockingIOError as error:
++            raise DataError("another protected review is active for this repository") from error
++        return run(args, github, token_input=token_input)
++
++
+ def main(argv=None):
+     parser = argparse.ArgumentParser(description=__doc__)
+     parser.add_argument("mode", choices=("inspect", "review"))
+@@ -426,24 +661,39 @@ def main(argv=None):
      config = parser.add_mutually_exclusive_group()
      config.add_argument("--issuer-config", type=Path, help="protected issuer configuration, installation token read from stdin")
      config.add_argument("--rehearsal-config", type=Path, help="protected reviewer configuration without App access")
@@ -3462,7 +3635,10 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..01e3920f96d1145d97304d216b04c95c
 +            github = OwnerGitHub(target=target)
 +        else:
 +            github = GitHub(target=target)
-+        result = run(args, github, token_input=token_input)
++        if args.app_id is None:
++            result = run(args, github, token_input=token_input)
++        else:
++            result = run_serialized(args, github, token_input)
      except (DataError, OSError, ValueError, TypeError, KeyError, subprocess.TimeoutExpired) as error:
          parser.exit(1, f"review gate: {error}\n")
      sys.stdout.buffer.write(encode(result))
