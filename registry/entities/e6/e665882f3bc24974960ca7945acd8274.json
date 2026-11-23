@@ -1,0 +1,1 @@
+{"aliases":[],"id":"e665882f3bc24974960ca7945acd8274","identity_claim":{"id":"algol20-archival-language-identity","kind":"claim","revision":1},"kind":"dialect","name":"ALGOL-20","relations":[{"claim":{"id":"algol20-dialect-of-algol60","kind":"claim","revision":1},"target":{"id":"8488a07aa09d43839f9dd43a5b08d069"},"type":"dialect-of"}],"state":"active"}

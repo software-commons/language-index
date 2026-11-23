@@ -1,0 +1,1 @@
+{"aliases":[],"id":"8f70333692a34e7b851cdb368a90c2b6","identity_claim":{"id":"bc-algol-archival-language-identity","kind":"claim","revision":1},"kind":"dialect","name":"BC ALGOL","relations":[{"claim":{"id":"bc-algol-dialect-of-algol60","kind":"claim","revision":1},"target":{"id":"8488a07aa09d43839f9dd43a5b08d069"},"type":"dialect-of"}],"state":"active"}
