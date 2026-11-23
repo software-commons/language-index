@@ -121,3 +121,5 @@ The preview includes scoped technical claims for KuMir, Pikto and eight language
 The preview adds scoped claims for Self, Pure Data, Elm and Gleam. The 1,126-lead ledger has 162 resolved and 964 unresolved leads, including 855 awaiting initial investigation. [Self and Pure Data](../research/campaigns/self-pure-data.md) · [Elm and Gleam](../research/campaigns/elm-gleam.md)
 
 The preview adds scoped claims for eight language profiles and separately adjudicated NIISI issue evidence. The 1,126-lead ledger has 169 resolved and 957 unresolved leads, including 849 awaiting initial investigation. [Self and Pure Data](../research/campaigns/self-pure-data.md) · [Elm and Gleam](../research/campaigns/elm-gleam.md) · [BQN and Eiffel](../research/campaigns/bqn-eiffel.md) · [CUE and Dhall](../research/campaigns/cue-dhall.md) · [NIISI issues](../research/campaigns/niisi-archive-education.md)
+
+The preview adds exact historical Z notation claims and an identity decision from the IEC catalogue. The 1,126-lead ledger has 170 resolved and 956 unresolved leads, including 848 awaiting initial investigation. [Z formal notation](../research/campaigns/iso-z-formal-notation.md)
