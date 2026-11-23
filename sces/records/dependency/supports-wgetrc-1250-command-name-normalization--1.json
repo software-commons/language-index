@@ -1,0 +1,1 @@
+{"basis":{"id":"gnu-wget-1250-release","kind":"source","revision":1},"citation":{"locator":"wget-1.25.0/doc/wget.texi, Wgetrc Syntax. Physical lines 3211–3223.","modality":"descriptive"},"claim":{"id":"wgetrc-1250-command-name-normalization","kind":"claim","revision":1},"id":"supports-wgetrc-1250-command-name-normalization","kind":"dependency","relation":"support","revision":1}
