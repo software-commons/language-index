@@ -50,6 +50,23 @@ def phase_input(run_file, trace_file):
     return run, (path, trace), receipts
 
 
+def assessments_support_claim(assessments, edges):
+    if not any(edges[key(assessment["dependency"])]["relation"] == "support" for assessment in assessments):
+        return False
+
+    for assessment in assessments:
+        relation = edges[key(assessment["dependency"])]["relation"]
+        outcome = assessment["outcome"]
+        checks = assessment["checks"].values()
+        if relation in {"support", "context"} and outcome == "supports" and all(check == "pass" for check in checks):
+            continue
+        if (relation == "context" and outcome in {"insufficient", "inapplicable"}
+                and all(check in {"pass", "not-applicable"} for check in checks)):
+            continue
+        return False
+    return True
+
+
 def assemble(batch, review, primary, independent, label, held):
     research_run, research_trace, research_receipts = primary
     review_run, review_trace, review_receipts = independent
@@ -119,8 +136,7 @@ def assemble(batch, review, primary, independent, label, held):
                 receipt = {name: capture[name] for name in ("source", "locator", "sha256", "capture", "retrieved_at")
                            if name in capture}
                 acquisitions.append({**receipt, "dependency": reference(edge)})
-            supported = all(item["outcome"] == "supports" and
-                            all(result == "pass" for result in item["checks"].values()) for item in assessments)
+            supported = assessments_support_claim(assessments, claim_edges)
             phase_conclusion = conclusion if role == "independent-review" else ("supported" if supported else "inconclusive")
             require(phase_conclusion != "supported" or supported, "Supported verdict contains a failed binding")
             identifier = f"{label}-{role}-{claim['id']}-r{claim['revision']}"
@@ -140,11 +156,17 @@ def assemble(batch, review, primary, independent, label, held):
         if conclusion in {"supported", "inconclusive"} and claim["id"] not in held:
             identifier = f"{label}-{claim['id']}-r{claim['revision']}"
             accepted = conclusion == "supported"
+            decisive_bindings = all(item["outcome"] == "supports" for item in [*research[claim_id], *reviewed])
+            if not accepted:
+                reason = "Independent verification was inconclusive. See the exact assessment and challenge."
+            elif decisive_bindings:
+                reason = "The two executions recorded support for each exact scoped binding."
+            else:
+                reason = "The two executions supported the claim and assessed every exact scoped binding."
             record(dict(make_ref("disposition", identifier), target=reference(claim),
                         evidence="supported" if accepted else "insufficient", verification="independently-reviewed",
                         finding="none" if accepted else "unknown", recorded=review_run["completed"],
-                        reason=("The two executions recorded support for each exact scoped binding." if accepted else
-                                "Independent verification was inconclusive. See the exact assessment and challenge."),
+                        reason=reason,
                         research=refs["research"], review=refs["independent-review"]))
     require(held <= {row["id"] for row in claims.values()}, "A withheld claim was not present in the batch")
     return planned
