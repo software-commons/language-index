@@ -1,0 +1,1 @@
+{"aliases":[],"id":"9a7163f1297647abbab567f985a272b2","identity_claim":{"id":"prolog-final-historical-identity","kind":"claim","revision":1},"kind":"edition","name":"Final Prolog","relations":[{"claim":{"id":"prolog-final-edition-of-prolog","kind":"claim","revision":1},"target":{"id":"65697a2cdfb84857a14a634f3398a4b0"},"type":"edition-of"}],"state":"active"}
