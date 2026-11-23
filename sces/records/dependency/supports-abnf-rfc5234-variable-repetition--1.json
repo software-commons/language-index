@@ -1,0 +1,1 @@
+{"basis":{"id":"ietf-rfc5234-abnf-january-2008","kind":"source","revision":1},"citation":{"locator":"RFC 5234 section 3.6, Variable Repetition","modality":"descriptive"},"claim":{"id":"abnf-rfc5234-variable-repetition","kind":"claim","revision":1},"id":"supports-abnf-rfc5234-variable-repetition","kind":"dependency","relation":"support","revision":1}

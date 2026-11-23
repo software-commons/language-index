@@ -1,0 +1,1 @@
+{"basis":{"id":"ietf-rfc5234-abnf-january-2008","kind":"source","revision":1},"citation":{"locator":"RFC 5234 sections 3.2–3.3, Alternatives and Incremental Alternatives","modality":"descriptive"},"claim":{"id":"abnf-rfc5234-alternative-operators","kind":"claim","revision":1},"id":"supports-abnf-rfc5234-alternative-operators","kind":"dependency","relation":"support","revision":1}
