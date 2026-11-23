@@ -1,0 +1,1 @@
+{"aliases":[],"id":"044fa5fe71fb4c0a82e424e1ea34acfb","identity_claim":{"id":"focal-dec-language-identity","kind":"claim","revision":1},"kind":"language","name":"FOCAL","relations":[{"claim":{"id":"focal-implemented-by-dec-focal8","kind":"claim","revision":1},"target":{"id":"9402947f8a4945af9e703e9c4d5100be"},"type":"implemented-by"}],"state":"active"}
