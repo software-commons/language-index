@@ -1,9 +1,54 @@
+diff --git a/tests/test_review_commission.py b/tests/test_review_commission.py
+index 1863d1130f1e65e59a85d98cf28dc0caea911682..1362af915de4c2d8ae94fbd49e8189e9f2da861c 100644
+--- a/tests/test_review_commission.py
++++ b/tests/test_review_commission.py
+@@ -12,7 +12,7 @@ from tools.review_commission import (
+ from tools.review_snapshot import BASE_REF, REPOSITORY, REPOSITORY_ID, PullSnapshot, SnapshotError
+
+ APP_ID = 8421
+-RULESET = 14
++RULESET = 27875276
+ NOW = datetime(2026, 11, 23, tzinfo=timezone.utc)
+ DECISION = "0" * 64
+ SNAPSHOT = PullSnapshot(REPOSITORY_ID, 1, "a" * 40, "b" * 40, "c" * 40)
+@@ -91,7 +91,7 @@ class CommissionTests(unittest.TestCase):
+     def inspect(self, values=None, *, after=SNAPSHOT, **options):
+         github = FixtureGitHub(values if values is not None else responses(), after)
+         options = {"app_id": APP_ID, "decision": DECISION, "owner_session": True,
+-                   "scope_github": github, "now": NOW, **options}
++                   "scope_github": github, "now": NOW, "phase": "additive", **options}
+         return preflight(github, pull=1, **options)
+
+     def test_match_reports_observations_only_and_distinguishes_head_and_merge(self):
+@@ -171,13 +171,18 @@ class CommissionTests(unittest.TestCase):
+                     del values[RULESET_PATH]["bypass_actors"]
+                 result = self.inspect(values)
+                 self.assertFalse(result["protection"]["active_rulesets_explicitly_without_bypass"])
+-                self.assertTrue(result["protection"]["human_approval_configured"])
++                self.assertEqual(result["protection"]["approval"]["approving_review_count"], 1)
+                 self.assertEqual(result["status"], "blocked")
+         values = responses()
+         values[BRANCH_RULES][2]["parameters"].update(required_approving_review_count=0, require_code_owner_review=False)
+-        missing = self.inspect(values)["protection"]
+-        self.assertFalse(missing["human_approval_configured"])
+-        self.assertFalse(missing["code_owner_review_configured"])
++        review = self.inspect(values)
++        self.assertEqual(review["status"], "blocked")
++        self.assertEqual(review["protection"]["approval"], {
++            "ruleset_id": RULESET, "code_owner_review": False, "approving_review_count": 0,
++        })
++        self.assertTrue(any("ordinary approval" in finding for finding in review["findings"]))
++        self.assertEqual(self.inspect(values, phase="final", authorized_cutover_ruleset=RULESET)["status"],
++                         "matching-observations")
+
+     def test_ruleset_context_requires_exact_app_and_strict_enforcement(self):
+         for update in ({"integration_id": ACTIONS_APP_ID}, {"integration_id": None}):
 diff --git a/tests/test_review_gate.py b/tests/test_review_gate.py
-index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..e94def1d8c7634de7e3e0e1678808f4eeb8c0ddc 100644
+index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..9b15526e304e60977efa8e276258485fa37e8b81 100644
 --- a/tests/test_review_gate.py
 +++ b/tests/test_review_gate.py
 @@ -2,7 +2,7 @@
- 
+
  from dataclasses import replace
  from hashlib import sha256
 -from io import BytesIO
@@ -11,7 +56,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..e94def1d8c7634de7e3e0e1678808f4e
  import json
  import os
  from pathlib import Path
-@@ -15,9 +15,9 @@ from unittest.mock import Mock, patch
+@@ -15,9 +15,10 @@ from unittest.mock import Mock, patch
  from tools.records import DataError
  from tools.review_gate import (
      ACTIONS_APP_ID, APP_TOKEN, CHECK_NAME, CI_CONTEXTS, Reviewer, create_check, launch_review, load_issuer, main,
@@ -19,11 +64,12 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..e94def1d8c7634de7e3e0e1678808f4e
 +    load_reviewer, protected_path, require_queue_rules, review_result, run, verify_issued_check, write_check,
  )
 -from tools.review_snapshot import PullSnapshot, REPOSITORY, SnapshotError
++from tools.review_protection import commissioning_policy
 +from tools.review_snapshot import LANGUAGE, LICENSE, PullSnapshot, SnapshotError
- 
+
  EXECUTION = "90c3284d-c009-4e34-bc00-beb41319adad"
  SNAPSHOT = PullSnapshot(repository_id=1468281504, number=1, base="a" * 40, head="b" * 40, merge="c" * 40)
-@@ -26,11 +26,12 @@ PATCH = b"diff --git a/tools/index.py b/tools/index.py\n+fixture change\n"
+@@ -26,11 +27,14 @@ PATCH = b"diff --git a/tools/index.py b/tools/index.py\n+fixture change\n"
  BINDING = {"merge": SNAPSHOT.merge, "diff_sha256": sha256(PATCH).hexdigest()}
  LEGACY_TOKEN = "ghs_" + "a" * 36
  STATELESS_TOKEN = "ghs_12345_" + "A" * 120 + "." + "_-" * 100 + "." + "B" * 180
@@ -31,14 +77,16 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..e94def1d8c7634de7e3e0e1678808f4e
 +TOKEN_REPOSITORY = {"id": LICENSE.repository_id, "full_name": LICENSE.repository}
 +LANGUAGE_TOKEN_REPOSITORY = {"id": LANGUAGE.repository_id, "full_name": LANGUAGE.repository}
  SCOPE_PATH = "/installation/repositories?per_page=100"
- 
- 
++LICENSE_POLICY = commissioning_policy(LICENSE.repository, "main", "additive")
++LANGUAGE_POLICY = commissioning_policy(LANGUAGE.repository, "main", "final", 27874363)
+
+
 -def make_trace(token="abc", *, verdict=None, inspect=True, terminal="turn.completed", proof=True):
 +def make_trace(token="abc", *, verdict=None, inspect=True, terminal="turn.completed", proof=True, sces_files=None):
      output = {"decision": "approve", "inspection_token": token, "merge_sha": BINDING["merge"],
                "diff_sha256": BINDING["diff_sha256"], "findings": [], "rationale": "Synthetic fixture outcome"}
      output.update(verdict or {})
-@@ -42,6 +43,11 @@ def make_trace(token="abc", *, verdict=None, inspect=True, terminal="turn.comple
+@@ -42,6 +46,11 @@ def make_trace(token="abc", *, verdict=None, inspect=True, terminal="turn.comple
              "aggregated_output": (sha256(token.encode() + PATCH).hexdigest() + "\n" + PATCH.decode()
                                    if proof else BINDING["diff_sha256"] + "\n" + PATCH.decode().splitlines()[0]),
          }})
@@ -50,9 +98,101 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..e94def1d8c7634de7e3e0e1678808f4e
      events.extend([{"type": "item.completed", "item": {"type": "agent_message", "text": json.dumps(output)}},
                     {"type": terminal}])
      return ("\n".join(json.dumps(event) for event in events) + "\n").encode()
-@@ -86,32 +92,180 @@ class ReviewGateTests(unittest.TestCase):
+@@ -51,14 +60,21 @@ def api_check(payload, app=123):
+     return {**payload, "app": {"id": app}, "id": 42}
+
+
+-def active_queue_rules():
++def active_queue_rules(policy=LICENSE_POLICY):
+     checks = [{"context": name, "integration_id": ACTIONS_APP_ID} for name in CI_CONTEXTS]
+-    return [{"type": kind} for kind in ("pull_request", "deletion", "non_fast_forward")] + [
+-        {"type": "merge_queue", "parameters": {
++    approval = policy.approval
++    ruleset = approval.ruleset_id or 27933280
++    return [
++        {"type": "pull_request", "ruleset_id": ruleset, "parameters": {
++            "require_code_owner_review": approval.code_owner_review,
++            "required_approving_review_count": approval.approving_review_count,
++        }},
++        *[{"type": kind, "ruleset_id": ruleset} for kind in ("deletion", "non_fast_forward")],
++        {"type": "merge_queue", "ruleset_id": ruleset, "parameters": {
+             "merge_method": "MERGE", "grouping_strategy": "ALLGREEN",
+             "max_entries_to_build": 1, "min_entries_to_merge": 1, "max_entries_to_merge": 1,
+         }},
+-        {"type": "required_status_checks", "parameters": {
++        {"type": "required_status_checks", "ruleset_id": ruleset, "parameters": {
+             "required_status_checks": [*checks, {"context": CHECK_NAME, "integration_id": 123}],
+             "strict_required_status_checks_policy": True,
+             "do_not_enforce_on_create": False,
+@@ -66,7 +82,65 @@ def active_queue_rules():
+     ]
+
+
++def use_queue_rules(github, rules=None):
++    rules = active_queue_rules() if rules is None else rules
++
++    def read(path):
++        if "/rules/branches/" in path:
++            return rules
++        ruleset = int(path.rsplit("/", 1)[1])
++        return {"id": ruleset, "target": "branch", "enforcement": "active", "bypass_actors": []}
++
++    github._get_json.side_effect = read
++
++
+ class ReviewGateTests(unittest.TestCase):
++    def test_approval_rules_are_exact_for_each_protected_phase(self):
++        phases = (
++            (LANGUAGE, "main", "additive", None, True, 0),
++            (LANGUAGE, "main", "final", 27874363, False, 0),
++            (LANGUAGE, "codex-gate-trial", "trial", None, True, 0),
++            (LICENSE, "main", "additive", None, True, 1),
++            (LICENSE, "main", "final", 27875276, False, 0),
++            (LICENSE, "codex-gate-trial", "trial", None, False, 0),
++        )
++        for target, base, phase, authorization, owners, count in phases:
++            with self.subTest(repo=target.repository, phase=phase):
++                policy = commissioning_policy(target.repository, base, phase, authorization)
++                self.assertIs(policy.approval.code_owner_review, owners)
++                self.assertEqual(policy.approval.approving_review_count, count)
++                target = replace(target, base_ref=base)
++                rules = active_queue_rules(policy)
++                github = Mock()
++                use_queue_rules(github, rules)
++                require_queue_rules(github, 123, target=target, policy=policy)
++                variants = (
++                    {"require_code_owner_review": not owners}, {"required_approving_review_count": count + 1},
++                    {"require_code_owner_review": int(owners)}, {"required_approving_review_count": bool(count)},
++                    {"require_code_owner_review": None}, {"required_approving_review_count": None},
++                )
++                for fields in variants:
++                    changed = [dict(rules[0], parameters={**rules[0]["parameters"], **fields}), *rules[1:]]
++                    use_queue_rules(github, changed)
++                    with self.assertRaisesRegex(DataError, "ordinary approval"):
++                        require_queue_rules(github, 123, target=target, policy=policy)
++                use_queue_rules(github, [rules[0], *rules])
++                with self.assertRaisesRegex(DataError, "ordinary approval"):
++                    require_queue_rules(github, 123, target=target, policy=policy)
++                if phase != "trial":
++                    use_queue_rules(github, [{**rules[0], "ruleset_id": 3}, *rules[1:]])
++                    with self.assertRaisesRegex(DataError, "ordinary approval"):
++                        require_queue_rules(github, 123, target=target, policy=policy)
++
++    def test_commissioning_requires_the_protected_branch_and_owner_pin(self):
++        for base, phase, authorization in (
++            ("main", None, None), ("main", "trial", None),
++            ("codex-gate-trial", "final", 27874363), ("main", "additive", 27874363),
++            ("main", "final", None), ("main", "final", "27874363"), ("main", "final", 27875276),
++        ):
++            with self.subTest(base=base, phase=phase, authorization=authorization), self.assertRaises(DataError):
++                commissioning_policy(LANGUAGE.repository, base, phase, authorization)
++
+     def test_accepts_only_complete_bound_verdicts(self):
+         execution, verdict = review_result(make_trace(), BINDING, "abc", PATCH)
+         self.assertEqual(execution, EXECUTION)
+@@ -86,40 +160,192 @@ class ReviewGateTests(unittest.TestCase):
              self.assertIsNone(APP_TOKEN.fullmatch(token))
- 
+
      def test_issuer_refuses_unverified_repository_scope_before_writing(self):
 -        scope = Mock()
 -        publisher = Mock()
@@ -130,6 +270,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..e94def1d8c7634de7e3e0e1678808f4e
 +        with TemporaryDirectory() as directory:
 +            args = SimpleNamespace(state_dir=Path(directory), mode="review", pull=1,
 +                                   app_id=123, queue_admission=True, authorized_control_merge=SNAPSHOT.head,
++                                   commissioning_policy=LANGUAGE_POLICY,
 +                                   reviewer=Reviewer(4001, 4002, Path(directory) / "reviewer-home"))
 +            github = Mock()
 +            github.get_pull.return_value = snapshot
@@ -137,37 +278,31 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..e94def1d8c7634de7e3e0e1678808f4e
 +            with (patch("tools.review_gate.capture_diff", return_value=("e" * 40, PATCH)),
 +                  patch("tools.review_gate.capture_sces", return_value=({"fixture": "data"}, {})),
 +                  patch("tools.review_gate.capture_control_paths", return_value=[".github/CODEOWNERS"]),
-+                  patch("tools.review_gate.require_queue_rules") as protections):
++                  patch("tools.review_gate.require_queue_rules", return_value=LANGUAGE_POLICY.approval) as protections):
 +                with self.assertRaisesRegex(DataError, "separate authorization"):
 +                    run(args, github, token_input=credential)
-+                protections.assert_called_once_with(github, args.app_id, target=LANGUAGE)
++                protections.assert_called_once_with(github, args.app_id, target=LANGUAGE, policy=LANGUAGE_POLICY)
 +                protections.side_effect = DataError("strict source")
 +                with self.assertRaisesRegex(DataError, "strict source"):
 +                    run(args, github, token_input=credential)
 +            credential.assert_not_called()
 +
-+    def test_language_queue_requires_owner_visible_no_bypass_and_strict_bindings(self):
++    def test_language_queue_requires_owner_visible_no_bypass(self):
 +        github = Mock()
-+        github._get_json.return_value = active_queue_rules()
-+        rules = {
-+            "active_rulesets_explicitly_without_bypass": False, "pull_request_required": True,
-+            "deletion_blocked": True, "force_push_blocked": True,
-+            "contexts": {name: {"strict_source_bound": True} for name in (*CI_CONTEXTS, CHECK_NAME)},
-+        }
-+        with (patch("tools.review_commission.OwnerGitHub") as owner,
-+              patch("tools.review_commission.read_protection", return_value=rules) as protection):
-+            with self.assertRaisesRegex(DataError, "no-bypass"):
-+                require_queue_rules(github, 123, target=LANGUAGE)
-+            owner.assert_called_once_with(target=LANGUAGE)
-+            protection.assert_called_once_with(owner.return_value,
-+                                               {**dict.fromkeys(CI_CONTEXTS, ACTIONS_APP_ID), CHECK_NAME: 123},
-+                                               LANGUAGE)
-+            github._get_json.assert_called_once_with("/repos/software-commons/language-index/rules/branches/main?per_page=100")
-+            rules["active_rulesets_explicitly_without_bypass"] = True
-+            require_queue_rules(github, 123, target=LANGUAGE)
-+            rules["contexts"][CI_CONTEXTS[0]]["strict_source_bound"] = False
-+            with self.assertRaisesRegex(DataError, "strict source binding"):
-+                require_queue_rules(github, 123, target=LANGUAGE)
++        active = active_queue_rules(LANGUAGE_POLICY)
++        use_queue_rules(github, active)
++        require_queue_rules(github, 123, target=LANGUAGE, policy=LANGUAGE_POLICY)
++        github._get_json.assert_any_call("/repos/software-commons/language-index/rules/branches/main?per_page=100")
++        github._get_json.assert_any_call("/repos/software-commons/language-index/rulesets/27874363")
++
++        def bypass(path):
++            if "/rules/branches/" in path:
++                return active
++            return {"id": 27874363, "target": "branch", "enforcement": "active", "bypass_actors": [{"actor_id": 3}]}
++
++        github._get_json.side_effect = bypass
++        with self.assertRaisesRegex(DataError, "no-bypass"):
++            require_queue_rules(github, 123, target=LANGUAGE, policy=LANGUAGE_POLICY)
 +
 +    def test_language_check_api_uses_its_allowlisted_repository(self):
 +        with patch("tools.review_gate.build_opener") as opener:
@@ -194,7 +329,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..e94def1d8c7634de7e3e0e1678808f4e
 +            state = Path(directory)
 +            args = SimpleNamespace(state_dir=state, mode="review", pull=1, model="fixture", codex=Path("fixture"),
 +                                   app_id=123, reviewer=Reviewer(4001, 4002, state / "reviewer-home"),
-+                                   authorized_control_merge=QUEUE["merge"], queue_run=321)
++                                   authorized_control_merge=QUEUE["merge"], queue_run=321, commissioning_policy=LANGUAGE_POLICY)
 +            github = Mock()
 +            github.get_pull.return_value = pull
 +            scope = Mock()
@@ -220,7 +355,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..e94def1d8c7634de7e3e0e1678808f4e
 +                    "external_id": issued[0]["external_id"],
 +                })
 +
-+            with (patch("tools.review_gate.require_queue_rules"),
++            with (patch("tools.review_gate.require_queue_rules", return_value=LANGUAGE_POLICY.approval) as protections,
 +                  patch("tools.review_gate.capture_queue_observation", return_value=QUEUE) as observation,
 +                  patch("tools.review_gate.capture_diff", return_value=("e" * 40, PATCH)),
 +                  patch("tools.review_gate.capture_sces", return_value=captured) as evidence,
@@ -249,15 +384,34 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..e94def1d8c7634de7e3e0e1678808f4e
 +                credential.assert_not_called()
 +                self.assertEqual(issued, [])
 +                observation.side_effect = None
++                changed = replace(LANGUAGE_POLICY.approval, ruleset_id=17)
++                protections.side_effect = [LANGUAGE_POLICY.approval, changed]
++                with self.assertRaisesRegex(DataError, "approval rules changed"):
++                    run(args, github, token_input=credential, publisher=publish)
++                credential.assert_not_called()
++                self.assertEqual(issued, [])
++                protections.side_effect = None
 +                result = run(args, github, token_input=lambda: STATELESS_TOKEN, publisher=publish)
 +            self.assertEqual(evidence.call_args.args[1], QUEUE["merge"])
 +            self.assertEqual(result["status"], "check-issued")
++            self.assertEqual(result["binding"]["commissioning"]["phase"], "final")
 +            self.assertEqual(issued[0]["head_sha"], QUEUE["merge"])
 +            self.assertIn(result["binding"]["sces_evidence_sha256"], issued[1]["output"]["summary"])
- 
+
      def test_issuer_publishes_final_review_only_to_the_current_queue_result(self):
          with TemporaryDirectory() as directory:
-@@ -142,7 +296,7 @@ class ReviewGateTests(unittest.TestCase):
+             state = Path(directory)
+             args = SimpleNamespace(state_dir=state, mode="review", pull=1, model="fixture", codex=Path("fixture"),
+-                                   app_id=123, reviewer=Reviewer(4001, 4002, state / "reviewer-home"), queue_run=321)
++                                   app_id=123, reviewer=Reviewer(4001, 4002, state / "reviewer-home"), queue_run=321,
++                                   commissioning_policy=LICENSE_POLICY)
+             github = Mock()
+-            github._get_json.return_value = active_queue_rules()
++            use_queue_rules(github)
+             def respond(_, payload, *, check_id=None):
+                 return api_check({"name": CHECK_NAME, "head_sha": QUEUE["merge"],
+                                   "external_id": publisher.call_args_list[-2].args[1]["external_id"],
+@@ -142,7 +368,7 @@ class ReviewGateTests(unittest.TestCase):
                    patch("tools.review_gate.launch_review", side_effect=fake_launch)):
                  result = run(args, github, token_input=lambda: STATELESS_TOKEN, publisher=publisher)
                  self.assertEqual(result["status"], "check-issued")
@@ -266,9 +420,9 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..e94def1d8c7634de7e3e0e1678808f4e
                  scope._get_json.assert_called_once_with(SCOPE_PATH)
                  first, last = publisher.call_args_list
                  self.assertEqual(first.args[0], STATELESS_TOKEN)
-@@ -186,24 +340,29 @@ class ReviewGateTests(unittest.TestCase):
+@@ -186,49 +412,54 @@ class ReviewGateTests(unittest.TestCase):
                  publisher.assert_not_called()
- 
+
      def test_queue_admission_targets_only_the_head_and_records_its_purpose(self):
 -        checks = []
 -        def publish(_token, payload, *, check_id=None):
@@ -311,28 +465,86 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..e94def1d8c7634de7e3e0e1678808f4e
 +                self.assertEqual(checks[0]["head_sha"], snapshot.head)
 +                self.assertIn("Queue admission", checks[1]["output"]["title"])
 +                self.assertEqual(fresh.call_count, 2)
- 
+
      def test_queue_rules_require_replay_protection_and_source_pins(self):
          github = Mock()
-@@ -352,7 +511,8 @@ class ReviewGateTests(unittest.TestCase):
+-        github._get_json.return_value = active_queue_rules()
+-        require_queue_rules(github, 123)
++        use_queue_rules(github)
++        require_queue_rules(github, 123, policy=LICENSE_POLICY)
+         with self.assertRaisesRegex(DataError, "exact integration"):
+-            require_queue_rules(github, 321)
++            require_queue_rules(github, 321, policy=LICENSE_POLICY)
+         for key, value in (("merge_method", "SQUASH"), ("grouping_strategy", "HEADGREEN"),
+                            ("max_entries_to_merge", 2), ("max_entries_to_build", True)):
+             rules = active_queue_rules()
+             rules[3]["parameters"][key] = value
+-            github._get_json.return_value = rules
++            use_queue_rules(github, rules)
+             with self.subTest(key=key), self.assertRaisesRegex(DataError, "single-entry"):
+-                require_queue_rules(github, 123)
++                require_queue_rules(github, 123, policy=LICENSE_POLICY)
+         for key, value in (("strict_required_status_checks_policy", False),
+                            ("strict_required_status_checks_policy", 1), ("do_not_enforce_on_create", True),
+                            ("do_not_enforce_on_create", None)):
+             rules = active_queue_rules()
+             rules[-1]["parameters"][key] = value
+-            github._get_json.return_value = rules
++            use_queue_rules(github, rules)
+             with self.subTest(key=key, value=value), self.assertRaisesRegex(DataError, "enforce strict checks"):
+-                require_queue_rules(github, 123)
+-        github._get_json.return_value = [row for row in active_queue_rules() if row["type"] != "merge_queue"]
++                require_queue_rules(github, 123, policy=LICENSE_POLICY)
++        use_queue_rules(github, [row for row in active_queue_rules() if row["type"] != "merge_queue"])
+         with self.assertRaisesRegex(DataError, "mandatory merge queue"):
+-            require_queue_rules(github, 123)
++            require_queue_rules(github, 123, policy=LICENSE_POLICY)
+
+     def test_wrong_source_and_stale_returned_checks_are_rejected(self):
+         payload = {"name": CHECK_NAME, "head_sha": SNAPSHOT.merge,
+@@ -257,9 +488,9 @@ class ReviewGateTests(unittest.TestCase):
+             state = Path(directory)
+             args = SimpleNamespace(state_dir=state, mode="review", pull=1, model="fixture", codex=Path("fixture"),
+                                    app_id=123, reviewer=Reviewer(4001, 4002, state / "reviewer-home"),
+-                                   queue_admission=True)
++                                   queue_admission=True, commissioning_policy=LICENSE_POLICY)
+             github = Mock()
+-            github._get_json.return_value = active_queue_rules()
++            use_queue_rules(github)
+             github.get_pull.return_value = SNAPSHOT
+             credential = Mock()
+             publisher = Mock()
+@@ -277,9 +508,9 @@ class ReviewGateTests(unittest.TestCase):
+             state = Path(directory)
+             args = SimpleNamespace(state_dir=state, mode="review", pull=1, model="fixture", codex=Path("fixture"),
+                                    app_id=123, reviewer=Reviewer(4001, 4002, state / "reviewer-home"),
+-                                   queue_admission=True)
++                                   queue_admission=True, commissioning_policy=LICENSE_POLICY)
+             github = Mock()
+-            github._get_json.return_value = active_queue_rules()
++            use_queue_rules(github)
+             github.get_pull.return_value = SNAPSHOT
+             credential = Mock()
+             publisher = Mock()
+@@ -352,7 +583,8 @@ class ReviewGateTests(unittest.TestCase):
                  token = json.loads((input_dir / "review-input.json").read_bytes())["inspection_token"]
                  return make_trace(token)
- 
+
 -            with (patch("tools.review_gate.load_issuer", return_value=(root, root / "codex", "fixture", None, reviewer)) as load,
-+            runtime = (root, root / "codex", "fixture", None, reviewer, LICENSE, None)
++            runtime = (root, root / "codex", "fixture", None, reviewer, LICENSE, None, None)
 +            with (patch("tools.review_gate.load_issuer", return_value=runtime) as load,
                    patch("tools.review_gate.GitHub", return_value=github),
                    patch("tools.review_gate.capture_diff", return_value=("e" * 40, PATCH)) as capture,
                    patch("tools.review_gate.protected_staging", return_value=root),
-@@ -378,6 +538,30 @@ class ReviewGateTests(unittest.TestCase):
+@@ -378,6 +610,30 @@ class ReviewGateTests(unittest.TestCase):
              self.assertEqual(result["decision_sha256"], sha256(decision).hexdigest())
              self.assertFalse((Path(result["audit"]) / "issued-check.json").exists())
- 
+
 +    def test_language_rehearsal_uses_only_the_repository_in_protected_configuration(self):
 +        with TemporaryDirectory() as directory:
 +            root = Path(directory)
 +            reviewer = Reviewer(4001, 4002, root / "reviewer-home")
-+            runtime = (root, root / "codex", "fixture", None, reviewer, LANGUAGE, None)
++            runtime = (root, root / "codex", "fixture", None, reviewer, LANGUAGE, None, None)
 +            stdout = BytesIO()
 +            with (patch("tools.review_gate.load_issuer", return_value=runtime),
 +                  patch("tools.review_gate.GitHub") as github,
@@ -355,12 +567,20 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..e94def1d8c7634de7e3e0e1678808f4e
      @unittest.skipUnless(os.name == "posix", "issuer deployment requires POSIX permissions")
      def test_protected_issuer_config_rejects_unpinned_runner_and_shared_permissions(self):
          with TemporaryDirectory() as directory:
-@@ -394,9 +578,27 @@ class ReviewGateTests(unittest.TestCase):
+@@ -387,6 +643,7 @@ class ReviewGateTests(unittest.TestCase):
+             config = root / "review.json"
+             settings = {
+                 "app_id": 123, "audit_dir": str(root), "codex": str(codex), "model": "fixture",
++                "commissioning_phase": "additive",
+                 "codex_sha256": sha256(codex.read_bytes()).hexdigest(),
+                 "reviewer_uid": 4001, "reviewer_gid": 4002, "reviewer_home": str(root / "reviewer-home"),
+             }
+@@ -394,9 +651,29 @@ class ReviewGateTests(unittest.TestCase):
              config.chmod(0o600)
              reviewer = Reviewer(4001, 4002, root / "reviewer-home")
              with patch("tools.review_gate.load_reviewer", return_value=reviewer):
 -                self.assertEqual(load_issuer(config), (root, codex, "fixture", 123, reviewer))
-+                self.assertEqual(load_issuer(config), (root, codex, "fixture", 123, reviewer, LICENSE, None))
++                self.assertEqual(load_issuer(config), (root, codex, "fixture", 123, reviewer, LICENSE, None, LICENSE_POLICY))
 +                with self.assertRaisesRegex(DataError, "invalid protected issuer configuration"):
 +                    load_issuer(config, rehearsal=True)
 +                data = json.loads(config.read_bytes())
@@ -368,14 +588,16 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..e94def1d8c7634de7e3e0e1678808f4e
 +                with self.assertRaisesRegex(DataError, "invalid protected review App ID"):
 +                    load_issuer(config)
 +                config.write_text(json.dumps({**data, "repository": LANGUAGE.repository,
-+                                              "authorized_control_merge": SNAPSHOT.merge}), encoding="utf-8")
++                                              "authorized_control_merge": SNAPSHOT.merge,
++                                              "commissioning_phase": "final",
++                                              "authorized_cutover_ruleset": 27874363}), encoding="utf-8")
 +                self.assertEqual(load_issuer(config),
-+                                 (root, codex, "fixture", 123, reviewer, LANGUAGE, SNAPSHOT.merge))
-+                rehearsal = {key: value for key, value in data.items() if key != "app_id"}
++                                 (root, codex, "fixture", 123, reviewer, LANGUAGE, SNAPSHOT.merge, LANGUAGE_POLICY))
++                rehearsal = {key: value for key, value in data.items() if key not in {"app_id", "commissioning_phase"}}
 +                rehearsal["repository"] = LANGUAGE.repository
 +                config.write_text(json.dumps(rehearsal), encoding="utf-8")
 +                self.assertEqual(load_issuer(config, rehearsal=True),
-+                                 (root, codex, "fixture", None, reviewer, LANGUAGE, None))
++                                 (root, codex, "fixture", None, reviewer, LANGUAGE, None, None))
 +                rehearsal["authorized_control_merge"] = SNAPSHOT.merge
 +                config.write_text(json.dumps(rehearsal), encoding="utf-8")
                  with self.assertRaisesRegex(DataError, "invalid protected issuer configuration"):
@@ -384,33 +606,35 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..e94def1d8c7634de7e3e0e1678808f4e
                  config.chmod(0o640)
                  with self.assertRaisesRegex(DataError, "must be private"):
                      load_issuer(config)
-@@ -411,7 +613,8 @@ class ReviewGateTests(unittest.TestCase):
+@@ -410,8 +687,10 @@ class ReviewGateTests(unittest.TestCase):
+                     load_issuer(config)
                  codex.write_bytes(b"synthetic executable")
                  del settings["app_id"]
++                del settings["commissioning_phase"]
                  config.write_text(json.dumps(settings), encoding="utf-8")
 -                self.assertEqual(load_issuer(config, rehearsal=True), (root, codex, "fixture", None, reviewer))
 +                self.assertEqual(load_issuer(config, rehearsal=True),
-+                                 (root, codex, "fixture", None, reviewer, LICENSE, None))
++                                 (root, codex, "fixture", None, reviewer, LICENSE, None, None))
                  with self.assertRaisesRegex(DataError, "invalid protected issuer configuration"):
                      load_issuer(config)
- 
+
 diff --git a/tests/test_review_queue.py b/tests/test_review_queue.py
 index c9398d9c4d4c41121b70db6ebc4af50e93b9f95e..36252d9025d2b269009c3301bf6e179952836c69 100644
 --- a/tests/test_review_queue.py
 +++ b/tests/test_review_queue.py
 @@ -6,7 +6,7 @@ import unittest
  from urllib.parse import quote
- 
+
  from tools.review_queue import capture_queue_observation
 -from tools.review_snapshot import REPOSITORY, REPOSITORY_ID, PullSnapshot, SnapshotError
 +from tools.review_snapshot import LANGUAGE, REPOSITORY, REPOSITORY_ID, PullSnapshot, SnapshotError
- 
- 
+
+
  PULL = PullSnapshot(REPOSITORY_ID, 17, "a" * 40, "b" * 40, "c" * 40)
 @@ -100,6 +100,37 @@ class QueueObservationTests(unittest.TestCase):
          self.assertEqual(github.calls, [SCES_RUN, REF_API, RUN_LIST, CHECKS, DOMAIN_JOBS, SCES_JOBS, RUN_LIST, REF_API])
          self.assertIsInstance(dumps(result), str)
- 
+
 +    def test_language_requires_its_own_repository_and_known_domain_layouts(self):
 +        pull = PullSnapshot(LANGUAGE.repository_id, PULL.number, PULL.base, PULL.head, PULL.merge, LANGUAGE)
 +        language_path = f"/repos/{LANGUAGE.repository}"
@@ -451,7 +675,7 @@ index 90a3be09910e0a7e0ef142602fefe7aeb1379c89..d12f59c397dd98a76adc41d73d408343
 +++ b/tests/test_review_snapshot.py
 @@ -1,5 +1,7 @@
  """Read-only review candidate fixtures. No GitHub mutations or trusted check writes."""
- 
+
 +from hashlib import sha256
 +import json
  import os
@@ -459,17 +683,17 @@ index 90a3be09910e0a7e0ef142602fefe7aeb1379c89..d12f59c397dd98a76adc41d73d408343
  import subprocess
 @@ -8,7 +10,7 @@ import unittest
  from unittest.mock import patch
- 
+
  from tools.review_snapshot import (
 -    REPOSITORY, REPOSITORY_ID, GitHub, PullSnapshot, SnapshotError, capture_diff,
 +    LANGUAGE, REPOSITORY, REPOSITORY_ID, GitHub, PullSnapshot, SnapshotError, capture_diff, capture_sces,
  )
- 
- 
+
+
 @@ -63,6 +65,19 @@ class PullTests(unittest.TestCase):
                  with self.assertRaisesRegex(SnapshotError, diagnostic):
                      self.read({**pull_response(), key: value})
- 
+
 +    def test_language_snapshot_requires_its_own_repository_identity(self):
 +        response = pull_response()
 +        github = GitHub(target=LANGUAGE)
@@ -483,12 +707,12 @@ index 90a3be09910e0a7e0ef142602fefe7aeb1379c89..d12f59c397dd98a76adc41d73d408343
 +            response["base"]["repo"]["id"] = LANGUAGE.repository_id
 +            self.assertEqual(github.get_pull(1).target, LANGUAGE)
 +
- 
+
  class CaptureTests(unittest.TestCase):
      def setUp(self):
 @@ -89,13 +104,16 @@ class CaptureTests(unittest.TestCase):
          self.git("update-ref", "refs/pull/1/merge", self.merge)
- 
+
      def git(self, *arguments):
 -        result = subprocess.run(["git", "-C", str(self.source), *arguments], capture_output=True, text=True)
 +        environment = {name: value for name, value in os.environ.items() if not name.upper().startswith("GIT_")}
@@ -497,18 +721,18 @@ index 90a3be09910e0a7e0ef142602fefe7aeb1379c89..d12f59c397dd98a76adc41d73d408343
 +                                capture_output=True, text=True, env=environment)
          self.assertEqual(result.returncode, 0, result.stderr)
          return result.stdout.strip()
- 
+
      def capture(self, *, head=None, merge=None, **options):
          snapshot = PullSnapshot(REPOSITORY_ID, 1, self.base, head or self.head, merge or self.merge)
 -        with patch("tools.review_snapshot._REMOTE_URL", self.source.as_uri()):
 +        with patch("tools.review_snapshot.remote_url", return_value=self.source.as_uri()):
              return capture_diff(snapshot, self.root / "snapshot", **options)
- 
+
      def test_captures_exact_complete_diff_without_checking_out(self):
 @@ -138,6 +156,45 @@ class CaptureTests(unittest.TestCase):
          with self.assertRaisesRegex(SnapshotError, "single-parent"):
              self.capture(head=self.merge, merge=replay, linear_head=True)
- 
+
 +    def test_sces_evidence_binds_commit_objects_and_requires_release_artifacts(self):
 +        sces = self.source / "sces"
 +        release = sces / "releases" / "fixture"
@@ -548,50 +772,92 @@ index 90a3be09910e0a7e0ef142602fefe7aeb1379c89..d12f59c397dd98a76adc41d73d408343
 +            self.assertNotEqual(changed[field], first[field])
 +        self.assertNotEqual(changed["artifacts"][artifact], first["artifacts"][artifact])
 +
- 
+
  if __name__ == "__main__":
      unittest.main()
 diff --git a/tools/review_commission.py b/tools/review_commission.py
-index d213d62143ea097a48f01697f606e7c61a21ee10..42b850d4f55988193bb2ffb923030f4b00fc31b9 100644
+index d213d62143ea097a48f01697f606e7c61a21ee10..f4e6d504992e6e3dcee47ebfe9bdb8734730477d 100644
 --- a/tools/review_commission.py
 +++ b/tools/review_commission.py
-@@ -14,11 +14,9 @@ import sys
- from .records import encode
+@@ -11,14 +11,13 @@ import re
+ import subprocess
+ import sys
+
+-from .records import encode
++from .records import DataError, encode
  from .review_gate import ACTIONS_APP_ID, APP_TOKEN, CHECK_NAME, CI_CONTEXTS, require_queue_rules
++from .review_protection import PHASES, ApprovalRule, commissioning_policy, observed_approval
  from .review_queue import capture_queue_observation
 -from .review_snapshot import (
 -    BASE_REF, REPOSITORY, REPOSITORY_ID, GitHub, SnapshotError, complete_rows, token_is_target_only,
 -)
 +from .review_snapshot import LICENSE, TARGETS, GitHub, SnapshotError, complete_rows, token_is_target_only
- 
+
 -ORGANIZATION = REPOSITORY.split("/", 1)[0]
 +ORGANIZATION = "software-commons"
  APP_PERMISSIONS = {"checks": "write", "statuses": "write", "metadata": "read"}
  LATEST_CHECKS = "/check-runs?filter=latest&per_page=100"
  MAX_AGE = timedelta(days=7)
-@@ -46,9 +44,9 @@ class OwnerGitHub(GitHub):
+@@ -46,10 +45,11 @@ class OwnerGitHub(GitHub):
          raise SnapshotError(f"GitHub CLI could not supply owner-readable commissioning data for {path}")
- 
- 
+
+
 -def read_protection(github, sources):
 -    repo_path = f"/repos/{REPOSITORY}"
 -    rules = github._get_json(f"{repo_path}/rules/branches/{BASE_REF}?per_page=100")
-+def read_protection(github, sources, target=LICENSE):
+-    if not isinstance(rules, list) or len(rules) >= 100:
++def read_protection(github, sources, target=LICENSE, *, rules=None):
 +    repo_path = f"/repos/{target.repository}"
-+    rules = github._get_json(f"{repo_path}/rules/branches/{target.base_ref}?per_page=100")
-     if not isinstance(rules, list) or len(rules) >= 100:
++    if rules is None:
++        rules = github._get_json(f"{repo_path}/rules/branches/{target.base_ref}?per_page=100")
++    if not isinstance(rules, list) or len(rules) >= 100 or not all(isinstance(rule, dict) for rule in rules):
          raise SnapshotError("The applied branch rules could not be read completely")
      identifiers = {rule.get("ruleset_id") for rule in rules}
-@@ -99,7 +97,7 @@ def read_protection(github, sources):
+     if any(type(value) is not int or value <= 0 for value in identifiers):
+@@ -62,13 +62,7 @@ def read_protection(github, sources):
+         for key, item in sets.items()
+     ) and bool(sets)
+     types = {rule.get("type") for rule in rules}
+-    approvals = [
+-        rule.get("parameters") or {} for rule in rules if rule.get("type") == "pull_request"
+-    ]
+-    count_required = any(
+-        type(policy.get("required_approving_review_count")) is int and policy["required_approving_review_count"] >= 1
+-        for policy in approvals
+-    )
++    approval = observed_approval(rules)
+     configured_sources = {}
+     for name, integration in sources.items():
+         matches = [
+@@ -83,8 +77,9 @@ def read_protection(github, sources):
+         configured_sources[name] = {
+             "expected_app_id": integration,
+             "observed_app_ids": [match[0] for match in matches],
+-            "strict_source_bound": bool(matches) and integration is not None and all(
+-                app == integration and strict is True and waive is False for app, strict, waive in matches
++            "strict_source_bound": len(matches) == 1 and integration is not None and all(
++                type(app) is int and app == integration and strict is True and waive is False
++                for app, strict, waive in matches
+             ),
+         }
+     return {
+@@ -93,13 +88,12 @@ def read_protection(github, sources):
+         "pull_request_required": "pull_request" in types,
+         "deletion_blocked": "deletion" in types,
+         "force_push_blocked": "non_fast_forward" in types,
+-        "human_approval_configured": count_required,
+-        "code_owner_review_configured": any(policy.get("require_code_owner_review") is True for policy in approvals),
++        "approval": asdict(approval) if approval is not None else None,
+         "contexts": configured_sources,
      }
- 
- 
+
+
 -def read_installation(github, scope_github, app_id, owner_session):
 +def read_installation(github, scope_github, app_id, owner_session, target=LICENSE):
      permissions = APP_PERMISSIONS.copy()
      result = {
          "requested_app_id": app_id,
-@@ -154,11 +152,11 @@ def read_installation(github, scope_github, app_id, owner_session):
+@@ -154,11 +148,11 @@ def read_installation(github, scope_github, app_id, owner_session):
      if scope_github is None:
          problems.append("The installation token's repository scope has not been observed")
      else:
@@ -603,9 +869,9 @@ index d213d62143ea097a48f01697f606e7c61a21ee10..42b850d4f55988193bb2ffb923030f4b
 -            problems.append("The installation token did not list only License Index")
 +            problems.append(f"The installation token did not list only {target.repository}")
      return result
- 
- 
-@@ -215,7 +213,7 @@ def read_checks(github, snapshot, sources, now, decision, *, admission=None, que
+
+
+@@ -215,7 +209,7 @@ def read_checks(github, snapshot, sources, now, decision, *, admission=None, que
      if queue:
          targets["queue"] = (queue["merge"], decision)
      for name, (commit, digest) in targets.items():
@@ -614,22 +880,21 @@ index d213d62143ea097a48f01697f606e7c61a21ee10..42b850d4f55988193bb2ffb923030f4b
          runs = complete_rows(github._get_json(path + LATEST_CHECKS), "check_runs")
          statuses = complete_rows(github._get_json(path + "/status?per_page=100"), "statuses")
          results[name] = {
-@@ -232,7 +230,7 @@ def read_checks(github, snapshot, sources, now, decision, *, admission=None, que
- 
- 
+@@ -232,7 +226,7 @@ def read_checks(github, snapshot, sources, now, decision, *, admission=None, que
+
+
  def preflight(github, *, pull, app_id=None, decision=None, owner_session=False, scope_github=None,
 -              queue_run=None, admission=None, now=None):
-+              queue_run=None, admission=None, now=None, after_cutover=False):
++              queue_run=None, admission=None, now=None, phase, authorized_cutover_ruleset=None):
      if app_id is not None and (type(app_id) is not int or app_id <= 0 or app_id == ACTIONS_APP_ID):
          raise SnapshotError("Supply the numeric ID of a dedicated App, separate from GitHub Actions")
      if decision is not None and not DECISION_SHA.fullmatch(decision):
-@@ -244,12 +242,15 @@ def preflight(github, *, pull, app_id=None, decision=None, owner_session=False,
+@@ -244,16 +238,20 @@ def preflight(github, *, pull, app_id=None, decision=None, owner_session=False,
          raise SnapshotError("An admission decision requires a final queue run")
      now = now or datetime.now(timezone.utc)
      snapshot = github.get_pull(pull)
 +    target = snapshot.target
-+    if after_cutover and not target.bind_sces:
-+        raise SnapshotError("The post-cutover observation is defined only for Language Index")
++    policy = commissioning_policy(target.repository, target.base_ref, phase, authorized_cutover_ruleset)
      sources = {**dict.fromkeys(CI_CONTEXTS, ACTIONS_APP_ID), CHECK_NAME: app_id}
 -    controls = read_protection(github, sources)
 -    install = read_installation(github, scope_github, app_id, owner_session)
@@ -638,27 +903,35 @@ index d213d62143ea097a48f01697f606e7c61a21ee10..42b850d4f55988193bb2ffb923030f4b
      queue = None
      if queue_run is not None:
 -        require_queue_rules(github, app_id)
-+        require_queue_rules(github, app_id, target=target)
++        require_queue_rules(github, app_id, target=target, policy=policy)
          queue = capture_queue_observation(github, snapshot, queue_run, actions_app_id=ACTIONS_APP_ID)
      checks = read_checks(github, snapshot, sources, now, decision, admission=admission, queue=queue)
      if github.get_pull(pull) != snapshot:
-@@ -257,11 +258,14 @@ def preflight(github, *, pull, app_id=None, decision=None, owner_session=False,
- 
+         raise SnapshotError("The GitHub review target changed during commissioning")
++    if read_protection(github, sources, target) != controls:
++        raise SnapshotError("The live branch rules changed during commissioning")
+
      findings = [
          *[f"Branch control unconfirmed: {name}" for name, confirmed in controls.items()
--          if type(confirmed) is bool and not confirmed],
-+          if type(confirmed) is bool and not confirmed and
-+          (not target.bind_sces or name not in {"human_approval_configured", "code_owner_review_configured"})],
-         *[f"Exact strict ruleset binding unconfirmed: {name}" for name, context in controls["contexts"].items()
+@@ -262,11 +260,14 @@ def preflight(github, *, pull, app_id=None, decision=None, owner_session=False,
            if not context["strict_source_bound"]],
          *install["problems"],
      ]
-+    if target.bind_sces and controls["code_owner_review_configured"] == after_cutover:
-+        findings.append("Code Owner requirement does not match the requested commissioning phase")
++    approval = controls["approval"]
++    if approval is None or not policy.matches(ApprovalRule(**approval)):
++        findings.append(f"Code Owner and ordinary approval requirements do not match commissioning phase {phase}")
      if queue:
-         for phase in ("head", "queue"):
-             for context, check in checks[phase]["contexts"].items():
-@@ -282,8 +286,8 @@ def preflight(github, *, pull, app_id=None, decision=None, owner_session=False,
+-        for phase in ("head", "queue"):
+-            for context, check in checks[phase]["contexts"].items():
++        for check_target in ("head", "queue"):
++            for context, check in checks[check_target]["contexts"].items():
+                 if check["classification"] != "matching-success":
+-                    findings.append(f"Required {phase} check {context}: {check['classification']}")
++                    findings.append(f"Required {check_target} check {context}: {check['classification']}")
+     else:
+         for context in CI_CONTEXTS:
+             merged = checks["test_merge"]["contexts"][context]
+@@ -282,11 +283,12 @@ def preflight(github, *, pull, app_id=None, decision=None, owner_session=False,
          if head_review["check_run_ids"] or head_review["classic_status_present"]:
              findings.append("A review check or same-name status exists on the raw PR head")
      return {
@@ -669,16 +942,21 @@ index d213d62143ea097a48f01697f606e7c61a21ee10..42b850d4f55988193bb2ffb923030f4b
          "observed_at": now.isoformat(),
          "snapshot": asdict(snapshot),
          "mode": "mandatory-merge-queue" if queue else "test-merge-diagnostic",
-@@ -306,6 +310,8 @@ def preflight(github, *, pull, app_id=None, decision=None, owner_session=False,
++        "commissioning_phase": phase,
+         "queue_ci": queue,
+         "status": "blocked" if findings else "matching-observations",
+         "live_branch_enforcement_proven": False,
+@@ -306,6 +308,9 @@ def preflight(github, *, pull, app_id=None, decision=None, owner_session=False,
  def main(argv=None):
      parser = argparse.ArgumentParser(description=__doc__)
      parser.add_argument("--pull", type=int, default=1)
 +    parser.add_argument("--repository", choices=sorted(TARGETS), default=LICENSE.repository)
-+    parser.add_argument("--after-cutover", action="store_true", help="Inspect the independently authorized Language cutover")
++    parser.add_argument("--commissioning-phase", required=True, choices=PHASES)
++    parser.add_argument("--authorized-cutover-ruleset", type=int, help="Exact owner-authorized production rule for final observations")
      parser.add_argument("--app-id", type=int, help="Expected dedicated GitHub App ID")
      parser.add_argument("--decision-sha256", help="SHA-256 of the protected review decision")
      parser.add_argument("--queue-run", type=int, help="GitHub Actions run ID on the live merge group")
-@@ -314,6 +320,7 @@ def main(argv=None):
+@@ -314,6 +319,7 @@ def main(argv=None):
      parser.add_argument("--installation-token-stdin", action="store_true",
                          help="Read a short-lived installation token over standard input for repository-scope inspection")
      args = parser.parse_args(argv)
@@ -686,7 +964,7 @@ index d213d62143ea097a48f01697f606e7c61a21ee10..42b850d4f55988193bb2ffb923030f4b
      try:
          scope = None
          if args.installation_token_stdin:
-@@ -322,9 +329,10 @@ def main(argv=None):
+@@ -322,13 +328,15 @@ def main(argv=None):
              token = sys.stdin.readline(4096).strip()
              if not APP_TOKEN.fullmatch(token):
                  raise SnapshotError("Expected a GitHub App installation token")
@@ -696,12 +974,18 @@ index d213d62143ea097a48f01697f606e7c61a21ee10..42b850d4f55988193bb2ffb923030f4b
 +            scope = GitHub(bearer=token, target=target)
 +        reader = OwnerGitHub(target=target) if args.gh_owner else GitHub(target=target)
 +        result = preflight(reader, pull=args.pull, app_id=args.app_id, decision=args.decision_sha256,
-+                           owner_session=args.gh_owner, scope_github=scope, after_cutover=args.after_cutover,
++                           owner_session=args.gh_owner, scope_github=scope, phase=args.commissioning_phase,
++                           authorized_cutover_ruleset=args.authorized_cutover_ruleset,
                             queue_run=args.queue_run, admission=args.admission_sha256)
          sys.stdout.buffer.write(encode(result))
          return 0 if result["status"] == "matching-observations" else 1
+-    except (OSError, SnapshotError, TypeError, ValueError, KeyError, AttributeError) as error:
++    except (OSError, DataError, SnapshotError, TypeError, ValueError, KeyError, AttributeError) as error:
+         parser.exit(1, f"review commissioning: {error}\n")
+
+
 diff --git a/tools/review_gate.py b/tools/review_gate.py
-index 46c36046f0bc7015d9fef4bb287659a424941a21..a9fd9a80c573db53db1312401092398b5d3fdf6b 100644
+index 46c36046f0bc7015d9fef4bb287659a424941a21..7dd7dbe2b5321522e160e0a22fd8e8e1f602ae63 100644
 --- a/tools/review_gate.py
 +++ b/tools/review_gate.py
 @@ -5,6 +5,7 @@ from __future__ import annotations
@@ -712,27 +996,29 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..a9fd9a80c573db53db1312401092398b
  from hashlib import file_digest, sha256
  import json
  import os
-@@ -21,7 +22,9 @@ from uuid import UUID, uuid4
- 
+@@ -20,8 +21,11 @@ from urllib.request import Request, build_opener
+ from uuid import UUID, uuid4
+
  from .records import DataError, NoRedirects, decode, encode, require
++from .review_protection import commissioning_policy, observed_approval
  from .review_queue import capture_queue_observation
 -from .review_snapshot import BASE_REF, REPOSITORY, GitHub, capture_diff, token_is_target_only
 +from .review_snapshot import (
 +    LICENSE, TARGETS, GitHub, capture_control_paths, capture_diff, capture_sces, token_is_target_only,
 +)
- 
+
  CHECK_NAME = "Software Commons / Codex technical review"
  ACTIONS_APP_ID = 15368
-@@ -69,7 +72,7 @@ def valid_execution(value):
+@@ -69,7 +73,7 @@ def valid_execution(value):
          return False
- 
- 
+
+
 -def review_result(trace, binding, inspection_token, diff):
 +def review_result(trace, binding, inspection_token, diff, evidence_files=None):
      """Accept a verdict only from one complete captured Codex execution."""
      require(len(trace) <= MAX_TRACE_BYTES, "review trace exceeds the configured limit")
      events = [decode(line) for line in trace.splitlines() if line.strip()]
-@@ -85,10 +88,13 @@ def review_result(trace, binding, inspection_token, diff):
+@@ -85,10 +89,13 @@ def review_result(trace, binding, inspection_token, diff):
      require(messages, "Codex review did not return a verdict")
      final_position = messages[-1]
      verdict = decode(items[final_position]["text"].encode("utf-8"))
@@ -748,7 +1034,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..a9fd9a80c573db53db1312401092398b
              "review verdict does not bind the exact inspected inputs")
      require(verdict["decision"] in {"approve", "changes-required", "inconclusive"}
              and isinstance(verdict["findings"], list)
-@@ -108,6 +114,14 @@ def review_result(trace, binding, inspection_token, diff):
+@@ -108,6 +115,14 @@ def review_result(trace, binding, inspection_token, diff):
      require(any(witness in output.casefold() for output in inspections)
              and any(any(line in patch_lines for line in output.splitlines()) for output in inspections),
              "review trace lacks a successful exact-byte proof and patch body inspection")
@@ -762,8 +1048,8 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..a9fd9a80c573db53db1312401092398b
 +                "review trace lacks exact selected SCES artifact inspection")
      require(verdict["decision"] != "approve" or not verdict["findings"], "approval contains material findings")
      return execution, verdict
- 
-@@ -145,7 +159,12 @@ def launch_review(codex, model, input_dir, schema, audit_dir, *, reviewer=None):
+
+@@ -145,7 +160,12 @@ def launch_review(codex, model, input_dir, schema, audit_dir, *, reviewer=None):
          "Account for all portions of the change, including generated records and their validation. "
          "If tooling or context prevents sufficient review, return inconclusive. "
          "Report only material findings. Use approve only if you have sufficient evidence and no material findings. "
@@ -777,10 +1063,10 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..a9fd9a80c573db53db1312401092398b
          "in the rationale. This is technical review only. You have no authority to verify scientific claims or "
          "authorize a release."
      )
-@@ -165,10 +184,11 @@ def verify_issued_check(check, merge, app_id, external_id, status, conclusion=No
+@@ -165,10 +185,11 @@ def verify_issued_check(check, merge, app_id, external_id, status, conclusion=No
              "GitHub returned a stale, failed, or wrong-source review check")
- 
- 
+
+
 -def write_check(token, payload, *, check_id=None):
 +def write_check(token, payload, *, check_id=None, target=LICENSE):
 +    require(TARGETS.get(target.repository) == target, "Check target is outside the issuer allowlist")
@@ -791,35 +1077,42 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..a9fd9a80c573db53db1312401092398b
                        headers={"Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json",
                                 "Content-Type": "application/json", "User-Agent": "Software-Commons-Review-Gate",
                                 "X-GitHub-Api-Version": "2022-11-28"})
-@@ -179,8 +199,9 @@ def write_check(token, payload, *, check_id=None):
+@@ -179,8 +200,9 @@ def write_check(token, payload, *, check_id=None):
          raise DataError(f"GitHub check API failed: {error.reason}") from None
- 
- 
+
+
 -def require_queue_rules(github, app_id):
 -    rules = github._get_json(f"/repos/{REPOSITORY}/rules/branches/{BASE_REF}?per_page=100")
-+def require_queue_rules(github, app_id, *, target=LICENSE):
++def require_queue_rules(github, app_id, *, policy, target=LICENSE):
 +    repo, base = target.repository, target.base_ref
 +    rules = github._get_json(f"/repos/{repo}/rules/branches/{base}?per_page=100")
      require(isinstance(rules, list) and len(rules) < 100 and all(isinstance(item, dict) for item in rules),
              "GitHub did not return a complete active branch rules view")
      by_type = {}
-@@ -212,17 +233,31 @@ def require_queue_rules(github, app_id):
+@@ -188,6 +210,9 @@ def require_queue_rules(github, app_id):
+         by_type.setdefault(item.get("type"), []).append(item)
+     require({"pull_request", "deletion", "non_fast_forward"} <= by_type.keys(),
+             "mandatory pull requests, branch deletion protection and force-push protection are required")
++    approval = observed_approval(rules)
++    require(policy.matches(approval),
++            f"live Code Owner and ordinary approval rules do not match commissioning phase {policy.phase}")
+     queue = by_type.get("merge_queue", [])
+     require(len(queue) == 1, "App issuance requires a mandatory merge queue")
+     parameters = queue[0].get("parameters")
+@@ -212,17 +237,28 @@ def require_queue_rules(github, app_id):
                  bindings[name].append(integration if strict and type(integration) is int else None)
      require(all(bindings[name] == [source] for name, source in expected.items()),
              "required review and CI contexts must each bind their exact integration and enforce strict checks")
-+    if target.bind_sces:
-+        from .review_commission import OwnerGitHub, read_protection
++    from .review_commission import read_protection
 +
-+        protection = read_protection(OwnerGitHub(target=target), expected, target)
-+        require(all(protection.get(control) is True for control in (
-+            "active_rulesets_explicitly_without_bypass", "pull_request_required", "deletion_blocked",
-+            "force_push_blocked",
-+        )), "live no-bypass ruleset and branch protections could not be confirmed")
-+        for context in expected:
-+            require(protection["contexts"][context]["strict_source_bound"] is True,
-+                    f"live strict source binding not confirmed for {context}")
- 
- 
++    protection = read_protection(github, expected, target, rules=rules)
++    require(all(protection.get(control) is True for control in (
++        "active_rulesets_explicitly_without_bypass", "pull_request_required", "deletion_blocked",
++        "force_push_blocked",
++    )), "live no-bypass ruleset and branch protections could not be confirmed")
++    return approval
+
+
  def create_check(snapshot, app_id, token, decision, publisher, verify_fresh, *, admission=False):
      require(type(app_id) is int and app_id > 0 and app_id != ACTIONS_APP_ID and APP_TOKEN.fullmatch(token),
              "expected a dedicated GitHub App installation token")
@@ -836,7 +1129,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..a9fd9a80c573db53db1312401092398b
      pending = publisher(token, {"name": CHECK_NAME, "head_sha": target,
                                  "status": "in_progress", "external_id": decision_digest})
      verify_issued_check(pending, target, app_id, decision_digest, "in_progress")
-@@ -236,7 +271,7 @@ def create_check(snapshot, app_id, token, decision, publisher, verify_fresh, *,
+@@ -236,7 +272,7 @@ def create_check(snapshot, app_id, token, decision, publisher, verify_fresh, *,
              "summary": (
                  f"PR #{snapshot.number}\n\nHead: `{snapshot.head}`\n\nBase: `{snapshot.base}`\n\n"
                  f"Reviewed merge: `{snapshot.merge}`\n\nExecution: `{decision['execution']}`\n\n"
@@ -845,24 +1138,27 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..a9fd9a80c573db53db1312401092398b
              ),
          },
      }, check_id=check_id)
-@@ -245,7 +280,7 @@ def create_check(snapshot, app_id, token, decision, publisher, verify_fresh, *,
+@@ -245,7 +281,7 @@ def create_check(snapshot, app_id, token, decision, publisher, verify_fresh, *,
      return result
- 
- 
+
+
 -def run(args, github, *, token_input=None, publisher=write_check):
 +def run(args, github, *, token_input=None, publisher=None):
      state = args.state_dir.resolve()
      require(state.is_dir(), "configure an existing issuer-owned state directory")
      reviewer = getattr(args, "reviewer", None)
-@@ -254,13 +289,14 @@ def run(args, github, *, token_input=None, publisher=write_check):
+@@ -254,13 +290,17 @@ def run(args, github, *, token_input=None, publisher=write_check):
      admission = getattr(args, "queue_admission", False)
      run_id = getattr(args, "queue_run", None)
      require(not (admission and run_id is not None), "select one review phase")
 +    pull = github.get_pull(args.pull)
++    policy = getattr(args, "commissioning_policy", None)
++    approval = None
      if args.app_id is not None:
          require(admission or run_id is not None, "check issuance requires a mandatory merge-queue phase")
 -        require_queue_rules(github, args.app_id)
-+        require_queue_rules(github, args.app_id, target=pull.target)
++        require(policy is not None, "check issuance requires a protected commissioning policy")
++        approval = require_queue_rules(github, args.app_id, target=pull.target, policy=policy)
      audit = state / str(uuid4())
      audit.mkdir(mode=0o700)
 -    pull = github.get_pull(args.pull)
@@ -871,7 +1167,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..a9fd9a80c573db53db1312401092398b
      snapshot = pull
      capture_options = {"linear_head": True} if admission else {}
      if run_id is not None:
-@@ -268,31 +304,54 @@ def run(args, github, *, token_input=None, publisher=write_check):
+@@ -268,31 +308,56 @@ def run(args, github, *, token_input=None, publisher=write_check):
          snapshot = replace(pull, merge=observation["merge"])
          capture_options["queue_ref"] = observation["queue_ref"]
      with TemporaryDirectory(prefix="git-", dir=state) as directory:
@@ -887,6 +1183,8 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..a9fd9a80c573db53db1312401092398b
                 "phase": "queue-admission" if admission else "queue-merge" if observation else "pull-inspection"}
      if observation:
          binding.update(test_merge=pull.merge, queue_ci=observation)
++    if approval is not None:
++        binding["commissioning"] = {"phase": policy.phase, "approval": asdict(approval)}
 +    if evidence is not None:
 +        binding.update(sces_evidence=evidence, sces_evidence_sha256=sha256(encode(evidence)).hexdigest(),
 +                       protected_paths=controls)
@@ -931,16 +1229,17 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..a9fd9a80c573db53db1312401092398b
      decision = {"binding": binding, "execution": execution, "model": args.model,
                  "started_at": started_at, "completed_at": completed_at,
                  "trace_sha256": sha256(trace).hexdigest(), "decision": verdict["decision"],
-@@ -310,7 +369,7 @@ def run(args, github, *, token_input=None, publisher=write_check):
+@@ -310,7 +375,8 @@ def run(args, github, *, token_input=None, publisher=write_check):
      def verify_fresh():
          require(github.get_pull(pull.number) == pull, "pull request changed after review")
          if args.app_id is not None:
 -            require_queue_rules(github, args.app_id)
-+            require_queue_rules(github, args.app_id, target=pull.target)
++            current = require_queue_rules(github, args.app_id, target=pull.target, policy=policy)
++            require(current == approval, "live approval rules changed after review")
          if observation is not None:
              current = capture_queue_observation(github, pull, run_id, actions_app_id=ACTIONS_APP_ID)
              require(current == observation, "merge queue candidate or CI evidence changed after review")
-@@ -320,6 +379,8 @@ def run(args, github, *, token_input=None, publisher=write_check):
+@@ -320,6 +386,8 @@ def run(args, github, *, token_input=None, publisher=write_check):
      if args.app_id is not None:
          # A protected caller, not the reviewer, provides a short-lived installation token.
          installation_token = token_input().strip()
@@ -949,12 +1248,14 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..a9fd9a80c573db53db1312401092398b
          check = create_check(snapshot, args.app_id, installation_token, decision, publisher, verify_fresh,
                               admission=admission)
          save(audit / "issued-check.json", encode(check))
-@@ -379,12 +440,19 @@ def load_issuer(path, *, rehearsal=False):
+@@ -378,13 +446,24 @@ def load_issuer(path, *, rehearsal=False):
+     protected_path(path.parent, directory=True)
      protected_path(path, directory=False)
      settings = decode(path.read_bytes())
-     expected_keys = RUNTIME_KEYS if rehearsal else RUNTIME_KEYS | {"app_id"}
+-    expected_keys = RUNTIME_KEYS if rehearsal else RUNTIME_KEYS | {"app_id"}
 -    require(isinstance(settings, dict) and settings.keys() == expected_keys
-+    optional_keys = {"repository"} if rehearsal else {"repository", "authorized_control_merge"}
++    expected_keys = RUNTIME_KEYS if rehearsal else RUNTIME_KEYS | {"app_id", "commissioning_phase"}
++    optional_keys = {"repository"} if rehearsal else {"repository", "authorized_control_merge", "authorized_cutover_ruleset"}
 +    require(isinstance(settings, dict) and (expected_keys <= settings.keys() <= expected_keys | optional_keys)
              and isinstance(settings["model"], str) and settings["model"].strip(),
              "invalid protected issuer configuration")
@@ -963,6 +1264,10 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..a9fd9a80c573db53db1312401092398b
              "invalid protected review App ID")
 +    target_name = settings.get("repository", LICENSE.repository)
 +    require(isinstance(target_name, str) and target_name in TARGETS, "issuer repository is outside the allowlist")
++    target = TARGETS[target_name]
++    policy = None if rehearsal else commissioning_policy(
++        target.repository, target.base_ref, settings["commissioning_phase"], settings.get("authorized_cutover_ruleset"),
++    )
 +    authorized = settings.get("authorized_control_merge")
 +    require(authorized is None or
 +            (TARGETS[target_name].bind_sces and isinstance(authorized, str) and re.fullmatch(r"[0-9a-f]{40}", authorized)),
@@ -970,16 +1275,16 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..a9fd9a80c573db53db1312401092398b
      audit = Path(settings["audit_dir"])
      protected_path(audit, directory=True)
      reviewer = load_reviewer(settings)
-@@ -393,7 +461,7 @@ def load_issuer(path, *, rehearsal=False):
+@@ -393,7 +472,7 @@ def load_issuer(path, *, rehearsal=False):
      with codex.open("rb") as executable:
          require(file_digest(executable, "sha256").hexdigest() == settings["codex_sha256"],
                  "Codex executable differs from the protected issuer pin")
 -    return audit, codex, settings["model"], app_id, reviewer
-+    return audit, codex, settings["model"], app_id, reviewer, TARGETS[target_name], authorized
- 
- 
++    return audit, codex, settings["model"], app_id, reviewer, target, authorized, policy
+
+
  def load_reviewer(settings):
-@@ -426,24 +494,34 @@ def main(argv=None):
+@@ -426,24 +505,35 @@ def main(argv=None):
      config = parser.add_mutually_exclusive_group()
      config.add_argument("--issuer-config", type=Path, help="protected issuer configuration, installation token read from stdin")
      config.add_argument("--rehearsal-config", type=Path, help="protected reviewer configuration without App access")
@@ -988,6 +1293,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..a9fd9a80c573db53db1312401092398b
      args.app_id = None
      args.reviewer = None
 +    args.authorized_control_merge = None
++    args.commissioning_policy = None
      try:
          config_path = args.issuer_config or args.rehearsal_config
          if config_path:
@@ -996,7 +1302,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..a9fd9a80c573db53db1312401092398b
                  parser.error("protected configuration is exclusive to review and supplies all deployment options")
 -            args.state_dir, args.codex, args.model, args.app_id, args.reviewer = load_issuer(
 +            (args.state_dir, args.codex, args.model, args.app_id, args.reviewer,
-+             target, args.authorized_control_merge) = load_issuer(
++             target, args.authorized_control_merge, args.commissioning_policy) = load_issuer(
                  config_path, rehearsal=args.rehearsal_config is not None,
              )
          else:
@@ -1007,7 +1313,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..a9fd9a80c573db53db1312401092398b
                  parser.error("local review needs an absolute --codex path and an explicit --model")
          token_input = (lambda: sys.stdin.readline(4096)) if args.app_id is not None else None
 -        result = run(args, GitHub(), token_input=token_input)
-+        if args.issuer_config and target.bind_sces:
++        if args.issuer_config:
 +            from .review_commission import OwnerGitHub
 +
 +            github = OwnerGitHub(target=target)
@@ -1017,6 +1323,76 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..a9fd9a80c573db53db1312401092398b
      except (DataError, OSError, ValueError, TypeError, KeyError, subprocess.TimeoutExpired) as error:
          parser.exit(1, f"review gate: {error}\n")
      sys.stdout.buffer.write(encode(result))
+diff --git a/tools/review_protection.py b/tools/review_protection.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..719b019820855a29252735672e6be5631e9e404a
+--- /dev/null
++++ b/tools/review_protection.py
+@@ -0,0 +1,64 @@
++"""Bind live GitHub approval rules to the authorized commissioning phase."""
++
++from dataclasses import dataclass
++
++from .records import require
++
++
++PHASES = ("trial", "additive", "final")
++PRODUCTION = {
++    "software-commons/language-index": (27874363, 0),
++    "software-commons/license-index": (27875276, 1),
++}
++
++
++@dataclass(frozen=True)
++class ApprovalRule:
++    ruleset_id: int
++    code_owner_review: bool
++    approving_review_count: int
++
++
++@dataclass(frozen=True)
++class CommissioningPolicy:
++    phase: str
++    approval: ApprovalRule
++
++    def matches(self, observed):
++        return (isinstance(observed, ApprovalRule)
++                and (self.phase == "trial" or self.approval.ruleset_id == observed.ruleset_id)
++                and self.approval.code_owner_review is observed.code_owner_review
++                and self.approval.approving_review_count == observed.approving_review_count)
++
++
++def commissioning_policy(repository, base_ref, phase, authorized_cutover_ruleset=None):
++    require(repository in PRODUCTION and phase in PHASES, "select an explicit commissioning phase")
++    ruleset_id, additive_count = PRODUCTION[repository]
++    if phase == "trial":
++        require(base_ref == "codex-gate-trial" and authorized_cutover_ruleset is None,
++                "trial commissioning requires the pinned trial branch without cutover authorization")
++        return CommissioningPolicy(phase, ApprovalRule(0, repository == "software-commons/language-index", 0))
++    require(base_ref == "main", "production commissioning requires the pinned main branch")
++    if phase == "additive":
++        require(authorized_cutover_ruleset is None, "additive commissioning cannot carry cutover authorization")
++        return CommissioningPolicy(phase, ApprovalRule(ruleset_id, True, additive_count))
++    require(type(authorized_cutover_ruleset) is int and authorized_cutover_ruleset == ruleset_id,
++            "final commissioning requires protected owner authorization for the exact production ruleset")
++    return CommissioningPolicy(phase, ApprovalRule(ruleset_id, False, 0))
++
++
++def observed_approval(rules):
++    """Read the one commissioned effective PR rule without coercing missing fields."""
++    approvals = [rule for rule in rules if rule.get("type") == "pull_request"]
++    if len(approvals) != 1:
++        return None
++    rule, = approvals
++    approval = rule.get("parameters")
++    if not isinstance(approval, dict):
++        return None
++    source = rule.get("ruleset_id")
++    owners = approval.get("require_code_owner_review")
++    count = approval.get("required_approving_review_count")
++    if type(source) is not int or source <= 0 or type(owners) is not bool or type(count) is not int or count < 0:
++        return None
++    return ApprovalRule(source, owners, count)
 diff --git a/tools/review_queue.py b/tools/review_queue.py
 index 8b8292098eeac021263bb31bb106a71b3e036188..e9dfd58305f3099846027ede73a4819db02be1eb 100644
 --- a/tools/review_queue.py
@@ -1024,11 +1400,11 @@ index 8b8292098eeac021263bb31bb106a71b3e036188..e9dfd58305f3099846027ede73a4819d
 @@ -5,18 +5,18 @@ from __future__ import annotations
  import re
  from urllib.parse import urlencode
- 
+
 -from .review_snapshot import BASE_REF, REPOSITORY, PullSnapshot, SnapshotError
 +from .review_snapshot import PullSnapshot, SnapshotError
- 
- 
+
+
 -_REPO_PATH = f"/repos/{REPOSITORY}"
 -_QUEUE_BRANCH = re.compile(rf"gh-readonly-queue/{re.escape(BASE_REF)}/pr-([1-9][0-9]*)-[0-9a-f]{{40}}")
 -_CHECK_RUN_URL = re.compile(rf"https://api\.github\.com{re.escape(_REPO_PATH)}/check-runs/([1-9][0-9]*)")
@@ -1043,13 +1419,13 @@ index 8b8292098eeac021263bb31bb106a71b3e036188..e9dfd58305f3099846027ede73a4819d
 +_LANGUAGE_WORKFLOWS = {**_WORKFLOWS, ".github/workflows/domain.yml": (
 +    "Domain", (("Registry validation",), ("Registry validation", "Registry tests")),
 +)}
- 
- 
+
+
  def _require(ok, message):
 @@ -50,8 +50,8 @@ def _required_workflow(row):
      return path.split("@", 1)[0]
- 
- 
+
+
 -def _verify_run(row, path, snapshot, branch, merge):
 -    name, _ = _WORKFLOWS[path]
 +def _verify_run(row, path, snapshot, branch, merge, workflows):
@@ -1067,8 +1443,8 @@ index 8b8292098eeac021263bb31bb106a71b3e036188..e9dfd58305f3099846027ede73a4819d
      evidence = {key: row.get(key) for key in ("id", "workflow_id", "run_number", "run_attempt", "check_suite_id")}
      _require(all(_positive_id(value) for value in evidence.values()), "GitHub returned invalid workflow evidence IDs")
      return evidence
- 
- 
+
+
 -def _selected_runs(github, listing_path, snapshot, branch, merge):
 -    candidates = {path: {} for path in _WORKFLOWS}
 +def _selected_runs(github, listing_path, snapshot, branch, merge, workflows):
@@ -1083,8 +1459,8 @@ index 8b8292098eeac021263bb31bb106a71b3e036188..e9dfd58305f3099846027ede73a4819d
              candidates[path][number] = (binding, _successful(row))
 @@ -89,8 +89,8 @@ def _selected_runs(github, listing_path, snapshot, branch, merge):
      return selected
- 
- 
+
+
 -def _verify_ref(github, branch, merge):
 -    item = github._get_json(f"{_REPO_PATH}/git/ref/heads/{branch}")
 +def _verify_ref(github, repo_path, branch, merge):
@@ -1094,8 +1470,8 @@ index 8b8292098eeac021263bb31bb106a71b3e036188..e9dfd58305f3099846027ede73a4819d
      target = item.get("object")
 @@ -98,23 +98,24 @@ def _verify_ref(github, branch, merge):
               "GitHub merge-queue ref no longer names the observed commit")
- 
- 
+
+
 -def _jobs(github, path, run, branch, merge, checks, actions_app_id):
 -    name, expected = _WORKFLOWS[path]
 +def _jobs(github, repo_path, path, run, branch, merge, checks, actions_app_id, workflows):
@@ -1109,7 +1485,7 @@ index 8b8292098eeac021263bb31bb106a71b3e036188..e9dfd58305f3099846027ede73a4819d
 +    names = {job.get("name") for job in jobs}
 +    _require(len(jobs) == len(names) and any(names == set(layout) for layout in expected),
               f"GitHub {path} has missing, unexpected or duplicate jobs for the exact attempt")
- 
+
      evidence = {}
 +    check_path = re.compile(rf"https://api\.github\.com{re.escape(repo_path)}/check-runs/([1-9][0-9]*)")
      for job in jobs:
@@ -1151,7 +1527,7 @@ index 8b8292098eeac021263bb31bb106a71b3e036188..e9dfd58305f3099846027ede73a4819d
      _require(_successful(anchor), "The selected GitHub merge-group run did not complete successfully")
 -    _verify_ref(github, branch, merge)
 +    _verify_ref(github, repo_path, branch, merge)
- 
+
      query = urlencode({"event": "merge_group", "branch": branch, "head_sha": merge, "per_page": 100})
 -    listing = f"{_REPO_PATH}/actions/runs?{query}"
 -    runs = _selected_runs(github, listing, pull_snapshot, branch, merge)
@@ -1166,7 +1542,7 @@ index 8b8292098eeac021263bb31bb106a71b3e036188..e9dfd58305f3099846027ede73a4819d
 +    observed = {path: {**run, "jobs": _jobs(github, repo_path, path, run, branch, merge,
 +                                           checks, actions_app_id, workflows)}
 +                for path, run in runs.items()}
- 
+
 -    _require(_selected_runs(github, listing, pull_snapshot, branch, merge) == runs,
 +    _require(_selected_runs(github, listing, pull_snapshot, branch, merge, workflows) == runs,
               "GitHub merge-group workflow runs changed during evidence collection")
@@ -1187,10 +1563,10 @@ index 67163aa9af81a323b712a724aa87672258dd9090..71a3a165709eaa51c2806f3b02dc3979
  from threading import Event, Timer
  from urllib.error import HTTPError, URLError
  from urllib.request import HTTPRedirectHandler, Request, build_opener
- 
+
 +from .records import decode
 +
- 
+
  REPOSITORY = "software-commons/license-index"
  REPOSITORY_ID = 1468281504
  BASE_REF = "main"
@@ -1202,8 +1578,8 @@ index 67163aa9af81a323b712a724aa87672258dd9090..71a3a165709eaa51c2806f3b02dc3979
  _API_TIMEOUT = 20
 @@ -47,6 +49,28 @@ def token_is_target_only(github, repository_id, repository):
      return type(row.get("id")) is int and row["id"] == repository_id and row.get("full_name") == repository
- 
- 
+
+
 +@dataclass(frozen=True)
 +class ReviewTarget:
 +    repository: str
@@ -1228,13 +1604,13 @@ index 67163aa9af81a323b712a724aa87672258dd9090..71a3a165709eaa51c2806f3b02dc3979
 +
  def _is_sha(value):
      return isinstance(value, str) and _SHA.fullmatch(value) is not None
- 
+
 @@ -58,9 +82,11 @@ class PullSnapshot:
      base: str
      head: str
      merge: str
 +    target: ReviewTarget = LICENSE
- 
+
      def __post_init__(self):
 -        if type(self.repository_id) is not int or self.repository_id != REPOSITORY_ID:
 +        if (type(self.repository_id) is not int or self.repository_id != self.target.repository_id
@@ -1245,7 +1621,7 @@ index 67163aa9af81a323b712a724aa87672258dd9090..71a3a165709eaa51c2806f3b02dc3979
 @@ -77,7 +103,10 @@ class _NoRedirects(HTTPRedirectHandler):
  class GitHub:
      """Read the fixed repository from GitHub without following redirects."""
- 
+
 -    def __init__(self, bearer=None):
 +    def __init__(self, bearer=None, *, target=LICENSE):
 +        if TARGETS.get(target.repository) != target:
@@ -1278,8 +1654,8 @@ index 67163aa9af81a323b712a724aa87672258dd9090..71a3a165709eaa51c2806f3b02dc3979
 -            repository.get("id"), number, base.get("sha"), head.get("sha"), item.get("merge_commit_sha"),
 +            repository.get("id"), number, base.get("sha"), head.get("sha"), item.get("merge_commit_sha"), self.target,
          )
- 
- 
+
+
 @@ -202,7 +231,7 @@ def capture_diff(snapshot, directory: Path, *, queue_ref=None, linear_head=False
          raise SnapshotError("Expected a validated pull-request snapshot")
      ref = f"refs/pull/{snapshot.number}/merge"
