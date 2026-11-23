@@ -45,10 +45,10 @@ index 1863d1130f1e65e59a85d98cf28dc0caea911682..1362af915de4c2d8ae94fbd49e8189e9
          for update in ({"integration_id": ACTIONS_APP_ID}, {"integration_id": None}):
 diff --git a/tests/test_review_evidence.py b/tests/test_review_evidence.py
 new file mode 100644
-index 0000000000000000000000000000000000000000..8f0d0cbf2d0649570bdea6a1153ae7323db97a18
+index 0000000000000000000000000000000000000000..e23e8f5a7cf7ba5d6d85e3726d7b7979d81fc4e1
 --- /dev/null
 +++ b/tests/test_review_evidence.py
-@@ -0,0 +1,220 @@
+@@ -0,0 +1,249 @@
 +"""Synthetic Git-object fixtures for the protected SCES review inputs."""
 +
 +from hashlib import sha256
@@ -59,7 +59,7 @@ index 0000000000000000000000000000000000000000..8f0d0cbf2d0649570bdea6a1153ae732
 +
 +from tools.qualification import POLICY_DIGEST, _canonical
 +from tools.records import DataError, decode
-+from tools.review_evidence import capture_selected_evidence
++from tools.review_evidence import _inventory, capture_selected_evidence
 +from tools.review_snapshot import LANGUAGE, SnapshotError, _git, remote_url
 +
 +
@@ -169,6 +169,35 @@ index 0000000000000000000000000000000000000000..8f0d0cbf2d0649570bdea6a1153ae732
 +        staged = capture_selected_evidence(self.root, candidate, LANGUAGE)
 +        self.assertEqual(staged, {**inputs, **publication})
 +        self.assertNotIn(UNSELECTED, staged)
++
++    def test_unreferenced_uppercase_file_is_allowed_but_uppercase_descriptor_is_not(self):
++        inputs, publication = fixture()
++        readme = "sces/artifacts/candidate-history/README.md"
++        document = b"Human-readable historical provenance.\n"
++        baseline = self.commit({**inputs, readme: document}, "freeze evidence and historical documentation")
++        publication = pin_source(publication, baseline)
++        candidate = self.commit(publication, "select existing lowercase artifact paths")
++        self.assertEqual(capture_selected_evidence(self.root, candidate, LANGUAGE), {**inputs, **publication})
++
++        source_path = "sces/records/source/original--1.json"
++        source = decode(inputs[source_path])
++        source["artifact"] = {"path": readme, "sha256": digest(document)}
++        invalid = self.commit({source_path: _canonical(source)}, "try uppercase artifact declaration")
++        with self.assertRaisesRegex(DataError, "invalid SCES artifact reference"):
++            capture_selected_evidence(self.root, invalid, LANGUAGE)
++
++    def test_tree_inventory_rejects_unsafe_colliding_or_nonregular_paths(self):
++        def row(path, mode=b"100644"):
++            return mode + b" blob " + b"a" * 40 + b"\t" + path + b"\0"
++
++        for listing in (
++            row(b"sces/artifacts/../outside.txt"), row(b"sces/artifacts/bad\tpath.txt"),
++            row(b"sces/artifacts/readme.md") + row(b"sces/artifacts/README.md"),
++            row(b"sces/artifacts/README.md", b"120000"),
++        ):
++            with self.subTest(listing=listing), patch("tools.review_evidence._git", return_value=listing):
++                with self.assertRaises(DataError):
++                    _inventory(self.root, "a" * 40, "sces")
 +
 +    def test_missing_inherited_verification_or_artifact_is_rejected(self):
 +        inputs, publication = fixture()
@@ -1370,10 +1399,10 @@ index d213d62143ea097a48f01697f606e7c61a21ee10..f4e6d504992e6e3dcee47ebfe9bdb873
 
 diff --git a/tools/review_evidence.py b/tools/review_evidence.py
 new file mode 100644
-index 0000000000000000000000000000000000000000..be5a3994b091c0ac13ac5b752a41bbdaeb7a8754
+index 0000000000000000000000000000000000000000..461802d9e18eeb905ddab188ce84289e3122f844
 --- /dev/null
 +++ b/tools/review_evidence.py
-@@ -0,0 +1,265 @@
+@@ -0,0 +1,270 @@
 +"""Capture the active SCES publication inputs as inert bytes from a reviewed Git tree."""
 +
 +from collections import defaultdict
@@ -1389,7 +1418,8 @@ index 0000000000000000000000000000000000000000..be5a3994b091c0ac13ac5b752a41bbda
 +_SUPPORT = {"support", "corroboration", "premise"}
 +_PHASES = ("research", "independent-review")
 +_SLUG = re.compile(r"[a-z][a-z0-9]*(?:-[a-z0-9]+)*")
-+_PATH = re.compile(r"sces/(?:[a-z0-9][a-z0-9._-]*/)*[a-z0-9][a-z0-9._-]*")
++_ARTIFACT_PATH = re.compile(r"sces/(?:[a-z0-9][a-z0-9._-]*/)*[a-z0-9][a-z0-9._-]*")
++_TREE_PATH = re.compile(r"sces/(?:[A-Za-z0-9][A-Za-z0-9._-]*/)*[A-Za-z0-9][A-Za-z0-9._-]*")
 +_MAX_INVENTORY = 2 * 1024 * 1024
 +_MAX_RECORDS = 16 * 1024 * 1024
 +_MAX_EVIDENCE = 16 * 1024 * 1024
@@ -1418,12 +1448,16 @@ index 0000000000000000000000000000000000000000..be5a3994b091c0ac13ac5b752a41bbda
 +    raw = _git(directory, "ls-tree", "-r", "-z", commit, "--", *prefixes, limit=_MAX_INVENTORY)
 +    require(not raw or raw.endswith(b"\0"), "incomplete SCES Git tree inventory")
 +    paths = {}
++    folded_paths = set()
 +    for row in raw.split(b"\0")[:-1]:
 +        parts = re.fullmatch(rb"100644 blob ([0-9a-f]{40})\t([^\0]+)", row)
 +        require(parts is not None, "SCES review tree must contain regular, non-executable blobs")
 +        oid, raw_path = parts.groups()
 +        path = raw_path.decode("ascii")
-+        require(_PATH.fullmatch(path) and path not in paths, "unsafe or duplicate SCES Git tree path")
++        folded = path.casefold()
++        require(_TREE_PATH.fullmatch(path) and folded not in folded_paths,
++                "unsafe or duplicate SCES Git tree path")
++        folded_paths.add(folded)
 +        paths[path] = oid.decode("ascii")
 +    return paths
 +
@@ -1548,7 +1582,7 @@ index 0000000000000000000000000000000000000000..be5a3994b091c0ac13ac5b752a41bbda
 +                           row.get("reproduction", {}).get("artifact")):
 +            if descriptor is not None:
 +                path, checksum = descriptor["path"], descriptor["sha256"]
-+                require(isinstance(path, str) and path.startswith("sces/artifacts/") and _PATH.fullmatch(path)
++                require(isinstance(path, str) and path.startswith("sces/artifacts/") and _ARTIFACT_PATH.fullmatch(path)
 +                        and artifacts.setdefault(path, checksum) == checksum, "invalid SCES artifact reference")
 +        for field in ("replaces", "previous"):
 +            if field in row:
