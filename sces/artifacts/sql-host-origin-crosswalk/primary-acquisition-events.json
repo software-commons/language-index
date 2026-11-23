@@ -1,0 +1,14 @@
+{
+  "execution": "01a207b7-f2d3-7912-aad4-73d6dda001af",
+  "turn": "01a207b7-f311-71e1-bc18-0693dbd796a6",
+  "started_at": "2026-11-23T09:23:45.601Z",
+  "completed_at": "2026-11-23T09:35:09.514Z",
+  "events": [
+    {"chunk": "fbc61d", "tool_call": "call_70431e8c3ae94b63ba94821a41f7c6a9", "at": "2026-11-23T09:26:22.762Z"},
+    {"chunk": "4218d8", "tool_call": "call_c0bc9175f7e54e07928e1d41946fcc02", "at": "2026-11-23T09:27:00.345Z"},
+    {"chunk": "cdc4d6", "tool_call": "call_9c4181f3eb0641dc95597ea980e364c1", "at": "2026-11-23T09:28:17.986Z"},
+    {"chunk": "7d0c1c", "tool_call": "call_1569cd19f26f46f8a6bb521f6361d969", "at": "2026-11-23T09:32:43.739Z"},
+    {"chunk": "89c7f0", "tool_call": "call_de260cf433c346eba5c1c87a463363bb", "at": "2026-11-23T09:34:16.901Z"}
+  ],
+  "projection": "Native Codex tool results for the primary source acquisition, direct inspection and evidence freeze. The capture index records the corresponding publisher requests and digests. Capture filenames in the index identify campaign scratch files."
+}

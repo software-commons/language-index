@@ -1,0 +1,1 @@
+{"aliases":[],"id":"fafa02b58cff5b3b8859441699a07c14","identity_claim":{"id":"oberon-2-report-dialect-identity","kind":"claim","revision":1},"kind":"dialect","name":"Oberon-2","relations":[{"claim":{"id":"oberon-2-dialect-of-oberon","kind":"claim","revision":1},"target":{"id":"919f10ac708c50ebbdb0dce47cf3196d"},"type":"dialect-of"}],"state":"active"}

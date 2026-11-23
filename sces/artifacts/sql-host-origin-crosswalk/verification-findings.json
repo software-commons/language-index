@@ -1,0 +1,74 @@
+{
+  "scope": "Independent assessment of original STRling facility context and existing Language Index host dialects at the 2026-08-15 discovery cutoff. This is a review of contextual associations against existing selected identity claims.",
+  "execution": "01a207c2-9f18-72e1-9870-b5472b985b07",
+  "turn": "01a207c2-9fb8-7fa0-ad49-04f2bf22749e",
+  "review_input_sha256": "cfb0faa78bbba2b2b3edecad10b0a99ae9f2f74ce4bd0105fc33c0e6b95c5ff0",
+  "verification_state": "independently-reviewed",
+  "evidence_index": "evidence-index.json",
+  "native_inspection_receipts": "inspection-receipts.jsonl",
+  "findings": [
+    {
+      "origin_key": "mysql-regex",
+      "original_line": 108,
+      "candidate_id": "4e46e81f10234c9baeb0acf48959ffe7",
+      "target_id": "90f7ae0a40074883afa1ed80d4e7d017",
+      "outcome": "supported-contextual-association",
+      "bindings": {
+        "original_context": ["strling-planning", "mysql-original-facility"],
+        "authority": ["mysql-oracle-reference", "mysql-oracle-facility", "mysql-80-facility", "mysql-innovation-facility"],
+        "edition_and_release": ["mysql-80-release-index", "mysql-8046", "mysql-8046-tag", "mysql-84-release-index", "mysql-developer-8410", "mysql-developer-8411", "mysql-8410-tag", "mysql-8411-tag", "mysql-innovation-model", "mysql-26070-developer-release", "mysql-26070-tag", "mysql-26070-version", "mysql-26100-release"],
+        "release_source_implementation": ["mysql-8410-sql-grammar", "mysql-8410-sql-registration", "mysql-8410-item", "mysql-8410-facade-impl", "mysql-8410-engine", "mysql-8046-registry", "mysql-26070-registry", "mysql-8410-cmake", "mysql-8046-cmake", "mysql-26070-cmake", "mysql-8410-icu-header", "mysql-8046-icu-header", "mysql-26070-icu-header"]
+      },
+      "sces": {
+        "authenticity": "GitHub immutable STRling content supplies the predecessor row. Oracle covers the MySQL manuals and release records. Oracle's source repository and commit-pinned version files establish release source authority. The same-publisher manuals do not supply independent original authorities.",
+        "integrity": "Original artifact, full line including LF, Oracle selected identity PDF, and pinned implementation digests reconcile. The original native HTTPS page returned HTTP 200 during this run. API release-tag body bytes differ from the supplied hashes. Actual JSON ref and commit values, body digests and tool receipts are retained.",
+        "relevance": "The language chapter and documented SQL string functions and operators, corroborated by native SQL grammar and function registration, directly connect the facility to the existing MySQL dialect. Release notes and tags establish scoped versions.",
+        "interpretation": "The row is a planning entry for an SQL facility. Its embedded locator illustrates the host's SQL interface. The ICU pattern engine, SQL dialect, server product, and packaged runtime receive distinct evidentiary treatment.",
+        "applicability": "At cutoff, 8.0.46 and Innovation 26.7.0 resolve the relative flags. The explicit 8.4.10 stays fixed. The selected Oracle PDF preface says 8.4.9 LTS. Exact 8.4.10 source supplies its distinct implementation binding. ICU 77.1 is the default bundled source option across the three relevant tags, subject to system or custom build selection.",
+        "contradiction": "8.4.11 was already published, while 8.4.12 and 26.10.0 are later than cutoff. The cited 8.0 transition excludes broad ICU attribution to pre-8.0.4. None conflicts with the bounded host-language association. Package edition, binary linkage and observed behavior remain untested."
+      }
+    },
+    {
+      "origin_key": "sqlserver-regex",
+      "original_line": 113,
+      "candidate_id": "9d4c42cdbfba42868c52314c2a0ca9c3",
+      "target_id": "c46eb05a99444d81a272b6b131064aec",
+      "outcome": "supported-contextual-association",
+      "bindings": {
+        "original_context": ["strling-planning", "tsql-original-facility"],
+        "authority": ["tsql-reference", "tsql-2025-pinned-overview", "tsql-2025-pinned-applies", "tsql-2025-pinned-functions", "tsql-2025-pinned-regexp-like"],
+        "edition_and_release": ["tsql-builds", "tsql-cu8-canonical"],
+        "configuration": ["tsql-2025-pinned-regexp-like", "tsql-2025-regexp-matches-live", "tsql-2025-regexp-split-live"]
+      },
+      "sces": {
+        "authenticity": "The immutable predecessor row is a STRling planning record. The SQL Server facility and language references come from Microsoft Learn and MicrosoftDocs. Microsoft Support is authority for SQL Server servicing and build numbers.",
+        "integrity": "Original artifact and exact line including LF, referenced Microsoft identity source and pinned MicrosoftDocs bodies match. Native live overview was a 301 to the 17.x query and then HTTP 200. Moving live overview and servicing page body bytes differ from the supplied hashes. Exact captures, effective URLs, response chains and build fields are retained.",
+        "relevance": "Microsoft explicitly identifies the facility as T-SQL and publishes native function syntax and applicability. Its build table and exact KB resolve the on-premises cutoff representative.",
+        "interpretation": "The association connects SQL Server's SQL regular expression facility to Transact-SQL. Microsoft describes the pattern implementation as RE2-based. The discussion of PCRE or PCRE2 syntax flavor does not identify an additional engine or establish unrestricted compatibility.",
+        "applicability": "SQL Server 2025 17.x CU8, dated 2026-08-13, database engine product version 17.0.4075.5 and executable file version 2025.170.4075.5. REGEXP_LIKE requires compatibility level at least 170. Two documented table-valued functions require level 170. Other scalar functions have their own documented applicability. Microsoft Azure and Fabric entries are separate deployment scopes.",
+        "contradiction": "CU9 and CU8 + GDR follow cutoff. Analysis Services has a separate build number. Microsoft and DuckDB assign different result models to similarly named functions. The exact CU8 RE2 build or source revision, installed edition and runtime behavior remain unverified."
+      }
+    },
+    {
+      "origin_key": "duckdb-regex",
+      "original_line": 117,
+      "candidate_id": "d6f46e1bbb4d4530ab41d96d87e34aea",
+      "target_id": "2a9d5e1dacef4abf95e6bef1feca168c",
+      "outcome": "supported-contextual-association",
+      "bindings": {
+        "original_context": ["strling-planning", "duckdb-original-facility", "duckdb-20-facility"],
+        "authority": ["duckdb-100-reference", "duckdb-15-dialect", "duckdb-15-facility"],
+        "edition_and_release": ["duckdb-releases", "duckdb-155-tag", "duckdb-155-release", "duckdb-156-release"],
+        "vendored_implementation": ["duckdb-155-code", "duckdb-155-re2-build", "duckdb-155-re2-tree", "duckdb-155-re2-git-tree"]
+      },
+      "sces": {
+        "authenticity": "The original pinned STRling planning record is independently reacquired. DuckDB Project owns the dialect documentation, release calendar and tagged implementation, including the vendored engine source tree.",
+        "integrity": "Original document, exact LF-terminated row, selected DuckDB 1.0.0 PDF and pinned implementation source bodies match supplied hashes. Live 1.5 and 2.0 HTML, client-side navigation and GitHub API representations returned different bytes. Actual native bodies and transport are retained. The named 1.5.5 release, tag commit and directory-tree ref cross-check as structured values.",
+        "relevance": "The selected 1.0.0 documentation describes DuckDB SQL and its functions. The project's 1.5 documentation and exact 1.5.5 function registration link the facility to the same host dialect.",
+        "interpretation": "The row describes the regex facility within the DuckDB SQL dialect. PostgreSQL influence preserves a distinct DuckDB dialect, while the tagged CMake and source identify a DuckDB vendored RE2 implementation.",
+        "applicability": "The cutoff uses DuckDB v1.5.5 released 2026-07-22, with release source d8cdaa33fda8df955cc76ef58a280f68f4cd43fa and exact vendored tree 8ca0023ecdeca5a6f5e9b17c5531930507be113a. The 1.5 documentation belongs to the minor line. Current navigation now reaches 2.0 and supplies navigation evidence.",
+        "contradiction": "DuckDB 1.5.6 and 2.0.0 follow cutoff. Its scalar regexp_matches differs from Microsoft's table-valued REGEXP_MATCHES despite common engine-family nomenclature. A Google RE2 version or commit mapping and packaged build behavior remain untested."
+      }
+    }
+  ]
+}

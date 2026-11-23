@@ -1,0 +1,1 @@
+{"basis":{"id":"rfc8259","kind":"source","revision":1},"citation":{"locator":"Abstract; §1 Introduction on value types; §2 opening and grammar; §§4–5 objects and arrays","modality":"descriptive"},"claim":{"id":"json-rfc8259-serialized-values","kind":"claim","revision":1},"id":"support-json-rfc8259-serialized-values","kind":"dependency","relation":"support","revision":1}

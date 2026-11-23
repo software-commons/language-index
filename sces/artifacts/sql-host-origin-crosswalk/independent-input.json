@@ -1,0 +1,491 @@
+{
+  "candidates": [
+    {
+      "candidate": {
+        "disposition": "unresolved",
+        "id": "4e46e81f10234c9baeb0acf48959ffe7",
+        "name": "MySQL SQL dialect",
+        "origins": [
+          "https://github.com/strling-lang/regex-conformance/blob/62084ca0ef9b05a28711dd28bf10885c6ed0cb5d/registries/universe/full-known-universe-2026-08-15.v1.json#L108"
+        ],
+        "reason": "The pinned predecessor planning row mysql-regex describes MySQL regex SQL surface (database). Obtain direct vendor evidence for the exact SQL dialect and edition, separate from the database product and its regex feature. The cited planning row supplies discovery context."
+      },
+      "candidate_authorities": [
+        {
+          "key": "mysql-oracle-reference",
+          "locator": "https://docs.oracle.com/cd/E17952_01/mysql-8.4-en/mysql-8.4-en.pdf",
+          "primary_representation_sha256": "a8c12fa28fa9ddb6837a12dad3bd6b758a28421ebd905ae4be4a504a644a32d2",
+          "role": "official-documentation"
+        },
+        {
+          "key": "mysql-oracle-facility",
+          "locator": "https://docs.oracle.com/cd/E17952_01/mysql-8.4-en/regexp.html",
+          "primary_representation_sha256": "97b6246defcedeb9955b7a8d1bf6761add5b330c39a9830961911a40b87105f6",
+          "role": "official-documentation"
+        },
+        {
+          "key": "mysql-8410-tag",
+          "locator": "https://api.github.com/repos/mysql/mysql-server/git/ref/tags/mysql-8.4.10",
+          "primary_representation_sha256": "411aec717d6af6def8218e7c5c1fef13a8825aefbc7f350316be88a5edd38e41",
+          "role": "publisher-release-metadata"
+        },
+        {
+          "key": "mysql-8410-sql-grammar",
+          "locator": "https://raw.githubusercontent.com/mysql/mysql-server/6adc159923b7b6abbe649949551ec25264c2daf9/sql/sql_yacc.yy",
+          "primary_representation_sha256": "91c79ba42c614439e2b134d454ce9da45da930dbfd81c0873476b09360dc2541",
+          "role": "primary-implementation"
+        },
+        {
+          "key": "mysql-8410-sql-registration",
+          "locator": "https://raw.githubusercontent.com/mysql/mysql-server/6adc159923b7b6abbe649949551ec25264c2daf9/sql/item_create.cc",
+          "primary_representation_sha256": "8f82c4c9c354afa8276e762b19243397ea405f0780ce6f9e099280af8e5f5532",
+          "role": "primary-implementation"
+        },
+        {
+          "key": "mysql-8410-item",
+          "locator": "https://raw.githubusercontent.com/mysql/mysql-server/6adc159923b7b6abbe649949551ec25264c2daf9/sql/item_regexp_func.cc",
+          "primary_representation_sha256": "215edea4e6c2e2807ef6601e3281668a2453b7e5bbcad1efdfb4cf9f470acd2e",
+          "role": "primary-implementation"
+        },
+        {
+          "key": "mysql-8410-facade",
+          "locator": "https://raw.githubusercontent.com/mysql/mysql-server/6adc159923b7b6abbe649949551ec25264c2daf9/sql/regexp/regexp_facade.h",
+          "primary_representation_sha256": "4e315fee2971771f8784e61f3ba809e67185bf758732a80af0a39646d30dd55f",
+          "role": "primary-implementation"
+        },
+        {
+          "key": "mysql-8410-facade-impl",
+          "locator": "https://raw.githubusercontent.com/mysql/mysql-server/6adc159923b7b6abbe649949551ec25264c2daf9/sql/regexp/regexp_facade.cc",
+          "primary_representation_sha256": "0cc636f7c185ee4577f2caad10b458f463f3665473dda2ecf14cad07e23d603d",
+          "role": "primary-implementation"
+        },
+        {
+          "key": "mysql-8410-engine",
+          "locator": "https://raw.githubusercontent.com/mysql/mysql-server/6adc159923b7b6abbe649949551ec25264c2daf9/sql/regexp/regexp_engine.h",
+          "primary_representation_sha256": "833194cf1de93e2f96c097faa1924ad0483c057333ae6e0bb899a7341a26e70e",
+          "role": "primary-implementation"
+        },
+        {
+          "key": "mysql-8410-cmake",
+          "locator": "https://raw.githubusercontent.com/mysql/mysql-server/6adc159923b7b6abbe649949551ec25264c2daf9/cmake/icu.cmake",
+          "primary_representation_sha256": "65e25ca07f476ff2080594cab874e95ec8ace05d8761422aeafb480ae9baa6f3",
+          "role": "primary-implementation"
+        },
+        {
+          "alternative_inspection": {
+            "event": "web direct open",
+            "retrieved_at": "2026-11-23",
+            "section": "Changes in MySQL 8.4.10 (2026-06-16)"
+          },
+          "key": "mysql-developer-8410",
+          "locator": "https://dev.mysql.com/doc/relnotes/mysql/8.4/en/news-8-4-10.html",
+          "role": "official-documentation"
+        },
+        {
+          "alternative_inspection": {
+            "event": "web direct open",
+            "retrieved_at": "2026-11-23",
+            "section": "Changes in MySQL 8.4.11 (2026-07-28)"
+          },
+          "key": "mysql-developer-8411",
+          "locator": "https://dev.mysql.com/doc/relnotes/mysql/8.4/en/news-8-4-11.html",
+          "role": "official-documentation"
+        },
+        {
+          "key": "mysql-8411-tag",
+          "locator": "https://api.github.com/repos/mysql/mysql-server/git/ref/tags/mysql-8.4.11",
+          "primary_representation_sha256": "31e60f0d6be9910bef83b8832d129235ea1b8a6e7a413f2b57fa11280589a9b7",
+          "role": "publisher-release-metadata"
+        },
+        {
+          "alternative_inspection": {
+            "event": "web direct open",
+            "retrieved_at": "2026-11-23",
+            "section": "Changes in MySQL 8.0.46 (2026-04-21)"
+          },
+          "key": "mysql-8046",
+          "locator": "https://dev.mysql.com/doc/relnotes/mysql/8.0/en/news-8-0-46.html",
+          "role": "official-documentation"
+        },
+        {
+          "alternative_inspection": {
+            "event": "web direct open and find",
+            "retrieved_at": "2026-11-23",
+            "section": "§14.8.2, introductory implementation note and Regular Expression Compatibility Considerations"
+          },
+          "key": "mysql-80-facility",
+          "locator": "https://dev.mysql.com/doc/refman/8.0/en/regexp.html",
+          "role": "official-documentation"
+        },
+        {
+          "key": "mysql-8046-tag",
+          "locator": "https://api.github.com/repos/mysql/mysql-server/git/ref/tags/mysql-8.0.46",
+          "primary_representation_sha256": "b2a654e356f9c2e6129a689f6875a19ab2029b8d314c4688fd7f7c983e3c31a4",
+          "role": "publisher-release-metadata"
+        },
+        {
+          "key": "mysql-8046-registry",
+          "locator": "https://raw.githubusercontent.com/mysql/mysql-server/0a7df2e4693d8f10901a26034ae6257699356e30/sql/item_create.cc",
+          "primary_representation_sha256": "21aab9a24309565338982c6cac47f905ddfbeaa2ce5cc8d02a6c1d40a44a89b4",
+          "role": "primary-implementation"
+        },
+        {
+          "alternative_inspection": {
+            "event": "web direct open",
+            "retrieved_at": "2026-11-23",
+            "section": "Changes in MySQL 26.7.0 (2026-07-28)"
+          },
+          "key": "mysql-26070-developer-release",
+          "locator": "https://dev.mysql.com/doc/relnotes/mysql/26.7/en/news-26-7-0.html",
+          "role": "publisher-release-metadata"
+        },
+        {
+          "alternative_inspection": {
+            "event": "web direct open",
+            "retrieved_at": "2026-11-23",
+            "section": "§14.8.2, Regular Expressions"
+          },
+          "key": "mysql-innovation-facility",
+          "locator": "https://dev.mysql.com/doc/refman/26.7/en/regexp.html",
+          "role": "official-documentation"
+        },
+        {
+          "key": "mysql-26070-tag",
+          "locator": "https://api.github.com/repos/mysql/mysql-server/git/ref/tags/mysql-26.7.0",
+          "primary_representation_sha256": "ca08ac1c1d1a9e17b1c65cba45054b49c71ff1bf41b78905da933168f405f6a9",
+          "role": "publisher-release-metadata"
+        },
+        {
+          "key": "mysql-26070-version",
+          "locator": "https://raw.githubusercontent.com/mysql/mysql-server/06a5c1c99c377fc41b2eba1ea244e8b220bdc3c8/MYSQL_VERSION",
+          "primary_representation_sha256": "5e50579dedad36143f1ac2791c3501872aef9a744fd69134bff5f8d07fb2b3b4",
+          "role": "primary-implementation"
+        },
+        {
+          "key": "mysql-26070-registry",
+          "locator": "https://raw.githubusercontent.com/mysql/mysql-server/06a5c1c99c377fc41b2eba1ea244e8b220bdc3c8/sql/item_create.cc",
+          "primary_representation_sha256": "6e4018d4daafa6223d11a177bd16ac9f7840e2b6b08926789aa98b3ff6625757",
+          "role": "primary-implementation"
+        }
+      ],
+      "candidate_path": "registry/candidates/4e/4e46e81f10234c9baeb0acf48959ffe7.json",
+      "candidate_sha256": "481ec0dad0a8b37a87d112527ff8c9163e65e867c81157478d7a675cf6bd6955",
+      "embedded_facility_locator": {
+        "alternative_inspection": {
+          "event": "web direct open",
+          "observed_locator": "https://dev.mysql.com/doc/refman/8.4/en/regexp.html",
+          "preservation_limit": "The native request returned HTTP 403. The rendered document was opened with the web tool. The byte-preserved Oracle PDF is the documentary binding for the proposal.",
+          "retrieved_at": "2026-11-23",
+          "section": "Visible 8.4 manual and §14.8.2, Regular Expressions"
+        },
+        "key": "mysql-original-facility",
+        "locator": "https://dev.mysql.com/doc/refman/8.4/en/regexp.html",
+        "role": "official-documentation"
+      },
+      "original_inventory": {
+        "key": "strling-planning",
+        "locator": "https://raw.githubusercontent.com/strling-lang/regex-conformance/62084ca0ef9b05a28711dd28bf10885c6ed0cb5d/registries/universe/full-known-universe-2026-08-15.v1.json",
+        "primary_representation_sha256": "0601c2c948b19c7f5265bd53260c7c8a47478d12d3dc79e863a2f2f8e411f9f8",
+        "role": "original-discovery"
+      },
+      "original_line": 108,
+      "original_line_sha256": "f56ddb45bfd608dbaa0b53ab48e112d63712b27a9ae31ab2b9e98dc1f44bb4c1",
+      "selected_identity_claim": {
+        "id": "mysql-84-sql-dialect-identity",
+        "kind": "claim",
+        "revision": 1
+      },
+      "selected_identity_source_path": "sces/records/source/goal-mysql84-oracle-manual-pdf--1.json",
+      "selected_identity_source_ref": {
+        "id": "goal-mysql84-oracle-manual-pdf",
+        "kind": "source",
+        "revision": 1
+      },
+      "target": {
+        "aliases": [],
+        "id": "90f7ae0a40074883afa1ed80d4e7d017",
+        "identity_claim": {
+          "id": "mysql-84-sql-dialect-identity",
+          "kind": "claim",
+          "revision": 1
+        },
+        "kind": "dialect",
+        "name": "MySQL SQL dialect",
+        "relations": [
+          {
+            "claim": {
+              "id": "mysql-84-sql-dialect-parent",
+              "kind": "claim",
+              "revision": 1
+            },
+            "target": {
+              "id": "b97a2dbaf9d644488c87e934193b55ff"
+            },
+            "type": "dialect-of"
+          }
+        ],
+        "state": "active"
+      },
+      "target_path": "registry/entities/90/90f7ae0a40074883afa1ed80d4e7d017.json",
+      "target_sha256": "88383dd23847e34b35dc9278e860f52bf155bf170ddcb744e3a9563ab5f7d07d"
+    },
+    {
+      "candidate": {
+        "disposition": "unresolved",
+        "id": "9d4c42cdbfba42868c52314c2a0ca9c3",
+        "name": "SQL Server SQL dialect",
+        "origins": [
+          "https://github.com/strling-lang/regex-conformance/blob/62084ca0ef9b05a28711dd28bf10885c6ed0cb5d/registries/universe/full-known-universe-2026-08-15.v1.json#L113"
+        ],
+        "reason": "The pinned predecessor planning row sqlserver-regex describes SQL Server regular expression functions (database). Obtain direct vendor evidence for the exact SQL dialect and edition, separate from the database product and its regex feature. The cited planning row supplies discovery context."
+      },
+      "candidate_authorities": [
+        {
+          "key": "tsql-reference",
+          "locator": "https://raw.githubusercontent.com/MicrosoftDocs/sql-docs/5f220f578385645cd005eed84f5b6881817b1c81/docs/t-sql/language-reference.md",
+          "primary_representation_sha256": "788db980778b2fa3521fbfaefe9d689e446283a40a39d594fe38ff6adc20d964",
+          "role": "official-documentation"
+        },
+        {
+          "key": "tsql-2025-pinned-overview",
+          "locator": "https://raw.githubusercontent.com/MicrosoftDocs/sql-docs/e1f04b23e13c80057f339c32b3e196d428eee0cc/docs/relational-databases/regular-expressions/overview.md",
+          "primary_representation_sha256": "06b42aff5f206233eb02abfed2596a70ddad9b3cdffa3aae7631e378d49485f9",
+          "role": "official-documentation"
+        },
+        {
+          "key": "tsql-2025-pinned-regexp-like",
+          "locator": "https://raw.githubusercontent.com/MicrosoftDocs/sql-docs/e1f04b23e13c80057f339c32b3e196d428eee0cc/docs/t-sql/functions/regexp-like-transact-sql.md",
+          "primary_representation_sha256": "79ac4d67160f4bbd0380c50edf1f0b01a8c29e1dc7aef84513d9ca4d84d20a9d",
+          "role": "official-documentation"
+        },
+        {
+          "key": "tsql-2025-pinned-applies",
+          "locator": "https://raw.githubusercontent.com/MicrosoftDocs/sql-docs/e1f04b23e13c80057f339c32b3e196d428eee0cc/docs/includes/applies-to-version/sqlserver2025-asdb-asmi-fabricsqldb.md",
+          "primary_representation_sha256": "24f6381bd1aa33f0287402b945b53ba288e4304c2a077655d8d70d708ffb79eb",
+          "role": "official-documentation"
+        },
+        {
+          "key": "tsql-2025-pinned-functions",
+          "locator": "https://raw.githubusercontent.com/MicrosoftDocs/sql-docs/e1f04b23e13c80057f339c32b3e196d428eee0cc/docs/includes/regexp-function-descriptions.md",
+          "primary_representation_sha256": "ce39dad99a8f7a9efd8956f5d529646c390a18253842d2fbd53f2c23d8611442",
+          "role": "official-documentation"
+        },
+        {
+          "key": "tsql-builds",
+          "locator": "https://learn.microsoft.com/en-us/troubleshoot/sql/releases/sqlserver-2025/build-versions",
+          "primary_representation_sha256": "43d300035f0f51dd4ad73958026fcdbdd799d6fc57fb2b29b8e3693ca22c7ead",
+          "role": "publisher-release-metadata"
+        },
+        {
+          "key": "tsql-cu8-canonical",
+          "locator": "https://support.microsoft.com/en-us/servicing/sql/sql-server-2025/cumulative-update/kb5104822-cu8",
+          "primary_representation_sha256": "c8eb1040ec36d1d61f11b9ab8bbb8ee049b5b913cf95184db791a5067254d9b5",
+          "role": "publisher-release-metadata"
+        }
+      ],
+      "candidate_path": "registry/candidates/9d/9d4c42cdbfba42868c52314c2a0ca9c3.json",
+      "candidate_sha256": "d51172f7dd635c8f1a94a8418ec1d5c6d913e379c5c36f818be21a593b971988",
+      "embedded_facility_locator": {
+        "key": "tsql-original-facility",
+        "locator": "https://learn.microsoft.com/en-us/sql/relational-databases/regular-expressions/overview",
+        "primary_representation_sha256": "851898d55cba4c7165a54092823da4e9ee722e87648e17dd0b29373602aeea2f",
+        "role": "official-documentation"
+      },
+      "original_inventory": {
+        "key": "strling-planning",
+        "locator": "https://raw.githubusercontent.com/strling-lang/regex-conformance/62084ca0ef9b05a28711dd28bf10885c6ed0cb5d/registries/universe/full-known-universe-2026-08-15.v1.json",
+        "primary_representation_sha256": "0601c2c948b19c7f5265bd53260c7c8a47478d12d3dc79e863a2f2f8e411f9f8",
+        "role": "original-discovery"
+      },
+      "original_line": 113,
+      "original_line_sha256": "bb0ac6d86523f137e7590e7717fd27466157429f59240636831104911563e832",
+      "selected_identity_claim": {
+        "id": "microsoft-tsql-dialect-identity",
+        "kind": "claim",
+        "revision": 1
+      },
+      "selected_identity_source_path": "sces/records/source/goal-tsql-ms-reference--1.json",
+      "selected_identity_source_ref": {
+        "id": "goal-tsql-ms-reference",
+        "kind": "source",
+        "revision": 1
+      },
+      "target": {
+        "aliases": [],
+        "id": "c46eb05a99444d81a272b6b131064aec",
+        "identity_claim": {
+          "id": "microsoft-tsql-dialect-identity",
+          "kind": "claim",
+          "revision": 1
+        },
+        "kind": "dialect",
+        "name": "Transact-SQL (Microsoft)",
+        "relations": [
+          {
+            "claim": {
+              "id": "microsoft-tsql-dialect-parent",
+              "kind": "claim",
+              "revision": 1
+            },
+            "target": {
+              "id": "b97a2dbaf9d644488c87e934193b55ff"
+            },
+            "type": "dialect-of"
+          }
+        ],
+        "state": "active"
+      },
+      "target_path": "registry/entities/c4/c46eb05a99444d81a272b6b131064aec.json",
+      "target_sha256": "2050a15d45c3630f57973df797949567f4ef8c5c3b3a47a8eb92ab2955934d47"
+    },
+    {
+      "candidate": {
+        "disposition": "unresolved",
+        "id": "d6f46e1bbb4d4530ab41d96d87e34aea",
+        "name": "DuckDB SQL dialect",
+        "origins": [
+          "https://github.com/strling-lang/regex-conformance/blob/62084ca0ef9b05a28711dd28bf10885c6ed0cb5d/registries/universe/full-known-universe-2026-08-15.v1.json#L117"
+        ],
+        "reason": "The pinned predecessor planning row duckdb-regex describes DuckDB regex SQL surface (database). Obtain direct vendor evidence for the exact SQL dialect and edition, separate from the database product and its regex feature. The cited planning row supplies discovery context."
+      },
+      "candidate_authorities": [
+        {
+          "key": "duckdb-100-reference",
+          "locator": "https://blobs.duckdb.org/docs/duckdb-docs-1.0.0.pdf",
+          "primary_representation_sha256": "8c588aebf7a55e221f8e1e00fb2ba292e4c462a69d1f9b01069d60443ff52ab4",
+          "role": "official-documentation"
+        },
+        {
+          "key": "duckdb-15-facility",
+          "locator": "https://duckdb.org/docs/1.5/sql/functions/regular_expressions.html",
+          "primary_representation_sha256": "9ecfeeb31fab22c4a83ba7fe17280a487b36f42f97b625933bfc9c5a94385b7a",
+          "role": "official-documentation"
+        },
+        {
+          "key": "duckdb-15-dialect",
+          "locator": "https://duckdb.org/docs/1.5/sql/dialect/overview.html",
+          "primary_representation_sha256": "2646c47bf0a59c3251c25ef1a407417b45f1e8843f17f7727f26da21d5ab3a08",
+          "role": "official-documentation"
+        },
+        {
+          "key": "duckdb-20-facility",
+          "locator": "https://duckdb.org/docs/2.0/sql/functions/regular_expressions.html",
+          "primary_representation_sha256": "89e9746dd3240aa102de65424433c52dc8a8fe34863fcedb6013a2f40d87d718",
+          "role": "official-documentation"
+        },
+        {
+          "key": "duckdb-releases",
+          "locator": "https://duckdb.org/release_calendar",
+          "primary_representation_sha256": "6bc4a68c113f0eafd939bb41685f2942c3057076efd2b65cf172267167748acc",
+          "role": "publisher-release-metadata"
+        },
+        {
+          "key": "duckdb-155-tag",
+          "locator": "https://api.github.com/repos/duckdb/duckdb/git/ref/tags/v1.5.5",
+          "primary_representation_sha256": "6112ea701baf5c39e6fc31e3b65f2e0c32fd4fb5b9bb2e289c1bc07fabb6f9d2",
+          "role": "publisher-release-metadata"
+        },
+        {
+          "key": "duckdb-155-release",
+          "locator": "https://api.github.com/repos/duckdb/duckdb/releases/tags/v1.5.5",
+          "primary_representation_sha256": "ec29ea0a5db02ff4f012ea1aa1105197b67ab5f1cfccaffcb5f031d5a6b17398",
+          "role": "publisher-release-metadata"
+        },
+        {
+          "key": "duckdb-155-code",
+          "locator": "https://raw.githubusercontent.com/duckdb/duckdb/d8cdaa33fda8df955cc76ef58a280f68f4cd43fa/src/function/scalar/string/regexp.cpp",
+          "primary_representation_sha256": "a7c34c07957a01e6e4455b598e1ed0111d3200cbb71cb4a88f6f7aef8f253ab3",
+          "role": "primary-implementation"
+        },
+        {
+          "key": "duckdb-155-re2-build",
+          "locator": "https://raw.githubusercontent.com/duckdb/duckdb/d8cdaa33fda8df955cc76ef58a280f68f4cd43fa/third_party/re2/CMakeLists.txt",
+          "primary_representation_sha256": "22830da96217103d3973be68a433df763a1e049677665553d7db74aca8285706",
+          "role": "primary-implementation"
+        },
+        {
+          "key": "duckdb-155-re2-tree",
+          "locator": "https://api.github.com/repos/duckdb/duckdb/contents/third_party?ref=d8cdaa33fda8df955cc76ef58a280f68f4cd43fa",
+          "primary_representation_sha256": "32c47c8ead67fc9c3af14fdaa3a95fe721e91cb1a731b3481a1829cb6ec7124b",
+          "role": "publisher-source-tree-metadata"
+        }
+      ],
+      "candidate_path": "registry/candidates/d6/d6f46e1bbb4d4530ab41d96d87e34aea.json",
+      "candidate_sha256": "9a8e292a91dd2aeb69844c8bf082982138f7698d6f9c149aba6353c2fdbf7617",
+      "embedded_facility_locator": {
+        "key": "duckdb-original-facility",
+        "locator": "https://duckdb.org/docs/current/sql/functions/regular_expressions",
+        "primary_representation_sha256": "2c785fddbdd2cf473dde4d6a2ea3e822424e4fff768a71b7998014dfe902b3ce",
+        "role": "publisher-navigation"
+      },
+      "original_inventory": {
+        "key": "strling-planning",
+        "locator": "https://raw.githubusercontent.com/strling-lang/regex-conformance/62084ca0ef9b05a28711dd28bf10885c6ed0cb5d/registries/universe/full-known-universe-2026-08-15.v1.json",
+        "primary_representation_sha256": "0601c2c948b19c7f5265bd53260c7c8a47478d12d3dc79e863a2f2f8e411f9f8",
+        "role": "original-discovery"
+      },
+      "original_line": 117,
+      "original_line_sha256": "e0591228740ee06c8c9dde11a7ce155af2af5f76ea21061a32de415bbbd1ad4c",
+      "selected_identity_claim": {
+        "id": "duckdb-100-sql-dialect-identity",
+        "kind": "claim",
+        "revision": 1
+      },
+      "selected_identity_source_path": "sces/records/source/goal-duckdb100-manual--1.json",
+      "selected_identity_source_ref": {
+        "id": "goal-duckdb100-manual",
+        "kind": "source",
+        "revision": 1
+      },
+      "target": {
+        "aliases": [],
+        "id": "2a9d5e1dacef4abf95e6bef1feca168c",
+        "identity_claim": {
+          "id": "duckdb-100-sql-dialect-identity",
+          "kind": "claim",
+          "revision": 1
+        },
+        "kind": "dialect",
+        "name": "DuckDB SQL dialect",
+        "relations": [
+          {
+            "claim": {
+              "id": "duckdb-100-sql-dialect-parent",
+              "kind": "claim",
+              "revision": 1
+            },
+            "target": {
+              "id": "b97a2dbaf9d644488c87e934193b55ff"
+            },
+            "type": "dialect-of"
+          },
+          {
+            "claim": {
+              "id": "duckdb-100-postgresql-dialect-influence",
+              "kind": "claim",
+              "revision": 1
+            },
+            "target": {
+              "id": "8b1f1030a0084595883cf70af1655bb9"
+            },
+            "type": "derived-from"
+          }
+        ],
+        "state": "active"
+      },
+      "target_path": "registry/entities/2a/2a9d5e1dacef4abf95e6bef1feca168c.json",
+      "target_sha256": "0de729b80f6c0edec4967374be73d293a149ffede6a91608458ffe5830c76561"
+    }
+  ],
+  "planning_cutoff": "2026-08-15",
+  "policy": {
+    "bundle_sha256": "14da3f31f697ab828d4a4560f060dbe511861020db54bea7bc531e20ea0855ce",
+    "commit": "ab26f278422772f2d9e5d4dd016407d14372a710",
+    "standard": "SCES-1.0"
+  },
+  "registry_head": "be39341993de56d708a66dd295e4b3f95493f417",
+  "repository": "software-commons/language-index",
+  "research_date": "2026-11-23",
+  "review": "Independently reacquire the original rows, the exact embedded locators and enough official and implementation material to judge each original pointer. Assess whether its host-language association can be recorded without implying equivalence of dialect, product, pattern grammar, engine, or client API. Resolve relative representatives at the predecessor cutoff. Check native evidence, publication applicability, configuration, transport redirects, potential contradictions and untested behavior. Review the optional exact documentary claim proposals separately if selected for promotion. Record six SCES findings where applicable, actual captures, exact spans, limitations and targeted challenges.",
+  "selected_identity_cohort": "0.1.0-rc.7"
+}

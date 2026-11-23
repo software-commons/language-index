@@ -1,0 +1,368 @@
+{
+  "duckdb-100-reference": [
+    {
+      "decoded_utf8_sha256": "c9b817165c01640b6ff7bc0987c216714bc15028a8f08d543cb4a9441cb68a46",
+      "method": "pypdf 6.19.0 PdfReader page extract_text; PDF source text occurs in decoded object streams",
+      "physical_pdf_page": 1
+    },
+    {
+      "decoded_utf8_sha256": "d8775f5fa8bd5130aa8bcae2ceece28153eb21a194b74c89c0482bab16a00fae",
+      "method": "pypdf 6.19.0 PdfReader page extract_text; PDF source text occurs in decoded object streams",
+      "physical_pdf_page": 688
+    },
+    {
+      "decoded_utf8_sha256": "eded05f404d81b370ab145b2470792cd30dd52c6aaac427f7f0eaff88ebeff72",
+      "method": "pypdf 6.19.0 PdfReader page extract_text; PDF source text occurs in decoded object streams",
+      "physical_pdf_page": 689
+    },
+    {
+      "decoded_utf8_sha256": "3219edd245f75f2e8705778426d06352af8987caa3d363d1f957fa8f2c2be7b4",
+      "method": "pypdf 6.19.0 PdfReader page extract_text; PDF source text occurs in decoded object streams",
+      "physical_pdf_page": 690
+    },
+    {
+      "decoded_utf8_sha256": "1bb01be9abf8621a1f817c9b7b023b809beb23ebb6b63dc362feae9910019da1",
+      "method": "pypdf 6.19.0 PdfReader page extract_text; PDF source text occurs in decoded object streams",
+      "physical_pdf_page": 691
+    },
+    {
+      "decoded_utf8_sha256": "298fabd8ce102e5b2bfc3e762bbf0d10c324aeeadfbafee2c927925313882897",
+      "method": "pypdf 6.19.0 PdfReader page extract_text; PDF source text occurs in decoded object streams",
+      "physical_pdf_page": 776
+    }
+  ],
+  "duckdb-15-dialect": [
+    {
+      "end_line": 295,
+      "exact_sha256": "7385492cd5b31b310dec3c55116c19be59db93f472200461041a6fcb5694c4a0",
+      "offset_end_exclusive": 68676,
+      "offset_start": 68196,
+      "start_line": 287
+    }
+  ],
+  "duckdb-15-facility": [
+    {
+      "end_line": 313,
+      "exact_sha256": "efec2199e86d75817772d38e09e9223c5d2d1e536af95f05de2b0f09635e9891",
+      "offset_end_exclusive": 70571,
+      "offset_start": 69438,
+      "start_line": 296
+    },
+    {
+      "end_line": 678,
+      "exact_sha256": "6c5538031dda731b7c71003ebb5503efad3c6d707860d1f648a823ec5b092d0d",
+      "offset_end_exclusive": 96687,
+      "offset_start": 95322,
+      "start_line": 658
+    }
+  ],
+  "duckdb-155-code": [
+    {
+      "end_line": 105,
+      "exact_sha256": "1b69b824b45a689fcfeecd668c7956144cf8051bbeb60658465cf1354c850ff5",
+      "offset_end_exclusive": 4385,
+      "offset_start": 4040,
+      "start_line": 95
+    },
+    {
+      "end_line": 401,
+      "exact_sha256": "f8c730d6d6da789fe695ca1a1f743b73a17939e8a121695df3dc763c57604f80",
+      "offset_end_exclusive": 17814,
+      "offset_start": 16095,
+      "start_line": 375
+    }
+  ],
+  "duckdb-155-re2-build": [
+    {
+      "end_line": 20,
+      "exact_sha256": "2e6a97d8e32e6af0b5f750b6de148ae6e0075cfbb5acd497bb8e4e58badeaa7b",
+      "offset_end_exclusive": 473,
+      "offset_start": 0,
+      "start_line": 1
+    }
+  ],
+  "duckdb-original-facility": [
+    {
+      "end_line": 10,
+      "exact_sha256": "1557df2ac1b872eb4b16f09df184434f6d38f3491bf0b559f2d7e880495c9ee1",
+      "offset_end_exclusive": 601,
+      "offset_start": 61,
+      "start_line": 4
+    }
+  ],
+  "duckdb-releases": [
+    {
+      "end_line": 385,
+      "exact_sha256": "c341270d2c0823675b785f26460e8ce31e4769adf18a8129b24f633cec501356",
+      "offset_end_exclusive": 11823,
+      "offset_start": 11358,
+      "start_line": 373
+    }
+  ],
+  "mysql-26070-registry": [
+    {
+      "end_line": 1525,
+      "exact_sha256": "14796351ef42a6db7c03284a955ade4ab4e1590d50ecee94301a26230f632860",
+      "offset_end_exclusive": 52519,
+      "offset_start": 52247,
+      "start_line": 1522
+    }
+  ],
+  "mysql-26070-version": [
+    {
+      "end_line": 6,
+      "exact_sha256": "5e50579dedad36143f1ac2791c3501872aef9a744fd69134bff5f8d07fb2b3b4",
+      "offset_end_exclusive": 157,
+      "offset_start": 0,
+      "start_line": 1
+    }
+  ],
+  "mysql-8046-registry": [
+    {
+      "end_line": 1531,
+      "exact_sha256": "14796351ef42a6db7c03284a955ade4ab4e1590d50ecee94301a26230f632860",
+      "offset_end_exclusive": 51854,
+      "offset_start": 51582,
+      "start_line": 1528
+    }
+  ],
+  "mysql-8410-cmake": [
+    {
+      "end_line": 33,
+      "exact_sha256": "8af4d15662341313f9a45803051639e35dcd89f0ce09b66a165354f1624d05d6",
+      "offset_end_exclusive": 1590,
+      "offset_start": 1181,
+      "start_line": 23
+    },
+    {
+      "end_line": 183,
+      "exact_sha256": "55883dc1f636f77961acee5daa36d214d94afcc1cd3f2045398a2f1ec9afb61c",
+      "offset_end_exclusive": 6364,
+      "offset_start": 5915,
+      "start_line": 166
+    }
+  ],
+  "mysql-8410-engine": [
+    {
+      "end_line": 28,
+      "exact_sha256": "4a3495ab6ad70eeb7b57b64ba97b1c79e87054ff7b395f0b327c4ecd1e9f37a6",
+      "offset_end_exclusive": 1301,
+      "offset_start": 1191,
+      "start_line": 25
+    },
+    {
+      "end_line": 108,
+      "exact_sha256": "b31af927ec70d9af28791f3e53f05ee6082cd7e113df9603eb5d5922df1efdad",
+      "offset_end_exclusive": 3986,
+      "offset_start": 3171,
+      "start_line": 87
+    }
+  ],
+  "mysql-8410-facade": [
+    {
+      "end_line": 78,
+      "exact_sha256": "aebefaee09c37af629b88743fb936aa4818de9f0bfe496b3ae52b43b6d851a90",
+      "offset_end_exclusive": 2657,
+      "offset_start": 2021,
+      "start_line": 60
+    },
+    {
+      "end_line": 192,
+      "exact_sha256": "eeb460467ba343b6ed3f29a7d54224adb399c275dfb1df860617e674f2192bbc",
+      "offset_end_exclusive": 6831,
+      "offset_start": 6381,
+      "start_line": 180
+    }
+  ],
+  "mysql-8410-facade-impl": [
+    {
+      "end_line": 184,
+      "exact_sha256": "e07f1f9503712ac786ffd155025c1eb653c2a7291f8bb59da7a603a75a6bbdad",
+      "offset_end_exclusive": 6689,
+      "offset_start": 6299,
+      "start_line": 174
+    },
+    {
+      "end_line": 274,
+      "exact_sha256": "03da006e04566f42092b64dd4b25d39efd764d0f0fe041a612f240a1219cb070",
+      "offset_end_exclusive": 9808,
+      "offset_start": 9303,
+      "start_line": 254
+    }
+  ],
+  "mysql-8410-item": [
+    {
+      "end_line": 156,
+      "exact_sha256": "abd790a29a77733afe39bef2227cc587e845a6382af6de48bdbe28f7ac8a6f77",
+      "offset_end_exclusive": 5652,
+      "offset_start": 4720,
+      "start_line": 126
+    },
+    {
+      "end_line": 241,
+      "exact_sha256": "c05273d87c281ff6d0504679a482311167a46b27289580228e87bcfb61fb459e",
+      "offset_end_exclusive": 7931,
+      "offset_start": 7359,
+      "start_line": 219
+    }
+  ],
+  "mysql-8410-sql-grammar": [
+    {
+      "end_line": 10244,
+      "exact_sha256": "fba18cdcf749ce1bc756cc681df295442b41e5f3d64a2cacffb01e3b28516a06",
+      "offset_end_exclusive": 331600,
+      "offset_start": 331050,
+      "start_line": 10229
+    }
+  ],
+  "mysql-8410-sql-registration": [
+    {
+      "end_line": 1532,
+      "exact_sha256": "14796351ef42a6db7c03284a955ade4ab4e1590d50ecee94301a26230f632860",
+      "offset_end_exclusive": 51890,
+      "offset_start": 51618,
+      "start_line": 1529
+    }
+  ],
+  "mysql-oracle-reference": [
+    {
+      "decoded_utf8_sha256": "4842d26bf8e3da626e71a18861bd7c2660bde1236c944d1cecb723c8fcd8c3dc",
+      "method": "pypdf 6.19.0 PdfReader page extract_text; PDF source text occurs in decoded object streams",
+      "physical_pdf_page": 1
+    },
+    {
+      "decoded_utf8_sha256": "9c1274da2e4f67f6d9b4be17fbe61d588c931940b63c16cb610e1ab5be1680c2",
+      "method": "pypdf 6.19.0 PdfReader page extract_text; PDF source text occurs in decoded object streams",
+      "physical_pdf_page": 2
+    },
+    {
+      "decoded_utf8_sha256": "b2bac187bc1833566676dfba5154b1b636972855d59a440609c63c31b191f47e",
+      "method": "pypdf 6.19.0 PdfReader page extract_text; PDF source text occurs in decoded object streams",
+      "physical_pdf_page": 79
+    },
+    {
+      "decoded_utf8_sha256": "6ec77a9e752a27dfbb6221ed2d11bfb44cf0b6147e7e245daef20600fdde3063",
+      "method": "pypdf 6.19.0 PdfReader page extract_text; PDF source text occurs in decoded object streams",
+      "physical_pdf_page": 2352
+    },
+    {
+      "decoded_utf8_sha256": "b7b0d694cbe88d856e33f6d960616b93da6c2183da44905fddcb1ede7991cca6",
+      "method": "pypdf 6.19.0 PdfReader page extract_text; PDF source text occurs in decoded object streams",
+      "physical_pdf_page": 2353
+    }
+  ],
+  "strling-planning": [
+    {
+      "end_line": 16,
+      "exact_sha256": "30393077cb88663a60af36d5f7f5d13268c89602cb4f327c88dcb35027d2f1f1",
+      "offset_end_exclusive": 558,
+      "offset_start": 2,
+      "start_line": 2
+    },
+    {
+      "end_line": 108,
+      "exact_sha256": "f56ddb45bfd608dbaa0b53ab48e112d63712b27a9ae31ab2b9e98dc1f44bb4c1",
+      "offset_end_exclusive": 22356,
+      "offset_start": 21907,
+      "start_line": 108
+    },
+    {
+      "end_line": 113,
+      "exact_sha256": "bb0ac6d86523f137e7590e7717fd27466157429f59240636831104911563e832",
+      "offset_end_exclusive": 24662,
+      "offset_start": 24211,
+      "start_line": 113
+    },
+    {
+      "end_line": 117,
+      "exact_sha256": "e0591228740ee06c8c9dde11a7ce155af2af5f76ea21061a32de415bbbd1ad4c",
+      "offset_end_exclusive": 26360,
+      "offset_start": 25970,
+      "start_line": 117
+    }
+  ],
+  "tsql-2025-pinned-applies": [
+    {
+      "end_line": 11,
+      "exact_sha256": "84939d9cff41e5f5c188a2fbf2f0d758925ca605db1e4115f9d19e58952e47f9",
+      "offset_end_exclusive": 424,
+      "offset_start": 131,
+      "start_line": 11
+    }
+  ],
+  "tsql-2025-pinned-functions": [
+    {
+      "end_line": 20,
+      "exact_sha256": "e7927ca4bfb9d5005c9d2831fa3429748fd817269269c8a528aa90fe33c06500",
+      "offset_end_exclusive": 1517,
+      "offset_start": 149,
+      "start_line": 10
+    }
+  ],
+  "tsql-2025-pinned-overview": [
+    {
+      "end_line": 36,
+      "exact_sha256": "f865fe4be092b8fcd0e43980d977ef7f85ababae5eb75376f022f3dced7fe25d",
+      "offset_end_exclusive": 1895,
+      "offset_start": 521,
+      "start_line": 20
+    },
+    {
+      "end_line": 173,
+      "exact_sha256": "23cf38267cc99fb68d36a0158a1077a731dd23737401f8a854915e000eeb569d",
+      "offset_end_exclusive": 8150,
+      "offset_start": 6391,
+      "start_line": 146
+    }
+  ],
+  "tsql-2025-pinned-regexp-like": [
+    {
+      "end_line": 42,
+      "exact_sha256": "7c582540c2bb40002b3ee78862bcdc2d77561291e897c96eabf158e7f5ec0b8e",
+      "offset_end_exclusive": 1547,
+      "offset_start": 497,
+      "start_line": 18
+    },
+    {
+      "end_line": 62,
+      "exact_sha256": "be0a4f918abdf468570d22da1cf08f481c781e9f091ce24f0e06663d1d370dbe",
+      "offset_end_exclusive": 1941,
+      "offset_start": 1878,
+      "start_line": 58
+    }
+  ],
+  "tsql-builds": [
+    {
+      "end_line": 792,
+      "exact_sha256": "7542adb69bf49782867bbdf27beb69f1a995925d636ec95d9294dc814264525b",
+      "offset_end_exclusive": 71998,
+      "offset_start": 71751,
+      "start_line": 782
+    }
+  ],
+  "tsql-cu8-canonical": [
+    {
+      "end_line": 743,
+      "exact_sha256": "744166a47074de3132703916b7e67f1661d2e1726f414b0a4b5f05b51a868223",
+      "offset_end_exclusive": 65069,
+      "offset_start": 64206,
+      "start_line": 734
+    }
+  ],
+  "tsql-reference": [
+    {
+      "end_line": 29,
+      "exact_sha256": "e21db7e7f723a1fc76771eee11137d7ca28c83964beebd90da01cdd1af169304",
+      "offset_end_exclusive": 1404,
+      "offset_start": 582,
+      "start_line": 21
+    },
+    {
+      "end_line": 70,
+      "exact_sha256": "8b481143b0f45257d6810e01e0c22015a7a261676a9ff45566080286e87c5f53",
+      "offset_end_exclusive": 3825,
+      "offset_start": 3425,
+      "start_line": 65
+    }
+  ]
+}
