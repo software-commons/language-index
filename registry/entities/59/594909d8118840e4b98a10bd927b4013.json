@@ -1,0 +1,1 @@
+{"aliases":[],"id":"594909d8118840e4b98a10bd927b4013","identity_claim":{"id":"gfm-identity","kind":"claim","revision":1},"kind":"dialect","name":"GitHub Flavored Markdown","relations":[{"claim":{"id":"gfm-parent-commonmark","kind":"claim","revision":1},"target":{"id":"9b50dc3275ea4534b412bc2443045da2"},"type":"dialect-of"}],"state":"active"}

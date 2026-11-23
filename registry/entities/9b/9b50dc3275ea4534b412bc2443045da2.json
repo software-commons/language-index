@@ -1,0 +1,1 @@
+{"aliases":[],"id":"9b50dc3275ea4534b412bc2443045da2","identity_claim":{"id":"commonmark-identity","kind":"claim","revision":1},"kind":"dialect","name":"CommonMark","relations":[{"claim":{"id":"commonmark-parent-markdown","kind":"claim","revision":1},"target":{"id":"167c34a626ab41a791af24280e83c649"},"type":"dialect-of"}],"state":"active"}
