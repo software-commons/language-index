@@ -73,3 +73,7 @@ Rc.12 documents the CPL, BCPL and B lineage, early JOVIAL, and the Smalltalk lan
 ## Candidate for first protected integration
 
 The `0.1.0-rc.5-main.1` [qualification report](../sces/releases/verified-language-cohort-main-bootstrap-rc1/qualification.json) selects the same 264 claim revisions and exact frozen source as the historical rc.5 candidate. The [archive manifest](../sces/artifacts/candidate-history/manifest.json) records the exact selectors, reports, and payloads of the five draft checkpoints. Protected integration and authorization to publish the exact assets remain separate. This checkpoint covers a limited cohort of the discovery population.
+
+## Bounded integration candidate `0.1.0-rc.12-main.1`
+
+The [qualification report](../sces/releases/verified-language-cohort-main-rc12/qualification.json) retains 482 claims and the exact frozen evidence commit of the historical candidate. The [checkpoint manifest](../sces/artifacts/candidate-history/manifest-rc12.json) records each original selector, qualification report, and payload by Git commit, path, and SHA-256. The original commits remain reachable through the ordinary ancestry merge. The active qualification records its exact predecessor. Publication requires separate authorization.
