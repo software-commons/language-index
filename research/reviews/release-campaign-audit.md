@@ -11,15 +11,15 @@ The campaign started from the 26 provisional profiles on `fb221d9141f529a8ef99f2
 | Go | Go 1.23 source-file structure and slice storage | Reverify both exact original claims. Larger edition and implementation history remains outside the original profile. |
 | Lua | 5.4 types, metatables and memory | Reverify applicability within the documented 5.4 language and distinguish behavior governed by the manual from a particular execution. |
 | Haskell | 2010 typing, evaluation and modules | Reverify against the language report. Compiler-specific extensions require separate records. |
-| XML | XML 1.0 Fifth Edition syntax and processor obligations | The broad pass-through claim omits a non-validating processor's ability to skip external entity replacement text. Retain the narrower specification evidence and exclude the old condition. |
+| XML | XML 1.0 Fifth Edition syntax and processor obligations | A reviewed successor limits character delivery to included and processed data and preserves the non-validating processor's external-entity exception. Earlier broad revisions remain excluded. |
 | XPath | 3.1 map and array expressions | The Recommendation and its publisher announcement support the version-specific source association for the existing XPath lead. |
-| Ada | Ada 2022 packages and tasking | Three proposed claims cited deleted paragraphs in the annotated manual. The identity and package revisions use active text. A later tasking draft still overstated queue residence when exceptional completion can occur. |
+| Ada | Ada 2022 packages and tasking | Three proposed claims cited deleted paragraphs in the annotated manual. The identity and package revisions use active text. The verified tasking successor covers ordinary queue insertion and leaves exceptional removal and completion scoped separately. |
 | Rust | Modules and drop scopes, with one Rust 2024 distinction | Resolve edition-specific applicability and keep compiler and Cargo conventions separate. |
 | Kotlin | Nullability and class inheritance | Isolate special treatment of sealed classes and keep interoperability platform-specific. |
 | Scala | 2.13 lazy values and object definitions | Restrict the source to Scala 2.13. Scala 3 relations and compiler lowering need separate evidence. |
 | Clojure | JVM 1.12 core macros and atom APIs | Distinguish Clojure identity from the JVM host and pin implementation/API claims to the documented distribution. |
-| PostgreSQL SQL | 17.0 table inheritance and partition declarations | The command reference supports specific vendor behavior. Governed SQL parent and dialect identity need separate authority. |
-| SQLite SQL | 3.46.0 parser grammar and table options | Parser evidence establishes recognized grammar fields. Engine behavior and SQL dialect identity need distinct support. |
+| PostgreSQL SQL | 17.0 table inheritance and partition declarations | The command reference supports version-specific behavior. An independent review links the dialect to the SQL identity using publisher documentation. |
+| SQLite SQL | 3.46.0 parser grammar and table options | Parser evidence and a release-specific reproduction establish recognized options. Publisher documentation supports the scoped dialect relationship. Storage behavior remains outside the parser claims. |
 | Visual Basic for .NET | Source compilation, Option Strict, and imports | Microsoft separately documents VB6 and VBA. A shared display name does not establish an alias or edition relation. The independent review also observed that the tested Roslyn compiler accepted a mixed-width keyword that the pinned grammar excludes. The scope of the selected claim is the grammar. [VB6 support statement](https://learn.microsoft.com/en-us/previous-versions/visualstudio/visual-basic-6/visual-basic-6-support-policy?view=vs-2019) · [VBA language specification](https://learn.microsoft.com/en-us/openspecs/microsoft_general_purpose_programming_languages/ms-vbal/d5418146-0bd2-45eb-9c7a-fd9502722c74) |
 
 ## Historical and enterprise profile audit
@@ -48,6 +48,8 @@ The first `OrdinaryGet` revision says its operation returns no own property desc
 
 ## Exact discovery matches
 
-The prospective registry links the existing XPath, NESL, PeopleCode and SIMULA candidates to their reviewed language identities. The dated W3C Recommendation supplies XPath edition context. The other three candidate locators are exact identity sources. SIMULA is resolved only in the sense defined by the 1986 source. The NIST-hosted Handbook 118 supports the MUMPS identity, while the Bitsavers discovery copy returned HTTP 403. That copy remains an unresolved crosswalk.
+The prospective registry links the existing XPath, NESL, PeopleCode, SIMULA, Napier88, and Argus candidates to reviewed language identities. The W3C Recommendation supplies XPath edition context. MIT's Handle and the Argus discovery URL returned identical catalog bytes with SHA-256 `da467e82208b651a5e1a622f548d8ebc762dff9dd09e4888c995aa22d439b927`. The other four candidate locators are exact identity sources. SIMULA is resolved in the sense defined by the 1986 source. The NIST-hosted Handbook 118 supports the MUMPS identity, while the Bitsavers discovery copy returned HTTP 403. That copy remains an unresolved crosswalk.
+
+The SQL parent uses the public 2023 Framework preview's identity and scope. Detailed clauses and the full corrigendum are outside the selection. The PostgreSQL 17.0 and SQLite 3.46.0 dialect relationships refer to their separately documented vendor boundaries. The qualified relationships carry no general conformance finding.
 
 The release cohort uses exact selected claims and directly inspected sources. Unreviewed profiles, unresolved lead matches, and candidate-era draft claims remain research records. The cohort establishes neither a closed population nor complete technical or historical coverage of an included language.
