@@ -1,13 +1,12 @@
 {
-  "snapshot": "census-2026-11-22-targeted",
-  "campaign": "Predecessor reconciliation and targeted public discovery",
+  "campaign": "Predecessor label follow-up and discovery locator audit",
   "cutoff": "2026-11-22",
-  "scope": "1,120 distinct source rows from tooling, Regex Conformance fallback, historical, enterprise, academic, international, and formal-language routes.",
-  "method": "Pinned Linguist intake and exact Regex Conformance fallback, followed by independent targeted passes with unique qualified discovery locators. Keep distinct origins and unresolved identities.",
   "limitations": [
-    "The recorded population contains labels and research leads. It does not denote a count of distinct languages.",
-    "The original Regex Conformance census artifact was unavailable. The private Atlas overlay remains outside the public registry.",
-    "Some publisher pointers were restricted or unavailable. Several catalog entries may be dialects, aliases, implementations, notations, or duplicates.",
-    "Identity, source qualification, and individual profile depth remain independently tracked."
-  ]
+    "The population is a set of source leads. Identity, family, alias, and edition adjudication remains incomplete.",
+    "Original external Regex census artifacts remain unavailable. Private Atlas row data is excluded.",
+    "Some sources were accessible through indexed publisher text only. Those routes do not establish full byte preservation or support canonical qualification."
+  ],
+  "method": "Compare six unmatched predecessor labels with original catalog rows and publisher sources. Recheck PLOC, Nadeshiko, and VDM locators against source material. Retain source row identities and record provisional findings.",
+  "scope": "The 1,120 original public source rows and two new publisher leads for Delphi language and the PL/I General-Purpose Subset.",
+  "snapshot": "census-2026-11-22-reconciliation"
 }
