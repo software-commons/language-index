@@ -1,0 +1,489 @@
+{
+  "selection": "0.1.0-rc.4",
+  "qualified_source_commit": "c4790500be5ec799058055558e9774113b9545a6",
+  "base_pr_head": "ed4c0ff6bff72b567377a5c02dc85821d0ca1d99",
+  "policy": {
+    "sces_bundle_sha256": "14da3f31f697ab828d4a4560f060dbe511861020db54bea7bc531e20ea0855ce",
+    "sces_revision": "ab26f278422772f2d9e5d4dd016407d14372a710",
+    "scirs_revision": "f23ffb93c5ad8d6b96d8652186ba20befee3bca8"
+  },
+  "independent_input_sha256": "ebe80daf31e841c08a0279d7c1bbe982a670c037d45c49086816c39191d56b24",
+  "capture_manifest_sha256": "790fd22c2487705457265e1573b7f106ce401128f51ec1aa76dc7c29de858146",
+  "review_basis": "Original URLs independently retrieved using curl. Capture SHA-256 is over the untouched response bytes. HTTP status is read from the preserved response headers. Publisher and standards text viewed through web indexing is indicated separately from acquired bodies. Candidate judgments rely on the frozen input and source inspection.",
+  "assessments": [
+    {
+      "candidate_id": "ab569e010556421f8f7be123d11099e3",
+      "candidate_sha256": "3c64f750a2bb51fcc6ca5439f38c7b4157be8f93d8b2bd648aa7af9eedb7d262",
+      "discovery_label": "CLU",
+      "selected_identity_claim": {
+        "id": "clu-language-identity",
+        "kind": "claim",
+        "revision": 1
+      },
+      "target_entity": "c553566fa2654ba3a6d26caa3e4ecac5",
+      "target_name": "CLU",
+      "verdict": "language-link-supported",
+      "scope": "language",
+      "finding": "Barbara Liskov\u2019s MIT LCS TR-561 directly identifies CLU as a programming language in its abstract. The development history distinguishes the language design, preliminary CLU .5, the reference manual, and successive compiler implementations.",
+      "link": "Link the discovery lead to the selected CLU language identity.",
+      "hold": "No hold for the language-level linkage.",
+      "evidence": [
+        {
+          "locator": "https://publications.csail.mit.edu/lcs/pubs/pdf/MIT-LCS-TR-561.pdf",
+          "candidate_id": "ab569e010556421f8f7be123d11099e3",
+          "role": "original",
+          "http_status": 200,
+          "headers_file": "captures/clu.pdf.headers",
+          "headers_sha256": "72f603c71f6331b9956aa1453751cc1ad9f86789e345790e4f949d2b1c137e3b",
+          "capture_file": "captures/clu.pdf",
+          "capture_bytes": 73751,
+          "capture_sha256": "1b1897dd7456ec4ab37e5b93e8d2552f4d4338f3ae32a78b9d02a40ca14189be",
+          "input_sha256": "1b1897dd7456ec4ab37e5b93e8d2552f4d4338f3ae32a78b9d02a40ca14189be",
+          "matches_input_sha256": true,
+          "passage": "PDF page 1, Abstract and Introduction. PDF page 22, CLU and Finishing Up."
+        }
+      ]
+    },
+    {
+      "candidate_id": "d13e46580d2a41e9866e7674028167ce",
+      "candidate_sha256": "deead333276ffb11436e203a0780a61e1438d4c977caeaa90724abe4a73aab50",
+      "discovery_label": "Modula-3",
+      "selected_identity_claim": {
+        "id": "modula-3-language-identity",
+        "kind": "claim",
+        "revision": 1
+      },
+      "target_entity": "b35f9c380ac7490f8d34702a1b9543c9",
+      "target_name": "Modula-3",
+      "verdict": "language-link-supported",
+      "scope": "historical collection with explicit language subject",
+      "finding": "The Computer History Museum landing page is an annotated collection. Its Introduction explicitly identifies Modula-3 as a programming language, and its bibliography binds the archive subject to the designers\u2019 revised language report and later language definition.",
+      "link": "Link the discovery lead for the collection\u2019s language subject to the selected Modula-3 language identity.",
+      "hold": "Keep the CHM collection, report and implementations such as CM3 scoped as separate objects.",
+      "evidence": [
+        {
+          "locator": "https://softwarepreservation.computerhistory.org/modula3/",
+          "candidate_id": "d13e46580d2a41e9866e7674028167ce",
+          "role": "original",
+          "http_status": 200,
+          "headers_file": "captures/modula3-chm.html.headers",
+          "headers_sha256": "0bad9c9d5fc44624a23451258b41560dfd008060f6e1dc0362be8bfd9869282b",
+          "capture_file": "captures/modula3-chm.html",
+          "capture_bytes": 152839,
+          "capture_sha256": "b8bf8c79e9dfba466c0a31df7e3a1585afd94d317c373a0e7e0f1b4748cd5062",
+          "input_sha256": "b8bf8c79e9dfba466c0a31df7e3a1585afd94d317c373a0e7e0f1b4748cd5062",
+          "matches_input_sha256": true,
+          "passage": "HTML lines 26\u201327, 72\u201378 and 99\u2013107, Abstract, Introduction and Cardelli bibliography entries."
+        },
+        {
+          "locator": "https://softwarepreservation.computerhistory.org/modula3/doc/SRC-RR-52.pdf",
+          "candidate_id": "d13e46580d2a41e9866e7674028167ce",
+          "role": "supplemental",
+          "http_status": 200,
+          "headers_file": "captures/modula3-src-rr-52.pdf.headers",
+          "headers_sha256": "aa05857ad5e371583863d15fd28a393cf987717002c43a306ddfed5a972bdf62",
+          "capture_file": "captures/modula3-src-rr-52.pdf",
+          "capture_bytes": 2344668,
+          "capture_sha256": "d022f91be1a904dd1ed3ea76a04744eec89ff4e278fc0588f279c9b39714f73a",
+          "input_sha256": "d022f91be1a904dd1ed3ea76a04744eec89ff4e278fc0588f279c9b39714f73a",
+          "matches_input_sha256": true,
+          "passage": "PDF pages 1, 5 and 9, cover, permission to implement or use the language, and language definition contents."
+        },
+        {
+          "locator": "https://softwarepreservation.computerhistory.org/modula3/doc/CardelliEtAl-M3_Language_Definition-1992.pdf",
+          "candidate_id": null,
+          "role": "independent-supplemental-attempt",
+          "http_status": 200,
+          "headers_file": "captures/modula3-cardelli-1992.pdf.headers",
+          "headers_sha256": "6e4d53fb89350c96377ef7cd7e7638ce601464bd35b2878865063ff91437f310",
+          "capture_file": "captures/modula3-cardelli-1992.pdf",
+          "capture_bytes": 2382050,
+          "capture_sha256": "3969fe8a15d3124b7fc434d7e3f920cc8295f27c5ae4726eb0d5022f49c79a5a",
+          "input_sha256": null,
+          "matches_input_sha256": null,
+          "passage": "PDF page 1, ACM SIGPLAN Notices 27(8), printed page 15, author abstract and Definitions."
+        }
+      ]
+    },
+    {
+      "candidate_id": "de573c6b30d046aca2d0cbd032e83dd4",
+      "candidate_sha256": "cdf90ee43700228332d6d1a62a515ed06b4bdffb5d424f3518ab87901529a776",
+      "discovery_label": "Icon",
+      "selected_identity_claim": {
+        "id": "icon-language-identity",
+        "kind": "claim",
+        "revision": 1
+      },
+      "target_entity": "ef5e04e8604f4519a6879f76e5ee3eea",
+      "target_name": "Icon",
+      "verdict": "language-link-supported",
+      "scope": "manual-edition landing page with explicit language subject",
+      "finding": "The University of Arizona landing page identifies a third-edition book and links the exact matching PDF. The creators\u2019 introduction and Griswold\u2019s project overview identify Icon as the programming language covered by the 1996 book and by the version 9 overview.",
+      "link": "Link the discovery lead for the book\u2019s language subject to the selected Icon language identity.",
+      "hold": "Keep the third book edition and version 9 as evidence scope. The sources establish the language subject through prose, syntax and reference material.",
+      "evidence": [
+        {
+          "locator": "https://www2.cs.arizona.edu/icon/lb3.htm",
+          "candidate_id": "de573c6b30d046aca2d0cbd032e83dd4",
+          "role": "original",
+          "http_status": 200,
+          "headers_file": "captures/icon-book-landing.html.headers",
+          "headers_sha256": "55c5cfb618462701332f83649024ebef5fe45dc73231e714572b26d1114772d6",
+          "capture_file": "captures/icon-book-landing.html",
+          "capture_bytes": 1701,
+          "capture_sha256": "b4761973f6bed8a8ccb5738d49626c60fe0e27e08657300faa0fe130400a8263",
+          "input_sha256": "b4761973f6bed8a8ccb5738d49626c60fe0e27e08657300faa0fe130400a8263",
+          "matches_input_sha256": true,
+          "passage": "HTML lines 4, 11\u201318, and 56, title, author/edition block, 1-up link, and Appendix D."
+        },
+        {
+          "locator": "https://www2.cs.arizona.edu/icon/ftp/doc/lb1up.pdf",
+          "candidate_id": "de573c6b30d046aca2d0cbd032e83dd4",
+          "role": "supplemental",
+          "http_status": 200,
+          "headers_file": "captures/icon-book.pdf.headers",
+          "headers_sha256": "dbae9a524abe78852a03cb7a4920edf0eb5006e9f4f558f82d469cdcca08342a",
+          "capture_file": "captures/icon-book.pdf",
+          "capture_bytes": 1780561,
+          "capture_sha256": "8f7d5110f33e9339790dffa72150bb5a15ac3c7a78015c41f12c61f27b33669b",
+          "input_sha256": "8f7d5110f33e9339790dffa72150bb5a15ac3c7a78015c41f12c61f27b33669b",
+          "matches_input_sha256": true,
+          "passage": "PDF page 17, Introduction, and PDF page 295, Appendix D, printed page 273."
+        },
+        {
+          "locator": "https://www2.cs.arizona.edu/icon/docs/ipd266.htm",
+          "candidate_id": "de573c6b30d046aca2d0cbd032e83dd4",
+          "role": "supplemental",
+          "http_status": 200,
+          "headers_file": "captures/icon-ipd266.html.headers",
+          "headers_sha256": "125f849682a8dbc419b8fa722d1a384ff3efffa9d7ed0a41c28f47af19d38923",
+          "capture_file": "captures/icon-ipd266.html",
+          "capture_bytes": 22277,
+          "capture_sha256": "f8d3c2651f19092cbf74a05499eaf2612eb85e8aa38e0d633d0005626153522c",
+          "input_sha256": "f8d3c2651f19092cbf74a05499eaf2612eb85e8aa38e0d633d0005626153522c",
+          "matches_input_sha256": true,
+          "passage": "HTML lines 4\u201322, title, author attribution, report number and Introduction."
+        }
+      ]
+    },
+    {
+      "candidate_id": "2aedea965e2244a1b1a2cacec3025a41",
+      "candidate_sha256": "c4e1e7bb37ade957301bcca9ed91389ad655dfefc3596eb45a3853a57e66e4ab",
+      "discovery_label": "Rocq Gallina",
+      "selected_identity_claim": {
+        "id": "gallina-language-identity",
+        "kind": "claim",
+        "revision": 1
+      },
+      "target_entity": "574fe6265be158c98b3d60329ab94cda",
+      "target_name": "Gallina",
+      "verdict": "language-link-supported-by-supplement",
+      "scope": "contextual language lead with product README as original locator",
+      "finding": "The committed README introduces the Rocq theorem prover and describes a formal language without naming Gallina. The acquired GitHub presentation has a different hash. Its embedded exact-commit document content matches all 108 lines of the separately acquired raw README, which matches the input digest. At that same commit the reference manual\u2019s SSReflect chapter names Gallina as Coq\u2019s logical specification language and describes SSReflect extensions separately. The official 8.9.1 manual directly corroborates the specification-language role.",
+      "link": "Link only the Gallina component of the qualified discovery label to the selected Gallina identity using the pinned language passage.",
+      "hold": "The README alone is insufficient. Preserve HTML representation drift. Exclude identity equivalence for the Rocq prover, SSReflect and tactic-language extensions.",
+      "evidence": [
+        {
+          "locator": "https://github.com/rocq-prover/rocq/blob/21891774bf0131945f6cf454e56121d6a4fda02e/README.md",
+          "candidate_id": "2aedea965e2244a1b1a2cacec3025a41",
+          "role": "original",
+          "http_status": 200,
+          "headers_file": "captures/gallina-github.html.headers",
+          "headers_sha256": "de6f7010dba566bb0b6882e23ad612b90f482ece6bfc77ae3a95add12a9de87e",
+          "capture_file": "captures/gallina-github.html",
+          "capture_bytes": 215721,
+          "capture_sha256": "3c8a4e197000607ccedaae3f13b727eed978279016518ff693f413092df569e6",
+          "input_sha256": "3c1ce156f42afb2a6f004847a1dc9d5e87896ffb013f74ee385025a8f62122cb",
+          "matches_input_sha256": false,
+          "passage": "Embedded JSON codeViewBlobLayoutRoute refInfo/currentOid and path and codeViewBlobLayoutRoute.StyledBlob/rawLines."
+        },
+        {
+          "locator": "https://raw.githubusercontent.com/rocq-prover/rocq/21891774bf0131945f6cf454e56121d6a4fda02e/README.md",
+          "candidate_id": "2aedea965e2244a1b1a2cacec3025a41",
+          "role": "supplemental",
+          "http_status": 200,
+          "headers_file": "captures/gallina-readme.md.headers",
+          "headers_sha256": "f5c26533b1e0dc9f62e257b9186b466d0ff587fecf57a74c9e2829efc99831d1",
+          "capture_file": "captures/gallina-readme.md",
+          "capture_bytes": 4633,
+          "capture_sha256": "5d8312220a3f61487f8b07fcddd5cc94f32a2641d112c15bc78fbdb6e0c4322e",
+          "input_sha256": "5d8312220a3f61487f8b07fcddd5cc94f32a2641d112c15bc78fbdb6e0c4322e",
+          "matches_input_sha256": true,
+          "passage": "Lines 1 and 25\u201327, product title and description."
+        },
+        {
+          "locator": "https://raw.githubusercontent.com/rocq-prover/rocq/21891774bf0131945f6cf454e56121d6a4fda02e/doc/sphinx/proof-engine/ssreflect-proof-language.rst",
+          "candidate_id": "2aedea965e2244a1b1a2cacec3025a41",
+          "role": "supplemental",
+          "http_status": 200,
+          "headers_file": "captures/gallina-ssreflect.rst.headers",
+          "headers_sha256": "939845bb13ef08a0b1f35c108fbfea222bb426515ef468a02450000b21de4e78",
+          "capture_file": "captures/gallina-ssreflect.rst",
+          "capture_bytes": 186894,
+          "capture_sha256": "2320cb9f3e68dda9dcac36dd43565a48a35ef310914e787e8334d545e4df5b58",
+          "input_sha256": "2320cb9f3e68dda9dcac36dd43565a48a35ef310914e787e8334d545e4df5b58",
+          "matches_input_sha256": true,
+          "passage": "Lines 113\u2013122, Gallina extensions section."
+        },
+        {
+          "locator": "https://rocq-prover.org/doc/V8.9.1/refman/language/gallina-specification-language.html",
+          "candidate_id": null,
+          "role": "independent-supplemental-attempt",
+          "http_status": 200,
+          "headers_file": "captures/gallina-v89-manual.html.headers",
+          "headers_sha256": "d3828cf6732f33c2862724dcbac7e7a77ed7fb31380584ccbb36836e0f0d292c",
+          "capture_file": "captures/gallina-v89-manual.html",
+          "capture_bytes": 360484,
+          "capture_sha256": "3ab7107f9d5eece88d82c2d234d61ddf0fcf65764b903d0a4763830aae7f95b2",
+          "input_sha256": null,
+          "matches_input_sha256": null,
+          "passage": "The Gallina specification language section and The Vernacular grammar."
+        }
+      ]
+    },
+    {
+      "candidate_id": "488cd40c9f6b42fc966ad03d8c0fd42b",
+      "candidate_sha256": "fc9a19ec4d395551a208e34c8270ef5581ec58b2b698a6895ca40b94b58e2b18",
+      "discovery_label": "Enterprise COBOL (IBM)",
+      "selected_identity_claim": {
+        "id": "cobol-language-identity",
+        "kind": "claim",
+        "revision": 1
+      },
+      "target_entity": "b3d4fcc2971c4f0b96ef9ddd24978127",
+      "target_name": "COBOL",
+      "verdict": "hold-equivalence-product-scope",
+      "scope": "vendor compiler implementation and extensions",
+      "finding": "IBM publication SC27-8713-03 is scoped to the COBOL implementation shipped with Enterprise COBOL for z/OS 6.4 and IBM language extensions. The same publication separately acknowledges the industry language. ISO/IEC 1989:2023 identifies the independent language standard scope.",
+      "link": "Retain IBM Enterprise COBOL as a related vendor implementation. The exact product lead may inform separately modeled implementation linkage.",
+      "hold": "Hold language-identity equivalence of the whole discovery label. The ISO registry abstract supports general COBOL only and does not change the IBM source scope.",
+      "evidence": [
+        {
+          "locator": "https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf",
+          "candidate_id": "488cd40c9f6b42fc966ad03d8c0fd42b",
+          "role": "original",
+          "http_status": 200,
+          "headers_file": "captures/ibm-cobol.pdf.headers",
+          "headers_sha256": "d3b12f248f72588aadf7a9b48fc50347eef73808f9a498d3179450c39d957dff",
+          "capture_file": "captures/ibm-cobol.pdf",
+          "capture_bytes": 4345979,
+          "capture_sha256": "eef69c81ab8bcd569eaa2a47f430ff70c5518d4929cff26e7ab1ed6170f5c0bc",
+          "input_sha256": "eef69c81ab8bcd569eaa2a47f430ff70c5518d4929cff26e7ab1ed6170f5c0bc",
+          "matches_input_sha256": true,
+          "passage": "PDF pages 1, 21 and 24, title, About this information and COBOL acknowledgment."
+        },
+        {
+          "locator": "https://www.iso.org/standard/74527.html",
+          "candidate_id": null,
+          "role": "independent-supplemental-attempt",
+          "http_status": 403,
+          "headers_file": "captures/cobol-iso.html.headers",
+          "headers_sha256": "e249d59360c155e63dce9f982b557283fe5994449c88cb0a904b3e84b683493e",
+          "capture_file": null,
+          "capture_bytes": null,
+          "capture_sha256": null,
+          "input_sha256": null,
+          "matches_input_sha256": null,
+          "passage": "ISO/IEC 1989:2023 publisher index Abstract viewed through web. Direct body acquisition returned HTTP 403."
+        }
+      ]
+    },
+    {
+      "candidate_id": "55aaef7ee78849f8967dce3a3d1b5ec0",
+      "candidate_sha256": "2a37f33983f3d796c799a8ac90dc619ada602255290e90b7f640a3626b1ec0ff",
+      "discovery_label": "MUMPS",
+      "selected_identity_claim": {
+        "id": "mumps-language-identity",
+        "kind": "claim",
+        "revision": 1
+      },
+      "target_entity": "1f875913670f478ba7baf5d30780d315",
+      "target_name": "MUMPS",
+      "verdict": "language-link-supported",
+      "scope": "historical language standard",
+      "finding": "The exact Bitsavers scan and publisher NIST archival copy have identical bytes. NBS Handbook 118 expressly scopes its specification and transition diagrams to the MUMPS programming language, including a standards date and committee provenance.",
+      "link": "Link the discovery lead to the selected MUMPS language identity within the historical standard\u2019s language scope.",
+      "hold": "Keep claims about releases, implementations, an operating system, modern M naming, and later standards separately scoped.",
+      "evidence": [
+        {
+          "locator": "https://www.bitsavers.org/pdf/mumps/NBS_Handbook_118_MUMPS_Language_Standard_Jan1976.pdf",
+          "candidate_id": "55aaef7ee78849f8967dce3a3d1b5ec0",
+          "role": "original",
+          "http_status": 200,
+          "headers_file": "captures/mumps-bitsavers.pdf.headers",
+          "headers_sha256": "35d4a143d8f36d728e1177a7896b709585ee97e78769e5c4e55fcdbcb6f0982a",
+          "capture_file": "captures/mumps-bitsavers.pdf",
+          "capture_bytes": 6795659,
+          "capture_sha256": "ed60a71b77cb98a49267334b38fc334a7fcf4365dd593a8e467ac83ba363b780",
+          "input_sha256": "ed60a71b77cb98a49267334b38fc334a7fcf4365dd593a8e467ac83ba363b780",
+          "matches_input_sha256": true,
+          "passage": "PDF pages 3, 5\u20136, title, foreword and Abstract."
+        },
+        {
+          "locator": "https://nvlpubs.nist.gov/nistpubs/Legacy/hb/nbshandbook118.pdf",
+          "candidate_id": "55aaef7ee78849f8967dce3a3d1b5ec0",
+          "role": "supplemental",
+          "http_status": 200,
+          "headers_file": "captures/mumps-nist.pdf.headers",
+          "headers_sha256": "82fd16ed34e54d70e7924e2d4317d4c0d20ed84c0a120523b8f9835a916b5ca7",
+          "capture_file": "captures/mumps-nist.pdf",
+          "capture_bytes": 6795659,
+          "capture_sha256": "ed60a71b77cb98a49267334b38fc334a7fcf4365dd593a8e467ac83ba363b780",
+          "input_sha256": "ed60a71b77cb98a49267334b38fc334a7fcf4365dd593a8e467ac83ba363b780",
+          "matches_input_sha256": true,
+          "passage": "Publisher archival copy, same pages and SHA-256 as the original Bitsavers copy."
+        }
+      ]
+    },
+    {
+      "candidate_id": "82d03bf9cc3b4c5e9d12345f9a9b0269",
+      "candidate_sha256": "63d54bbc8ee9ae79ed920ecccf76248635e27ccb729921fdf232f8981ab13ddf",
+      "discovery_label": "RPG IV",
+      "selected_identity_claim": {
+        "id": "rpg-iv-language-identity",
+        "kind": "claim",
+        "revision": 1
+      },
+      "target_entity": "3f8ce68fb2a8483f85da6c18a0b40526",
+      "target_name": "RPG IV",
+      "verdict": "hold-original-unavailable",
+      "scope": "language described by a compiler-scoped reference",
+      "finding": "The exact IBM i 7.5 ILE RPG Reference URL returned HTTP 403. IBM's exact-URL indexed description and published i 7.5 manual expressly call RPG IV the language implemented by the ILE RPG compiler on IBM i. The IBM-authored, independently captured manual mirror corroborates the same passage and gives a language-reference scope.",
+      "link": "Preserve the independently supported distinction between RPG IV as a language and ILE RPG as its IBM i compiler. Preserve the mirror under a separate source locator.",
+      "hold": "Hold exact-discovery-lead acceptance pending original body recovery or adjudication of an explicit alternative-evidence route.",
+      "evidence": [
+        {
+          "locator": "https://www.ibm.com/docs/en/i/7.5.0?topic=rpg-ile-reference",
+          "candidate_id": "82d03bf9cc3b4c5e9d12345f9a9b0269",
+          "role": "original",
+          "http_status": 403,
+          "headers_file": "captures/rpg-ibm-original.html.headers",
+          "headers_sha256": "7756d6637be428d9929c35318210ba8faf7935a350effd0ae6803678ecbfc5d5",
+          "capture_file": null,
+          "capture_bytes": null,
+          "capture_sha256": null,
+          "input_sha256": null,
+          "matches_input_sha256": null,
+          "passage": "Exact URL. HTTP 403, no body capture. Search index snippet used as locator context."
+        },
+        {
+          "locator": "https://www.ibm.com/docs/zh/ssw_ibm_i_75/pdf/sc092508.pdf",
+          "candidate_id": null,
+          "role": "independent-supplemental-attempt",
+          "http_status": 403,
+          "headers_file": "captures/rpg-ibm-zh-manual.pdf.headers",
+          "headers_sha256": "27e46e0c7885e429aa162d166639ae3f5dd58afff03b0e52fe86f401a583db1f",
+          "capture_file": null,
+          "capture_bytes": null,
+          "capture_sha256": null,
+          "input_sha256": null,
+          "matches_input_sha256": null,
+          "passage": "IBM publisher-hosted i 7.5 English PDF indexed by the web tool under the zh path. About ILE RPG Reference. Direct body acquisition returned HTTP 403."
+        },
+        {
+          "locator": "https://www.nicklitten.com/wp-content/uploads/sc092508-%E2%80%93-Programming-IBM-Rational-Development-Studio-for-I-ILE-RPG-Reference.pdf",
+          "candidate_id": null,
+          "role": "independent-supplemental-attempt",
+          "http_status": 200,
+          "headers_file": "captures/rpg-ibm-revision-mirror.pdf.headers",
+          "headers_sha256": "4c86e142f9f293c423e071bb4716ffc432d3e4131f36e5d298e97b5d28c37c45",
+          "capture_file": "captures/rpg-ibm-revision-mirror.pdf",
+          "capture_bytes": 5882875,
+          "capture_sha256": "bf570f449ae73457942288a52838401767c8407f218f78d447d2906da0143b28",
+          "input_sha256": null,
+          "matches_input_sha256": null,
+          "passage": "IBM-authored i 7.5 reference mirror, PDF pages 23 and 25, ILE RPG Reference and Who Should Use This Reference."
+        }
+      ]
+    },
+    {
+      "candidate_id": "970020a867134299961281a7b3bc7eea",
+      "candidate_sha256": "c75ceaef9a486dd5a47e4e0876913cd7837929dd34b8383dbdf4252812f0844a",
+      "discovery_label": "REXX",
+      "selected_identity_claim": {
+        "id": "classic-rexx-language-identity",
+        "kind": "claim",
+        "revision": 1
+      },
+      "target_entity": "adba285f093355408731c6b026ad74c6",
+      "target_name": "REXX",
+      "verdict": "hold-original-unavailable",
+      "scope": "host-specific TSO/E overview with separate Classic Rexx support",
+      "finding": "The exact IBM z/OS 2.5 Highlights of TSO/E URL returned HTTP 403. Its indexed description identifies REXX as a procedures language for writing REXX execs in the TSO/E context. IBM\u2019s 2.5 user guide documents use of REXX in TSO/E. Cowlishaw\u2019s Classic Rexx history describes MVS/TSO as an implementation among several and identifies the ANSI standard. The committee draft establishes language-level syntax, semantics and portability separately.",
+      "link": "Preserve independently supported Classic Rexx language identity and the separately scoped TSO/E implementation context.",
+      "hold": "Hold exact-discovery-lead acceptance pending original body recovery or adjudication of an explicit alternative-evidence route. The ANSI registry lists the published standard. The retrieved committee PDF is a draft.",
+      "evidence": [
+        {
+          "locator": "https://www.ibm.com/docs/en/zos/2.5.0?topic=introduction-highlights-tsoe#:~:text=REXX%20is%20a%20high%2Dlevel",
+          "candidate_id": "970020a867134299961281a7b3bc7eea",
+          "role": "original",
+          "http_status": 403,
+          "headers_file": "captures/rexx-ibm-original.html.headers",
+          "headers_sha256": "243aaecc0cdd80a9919dbcdf653835db53683deb80639169f65999fec3b45eaf",
+          "capture_file": null,
+          "capture_bytes": null,
+          "capture_sha256": null,
+          "input_sha256": null,
+          "matches_input_sha256": null,
+          "passage": "Exact URL including text fragment. HTTP 403, no body capture. Search index snippet used as locator context."
+        },
+        {
+          "locator": "https://rexxinfo.org/reference/articles/tso_e_rexx_users_guide_v2r5.pdf",
+          "candidate_id": null,
+          "role": "independent-supplemental-attempt",
+          "http_status": 200,
+          "headers_file": "captures/rexx-ibm-25-user-guide-mirror.pdf.headers",
+          "headers_sha256": "8ec06838088a8edda1e5b01240029aa5b3128fbff68f576b7e84d84163e8ebb9",
+          "capture_file": "captures/rexx-ibm-25-user-guide-mirror.pdf",
+          "capture_bytes": 1268755,
+          "capture_sha256": "a9673334eb573c4088e0af72ed4e85b4924e48b1095715fda6d2df1e05b18a73",
+          "input_sha256": null,
+          "matches_input_sha256": null,
+          "passage": "IBM-authored z/OS 2.5 user-guide mirror, PDF page 199, Comparing CLIST and REXX."
+        },
+        {
+          "locator": "https://rexxla.org/rexxlang/history/mfc/rexxhist.html",
+          "candidate_id": null,
+          "role": "independent-supplemental-attempt",
+          "http_status": 200,
+          "headers_file": "captures/rexx-cowlishaw-history.html.headers",
+          "headers_sha256": "cf4f3ef4a0771a5054dbc87e41f123560c0af32a75b4015c821a016311da2cba",
+          "capture_file": "captures/rexx-cowlishaw-history.html",
+          "capture_bytes": 7929,
+          "capture_sha256": "f2f096569452e6d6fd6546ba7dbfb6c0a647dafdbe6028d7087a375d31640862",
+          "input_sha256": null,
+          "matches_input_sha256": null,
+          "passage": "HTML lines 8, 116\u2013120 and 139\u2013142, Classic Rexx history, SAA implementation and standard."
+        },
+        {
+          "locator": "https://www.rexxla.org/rexxlang/standards/j18pub.pdf",
+          "candidate_id": null,
+          "role": "independent-supplemental-attempt",
+          "http_status": 200,
+          "headers_file": "captures/rexx-ansi-draft.pdf.headers",
+          "headers_sha256": "ff72ec09b735b683d6db2fdabfa96035e7a908db89bb8b13c6fda4d5050841b2",
+          "capture_file": "captures/rexx-ansi-draft.pdf",
+          "capture_bytes": 414740,
+          "capture_sha256": "f38ac9b1b282bf6b0446ecc177b59eefd85c96b677814de541e2bebd011058df",
+          "input_sha256": null,
+          "matches_input_sha256": null,
+          "passage": "PDF page 1, draft notice. PDF page 15, \u00a7\u00a71.1\u20131.3, Scope, purpose, and application."
+        },
+        {
+          "locator": "https://webstore.ansi.org/standards/incits/ansiincits2741996r2001",
+          "candidate_id": null,
+          "role": "independent-supplemental-attempt",
+          "http_status": 403,
+          "headers_file": "captures/rexx-ansi-registry.html.headers",
+          "headers_sha256": "1487f4d74ec55a04b8bac988c8e0557420c9f3b80ff122143a55fef8bc132fb6",
+          "capture_file": null,
+          "capture_bytes": null,
+          "capture_sha256": null,
+          "input_sha256": null,
+          "matches_input_sha256": null,
+          "passage": "Published ANSI INCITS 274-1996 (R2001) registry listing viewed through web. Direct body acquisition returned HTTP 403."
+        }
+      ]
+    }
+  ]
+}
