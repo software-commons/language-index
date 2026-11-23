@@ -1,0 +1,13 @@
+{
+  "snapshot": "census-2026-11-22-targeted",
+  "campaign": "Predecessor reconciliation and targeted public discovery",
+  "cutoff": "2026-11-22",
+  "scope": "1,120 distinct source rows from tooling, Regex Conformance fallback, historical, enterprise, academic, international, and formal-language routes.",
+  "method": "Pinned Linguist intake and exact Regex Conformance fallback, followed by independent targeted passes with unique qualified discovery locators. Keep distinct origins and unresolved identities.",
+  "limitations": [
+    "The recorded population contains labels and research leads. It does not denote a count of distinct languages.",
+    "The original Regex Conformance census artifact was unavailable. The private Atlas overlay remains outside the public registry.",
+    "Some publisher pointers were restricted or unavailable. Several catalog entries may be dialects, aliases, implementations, notations, or duplicates.",
+    "Identity, source qualification, and individual profile depth remain independently tracked."
+  ]
+}

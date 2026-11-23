@@ -2,6 +2,8 @@
 
 This directory records discovery methods, coverage decisions, and gaps. The candidate ledger records leads and dispositions. Canonical entities and qualified claims use the separate registry and SCES paths documented in the maintenance guide.
 
+The [November 22, 2026 census](census-2026-11-22.md) records the current public intake, measured intersections, original ledger recovery attempt, and limitations.
+
 ## Predecessor reconciliation
 
 Inspect the exact Regex Conformance census documentation, forecast, universe registry, and discovery contracts. Search accessible predecessor working areas for the external census artifact. Compare any matching candidate bytes with the published digests before treating them as recovered. Preserve the results of the search and distinguish inspected historical counts from independently reconstructed leads.

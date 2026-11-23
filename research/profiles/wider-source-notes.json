@@ -1,0 +1,259 @@
+{
+  "status": "provisional-primary-source-facets-awaiting-independent-review",
+  "sources": {
+    "rust-reference-module": {
+      "title": "Rust Reference: Modules",
+      "locator": "https://raw.githubusercontent.com/rust-lang/reference/c9cc32825b03fc206d9c6fe73e9ca6a2f3576d6c/src/items/modules.md",
+      "sha256": "902fdad152919f8152a8f55dae07b5683bb2ca8a37600aaa265e92fbc5c933b2"
+    },
+    "rust-reference-destructors": {
+      "title": "Rust Reference: Destructors",
+      "locator": "https://raw.githubusercontent.com/rust-lang/reference/c9cc32825b03fc206d9c6fe73e9ca6a2f3576d6c/src/destructors.md",
+      "sha256": "3dd3a9215d8d8b3bdbcf9282679f272a5c9a8a147720a448a79bbdea3f65f51b"
+    },
+    "clojure-112-core": {
+      "title": "Clojure 1.12.0 JVM core source",
+      "locator": "https://raw.githubusercontent.com/clojure/clojure/d4bb93f0d1ab2004f89c6ead1b32449fd7ed1a6d/src/clj/clojure/core.clj",
+      "sha256": "bce3e81261ac1dbfdcdeb75a42e847dcc14a6ea3bd817c17aeb6d031d10bdaf2"
+    },
+    "scala-213-spec-classes": {
+      "title": "Scala 2.13 specification, Classes and Objects",
+      "locator": "https://www.scala-lang.org/files/archive/spec/2.13/05-classes-and-objects.html",
+      "sha256": "8f61a73effa8c4086fdcfe69f97bc017e042fababbfae2a807da9b72cefb6155"
+    },
+    "pg-170-create-table": {
+      "title": "PostgreSQL 17.0 CREATE TABLE reference source",
+      "locator": "https://raw.githubusercontent.com/postgres/postgres/d7ec59a63d745ba74fba0e280bbf85dc6d1caa3e/doc/src/sgml/ref/create_table.sgml",
+      "sha256": "97f8f243fb2cbf2aaa3ef9bad0fa3112d4cc2b5395e8bef266607be4515fd315"
+    },
+    "sqlite-346-parser": {
+      "title": "SQLite 3.46.0 parser source",
+      "locator": "https://raw.githubusercontent.com/sqlite/sqlite/bebe2d8be8acfd02592c4972f4ba32c3b4e4a33f/src/parse.y",
+      "sha256": "6e8f340dccc258273db9efb60dd2cc034bc2f8a2b5d1d1c00c578dc28fb03d4f"
+    },
+    "kotlin-spec-types": {
+      "title": "Kotlin language specification, Type System",
+      "locator": "https://raw.githubusercontent.com/Kotlin/kotlin-spec/0f762a2314a9304e4b3fc386b1aceef1d56c7e4c/docs/src/md/kotlin.core/type-system.md",
+      "sha256": "f0b9a51178b98ff722b8a2f77fee0c2c2ab0b777f92ca5784c0c9167c047fd62"
+    },
+    "kotlin-spec-inheritance": {
+      "title": "Kotlin language specification, Inheritance",
+      "locator": "https://raw.githubusercontent.com/Kotlin/kotlin-spec/0f762a2314a9304e4b3fc386b1aceef1d56c7e4c/docs/src/md/kotlin.core/inheritance.md",
+      "sha256": "543bdecae15615f39bef19cf957ee6a5c36aafe2b460c55cc496bee6ff8888bc"
+    },
+    "vb-dotnet-basics": {
+      "title": "Visual Basic .NET language specification, General Concepts",
+      "locator": "https://raw.githubusercontent.com/dotnet/vblang/0712f0b8c91dfba593fc16f846c5821ed5cad2f9/spec/general-concepts.md",
+      "sha256": "3771537878d33edd9351ba8163d49ebaf0f2fa4112c7569ab64c17b64507ebb0"
+    },
+    "vb-dotnet-source": {
+      "title": "Visual Basic .NET language specification, Source Files and Namespaces",
+      "locator": "https://raw.githubusercontent.com/dotnet/vblang/0712f0b8c91dfba593fc16f846c5821ed5cad2f9/spec/source-files-and-namespaces.md",
+      "sha256": "b409f7229f0075747e46bdf66dc7982991cbbef07c732a9d28191df6fd3f08a1"
+    }
+  },
+  "profiles": [
+    {
+      "subject": "Rust",
+      "scope": "Rust Reference snapshot `c9cc32825b03fc206d9c6fe73e9ca6a2f3576d6c`. The edition-specific facet applies to Rust 2024.",
+      "identity_boundary": "The language reference is the evidence for these scoped constructs. Compiler implementation strategies, Cargo conventions, and runtime behavior need separate sources.",
+      "facets": [
+        {
+          "dimension": "Module source layout",
+          "claim": "An out-of-line module declaration loads its body from a file. In the absence of a path attribute, the lookup follows module paths and the documented naming and directory rules.",
+          "source": "rust-reference-module",
+          "locator": "items.mod.outlined.intro and items.mod.outlined.search, lines 53–64",
+          "anchor": "L53-L64",
+          "limitation": "The source distinguishes conventional module lookup from explicit path attributes. It does not establish package layout.",
+          "reference": "https://github.com/rust-lang/reference/blob/c9cc32825b03fc206d9c6fe73e9ca6a2f3576d6c/src/items/modules.md#L53-L64"
+        },
+        {
+          "dimension": "Resource lifetime",
+          "claim": "When control flow leaves a drop scope, associated variables drop in reverse declaration order and associated temporaries in reverse creation order.",
+          "source": "rust-reference-destructors",
+          "locator": "destructors.scope.intro, lines 55–62",
+          "anchor": "L55-L62",
+          "limitation": "This applies within the drop scope. Edition, control flow, expression kind, and special scrutinee rules matter when determining a temporary's scope.",
+          "reference": "https://github.com/rust-lang/reference/blob/c9cc32825b03fc206d9c6fe73e9ca6a2f3576d6c/src/destructors.md#L55-L62"
+        },
+        {
+          "dimension": "Rust 2024 edition difference",
+          "claim": "The reference marks extra temporary-scope narrowing for if let and block tail expressions in the 2024 edition.",
+          "source": "rust-reference-destructors",
+          "locator": "destructors.scope.temporary.edition2024, lines 287–289",
+          "anchor": "L287-L289",
+          "limitation": "The rule is edition-specific.",
+          "reference": "https://github.com/rust-lang/reference/blob/c9cc32825b03fc206d9c6fe73e9ca6a2f3576d6c/src/destructors.md#L287-L289"
+        }
+      ]
+    },
+    {
+      "subject": "Kotlin",
+      "scope": "Core Kotlin language specification snapshot `0f762a2314a9304e4b3fc386b1aceef1d56c7e4c`.",
+      "identity_boundary": "These are Kotlin core-language claims. A shared JVM backend or Java library does not establish a Kotlin identity merge or identical Kotlin/Native, Kotlin/JS, and Kotlin/JVM behavior.",
+      "facets": [
+        {
+          "dimension": "Nullability",
+          "claim": "The specification distinguishes nullable and non-nullable type universes. A value of a non-nullable type cannot contain null under the described model.",
+          "source": "kotlin-spec-types",
+          "locator": "Type-system overview, lines 96–105",
+          "anchor": "L96-L105",
+          "limitation": "The claim concerns the type model. Interop flexible types and particular runtime null failures require separate treatment.",
+          "reference": "https://github.com/Kotlin/kotlin-spec/blob/0f762a2314a9304e4b3fc386b1aceef1d56c7e4c/docs/src/md/kotlin.core/type-system.md#L96-L105"
+        },
+        {
+          "dimension": "Inheritance",
+          "claim": "A class is closed when its declaration supplies neither open nor abstract. The source also explains the implicit abstract status of a sealed class.",
+          "source": "kotlin-spec-inheritance",
+          "locator": "Inheritance, lines 12–25",
+          "anchor": "L12-L25",
+          "limitation": "The rule concerns classes and includes the sealed-class qualification. Interface inheritance follows separate rules.",
+          "reference": "https://github.com/Kotlin/kotlin-spec/blob/0f762a2314a9304e4b3fc386b1aceef1d56c7e4c/docs/src/md/kotlin.core/inheritance.md#L12-L25"
+        }
+      ]
+    },
+    {
+      "subject": "Scala",
+      "scope": "Scala 2.13 archived language specification, Classes and Objects. Source bytes are identified in the accession table.",
+      "identity_boundary": "The claims concern Scala 2.13 language forms. Scala 3 and individual JVM compiler lowering require separately scoped sources.",
+      "facets": [
+        {
+          "dimension": "Lazy initialization",
+          "claim": "The specification describes a lazy value as initialized on its first access.",
+          "source": "scala-213-spec-classes",
+          "locator": "The lazy modifier",
+          "anchor": "lazy",
+          "limitation": "Recursive initialization may exhibit looping, and an exception has separate rules. The source does not imply eager initialization at declaration.",
+          "reference": "https://www.scala-lang.org/files/archive/spec/2.13/05-classes-and-objects.html#lazy"
+        },
+        {
+          "dimension": "Object definitions",
+          "claim": "An object definition introduces a single object of a new class.",
+          "source": "scala-213-spec-classes",
+          "locator": "Object Definitions",
+          "anchor": "object-definitions",
+          "limitation": "This is the object-definition construct. An arbitrary class declaration or shared JVM runtime does not establish the same single-object behavior.",
+          "reference": "https://www.scala-lang.org/files/archive/spec/2.13/05-classes-and-objects.html#object-definitions"
+        }
+      ]
+    },
+    {
+      "subject": "Clojure",
+      "scope": "Clojure 1.12.0 JVM core source at `d4bb93f0d1ab2004f89c6ead1b32449fd7ed1a6d`.",
+      "identity_boundary": "Source-level descriptions from the Clojure/JVM distribution establish the identified API contract. ClojureScript or other implementations need their own sources.",
+      "facets": [
+        {
+          "dimension": "Lazy sequences",
+          "claim": "The lazy-seq macro documents deferred realization through seq and caching of the resulting sequence.",
+          "source": "clojure-112-core",
+          "locator": "lazy-seq implementation and documentation, lines 685–692",
+          "anchor": "L685-L692",
+          "limitation": "This is one Seqable value created by the macro. Evaluation of arbitrary applications is outside scope.",
+          "reference": "https://github.com/clojure/clojure/blob/d4bb93f0d1ab2004f89c6ead1b32449fd7ed1a6d/src/clj/clojure/core.clj#L685-L692"
+        },
+        {
+          "dimension": "Atomic state updates",
+          "claim": "The swap! contract documents an atomic update derived from the current atom value and warns that the update function may be called more than once.",
+          "source": "clojure-112-core",
+          "locator": "swap! implementation and documentation, lines 2362–2372",
+          "anchor": "L2362-L2372",
+          "limitation": "The result concerns atom updates through this API. It supplies no exactly-once guarantee for the update function's side effects.",
+          "reference": "https://github.com/clojure/clojure/blob/d4bb93f0d1ab2004f89c6ead1b32449fd7ed1a6d/src/clj/clojure/core.clj#L2362-L2372"
+        },
+        {
+          "dimension": "Namespaces",
+          "claim": "The ns macro sets the current namespace by an unevaluated name, creating it when needed, and supports optional namespace clauses.",
+          "source": "clojure-112-core",
+          "locator": "ns implementation and documentation, lines 5817–5829",
+          "anchor": "L5817-L5829",
+          "limitation": "Compilation-only class generation follows separate behavior.",
+          "reference": "https://github.com/clojure/clojure/blob/d4bb93f0d1ab2004f89c6ead1b32449fd7ed1a6d/src/clj/clojure/core.clj#L5817-L5829"
+        }
+      ]
+    },
+    {
+      "subject": "PostgreSQL SQL dialect",
+      "scope": "PostgreSQL 17.0 publisher-authored command reference source at `d7ec59a63d745ba74fba0e280bbf85dc6d1caa3e`.",
+      "identity_boundary": "The source documents PostgreSQL commands at the named release. A generic SQL definition and the identity relationships of other dialects need their own governing evidence.",
+      "facets": [
+        {
+          "dimension": "Table inheritance",
+          "claim": "The optional INHERITS clause names parent tables whose columns are inherited when PostgreSQL defines the child. Its documented parent relationship is persistent.",
+          "source": "pg-170-create-table",
+          "locator": "INHERITS, lines 354–381",
+          "anchor": "L354-L381",
+          "limitation": "Type conflicts, declaration merging, and subsequent schema propagation have additional rules.",
+          "reference": "https://github.com/postgres/postgres/blob/d7ec59a63d745ba74fba0e280bbf85dc6d1caa3e/doc/src/sgml/ref/create_table.sgml#L354-L381"
+        },
+        {
+          "dimension": "Partition declarations",
+          "claim": "The optional PARTITION BY clause offers range, list, and hash strategies. List partitioning requires a single column or expression in the partition key.",
+          "source": "pg-170-create-table",
+          "locator": "PARTITION BY, lines 411–433",
+          "anchor": "L411-L433",
+          "limitation": "Range and hash have different key arity and operator-class constraints. The statement does not describe every data insertion outcome.",
+          "reference": "https://github.com/postgres/postgres/blob/d7ec59a63d745ba74fba0e280bbf85dc6d1caa3e/doc/src/sgml/ref/create_table.sgml#L411-L433"
+        }
+      ]
+    },
+    {
+      "subject": "SQLite SQL dialect",
+      "scope": "SQLite 3.46.0 implementation parser source at `bebe2d8be8acfd02592c4972f4ba32c3b4e4a33f`.",
+      "identity_boundary": "The source supports claims about SQLite's parser at this release. It does not establish general SQL syntax or prove storage and constraint effects for executed databases.",
+      "facets": [
+        {
+          "dimension": "Table option grammar",
+          "claim": "For the parenthesized column-list form of CREATE TABLE, the parser accepts a table option set that can combine comma-separated options.",
+          "source": "sqlite-346-parser",
+          "locator": "create_table_args and table_option_set productions, lines 203–214",
+          "anchor": "L203-L214",
+          "limitation": "The CREATE TABLE AS SELECT alternative is separately expressed in the grammar.",
+          "reference": "https://github.com/sqlite/sqlite/blob/bebe2d8be8acfd02592c4972f4ba32c3b4e4a33f/src/parse.y#L203-L214"
+        },
+        {
+          "dimension": "Table flags",
+          "claim": "The parser recognizes WITHOUT ROWID and STRICT table options by case-insensitive name checks and maps them to different flags.",
+          "source": "sqlite-346-parser",
+          "locator": "table_option productions, lines 215–230",
+          "anchor": "L215-L230",
+          "limitation": "The claim excludes downstream validation and storage behavior.",
+          "reference": "https://github.com/sqlite/sqlite/blob/bebe2d8be8acfd02592c4972f4ba32c3b4e4a33f/src/parse.y#L215-L230"
+        }
+      ]
+    },
+    {
+      "subject": "Visual Basic for .NET",
+      "scope": "Visual Basic language-specification snapshot `0712f0b8c91dfba593fc16f846c5821ed5cad2f9`.",
+      "identity_boundary": "This specification is scoped to Visual Basic for .NET. Retain classic Visual Basic 6 and Visual Basic for Applications as separate lineage investigations until exact historical crosswalks are reviewed. The .NET compilation rules do not transfer to either candidate.",
+      "facets": [
+        {
+          "dimension": "Compilation unit and names",
+          "claim": "Within the described compilation model, source files are processed together and their top-level declarations contribute to the implicit global namespace.",
+          "source": "vb-dotnet-source",
+          "locator": "Source Files and Namespaces introduction, lines 1–25",
+          "anchor": "L1-L25",
+          "limitation": "The source explicitly allows the compilation environment to override the implicit namespace.",
+          "reference": "https://github.com/dotnet/vblang/blob/0712f0b8c91dfba593fc16f846c5821ed5cad2f9/spec/source-files-and-namespaces.md#L1-L25"
+        },
+        {
+          "dimension": "Type checking",
+          "claim": "An explicit Option Strict statement with no On or Off argument defaults to On. With no statement, the compilation environment selects the setting.",
+          "source": "vb-dotnet-source",
+          "locator": "Option Strict Statement, lines 114–124",
+          "anchor": "L114-L124",
+          "limitation": "The default for omitted statement is distinct from the default for an omitted argument.",
+          "reference": "https://github.com/dotnet/vblang/blob/0712f0b8c91dfba593fc16f846c5821ed5cad2f9/spec/source-files-and-namespaces.md#L114-L124"
+        },
+        {
+          "dimension": "Imports",
+          "claim": "An Imports directive makes names available to declarations in its source file. Its scope excludes other Imports statements and other source files.",
+          "source": "vb-dotnet-source",
+          "locator": "Imports Statement, lines 249–266",
+          "anchor": "L249-L266",
+          "limitation": "The source also describes implicit imports and separate import-name resolution rules.",
+          "reference": "https://github.com/dotnet/vblang/blob/0712f0b8c91dfba593fc16f846c5821ed5cad2f9/spec/source-files-and-namespaces.md#L249-L266"
+        }
+      ]
+    }
+  ]
+}

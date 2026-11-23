@@ -1,0 +1,1 @@
+{"basis":{"id":"go-123-spec","kind":"source","revision":1},"citation":{"locator":"Slice expressions (#Slice_expressions), lines 4047–4052","modality":"required"},"claim":{"id":"go123-slice-shares-array","kind":"claim","revision":1},"id":"supports-go123-slice-shares-array","kind":"dependency","relation":"support","revision":1}
