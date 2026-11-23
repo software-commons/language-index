@@ -1,0 +1,129 @@
+{
+  "base_entity": {
+    "path": "registry/entities/89/89f891b32910408b9e4baece3deaa407.json",
+    "record_sha256": "c7291c0801dee7d8bba40f570fd786447578622cc8b429a0c4c3e159506a6e43",
+    "ref": {
+      "aliases": [],
+      "id": "89f891b32910408b9e4baece3deaa407",
+      "identity_claim": {
+        "id": "clojure-language-identity",
+        "kind": "claim",
+        "revision": 1
+      },
+      "kind": "language",
+      "name": "Clojure",
+      "relations": [],
+      "state": "active"
+    }
+  },
+  "input_sha256": "1c85f4b6a0b760cb061a7040fff287297bd4da6924736a3ec493b4ff0847c573",
+  "lead_assessments": [
+    {
+      "candidate_id": "8c3d0aca9e98442e918331b62046d7ae",
+      "candidate_sha256": "b9b389ea90d3a94ce0de6eeed3aad7f795898d62a4a0c21f36987a37670d3df7",
+      "catalog_span": {
+        "end_byte_exclusive": 25352,
+        "first_line": 1349,
+        "last_line": 1371,
+        "section": "Clojure",
+        "sha256": "64f716599c7c56c33c59dab53c05057a104c06866efee2e465152d7897afb2cf",
+        "start_byte": 24984
+      },
+      "origin": "https://github.com/github-linguist/linguist/blob/cfd7a0113aa1efab99faeff38756f0ed4d48add8/lib/linguist/languages.yml#L1349",
+      "reasoning": "The row names Clojure and contains Clojure samples. The exact classifier also covers .cljs, .cljs.hl and .cljc and supplies ClojureScript and cross-target samples alongside other tooling profiles. The existing base Clojure entity has its own documented identity. Preserve the narrow Clojure and ClojureScript discovery context while withholding an exhaustive one-entity assignment for the complete row.",
+      "reviewed_disposition": "unresolved",
+      "specimens": [
+        {
+          "git_blob": "6de0bfca954e8a67e8e3387fa18dec3db75c77b8",
+          "path": "samples/Clojure/build.boot",
+          "sha256": "85e607034e220a63df8d1acdcc5283d97e4d9bdeb065f3ecfc73779a4b8c3788"
+        },
+        {
+          "git_blob": "725f7b2dc07231bda568e6872e6a813961c2f9e4",
+          "path": "samples/Clojure/for.clj",
+          "sha256": "63a73b3cb6d7a161fdde001c33904ab2f1f54ce3f47a6e66e78d1bc398c1908d"
+        },
+        {
+          "git_blob": "318f03da1cd5871007dd3e9f8afe219e2715bd19",
+          "path": "samples/Clojure/hiccup.hic",
+          "sha256": "7245049f9419e372d3f0d7c38b63f00ab081049c2b892de9ce109e9b24b65b71"
+        },
+        {
+          "git_blob": "043df92b09338b0c9b9120836a73844aff8775ae",
+          "path": "samples/Clojure/index.cljs.hl",
+          "sha256": "0e35f2c83faf2510080ccb16ea1a5066cd4d305c0402347caa4e0614afed0cb9"
+        },
+        {
+          "git_blob": "a1c9fa29d0a406fcdb3b13bbb5b444b7d85c2bdd",
+          "path": "samples/Clojure/into-array.cljc",
+          "sha256": "1bbc7abc9fe5317c3444eeabc979b39da62a885ae0196fbf487b05c61f6a5fda"
+        },
+        {
+          "git_blob": "5496ac0ccb982c56de75986feb424ad4d028f54d",
+          "path": "samples/Clojure/protocol.cljs",
+          "sha256": "f6f6e98f5936630bf561723f93e57025e157b4fcd24816d34a5e14f730a77f02"
+        },
+        {
+          "git_blob": "ca07579db9d5abb553ef38c0d63112c88836075a",
+          "path": "samples/Clojure/rand.cljscm",
+          "sha256": "5cfd0beff3415d5e7ce1a6742007e50a1b81db762feaeb1b1a4951f2c0ca57fc"
+        },
+        {
+          "git_blob": "dd2206d4a8f9a16d1b09485a4626adf9ab4ba981",
+          "path": "samples/Clojure/svg.cljx",
+          "sha256": "8040563e4cd3c01380a3a86c41d698d08f83ad36b16f352c6a2784731273a13a"
+        },
+        {
+          "git_blob": "bac2158641ab277c967d5c4f36dd15f3f8fefdd8",
+          "path": "samples/Clojure/unit-test.cl2",
+          "sha256": "6409be314ccf296c8780dfe21db2520f4effd0ee6cc77f759dc3219ac08630d3"
+        },
+        {
+          "git_blob": "05a5d746e03bfc797e3e9c29ce51989d5ad87330",
+          "path": "samples/Clojure/validate-and-format.bb",
+          "sha256": "a5f97ffd05ce37cb04925102ea11832de92682a9cf863d8560d45c10862ec7a6"
+        }
+      ]
+    },
+    {
+      "candidate_id": "12e766965b4c4a78958bf2363a790565",
+      "candidate_sha256": "2041b4a08892ec23fc56d5142b1be562637b0eae05d2fe6897ece0d1b3705f65",
+      "catalog_span": {
+        "end_byte_exclusive": 164440,
+        "first_line": 9579,
+        "last_line": 9587,
+        "section": "edn",
+        "sha256": "4ef218412ab06a2844f0b3f370f3376d93b3039687d3b8694b8d103fb1f9455b",
+        "start_byte": 164264
+      },
+      "origin": "https://github.com/github-linguist/linguist/blob/cfd7a0113aa1efab99faeff38756f0ed4d48add8/lib/linguist/languages.yml#L9579",
+      "reasoning": "The pin classifies edn as data and intentionally shares Clojure highlighting. The fixture uses the EDN container and tagged values for a Datomic schema or transaction data model. The original EDN specification supplies the controlling serialization and no-native-schema boundary, and Datomic governs the separate domain constraints. The reviewed exact origin concerns base EDN, a format at the present Language Index boundary. It supplies no separately governed Datalog, schema, or Clojure program identity.",
+      "reviewed_disposition": "out-of-scope",
+      "specimens": [
+        {
+          "git_blob": "47ce43cd106742296639ffcaec2b7e4c254b9863",
+          "path": "samples/edn/bigger-than-pluto.edn",
+          "sha256": "6749e56bcf6b8892bda1f50a4acf13f9ced1e5aabafe0a8570be85cae4a2307e"
+        }
+      ]
+    }
+  ],
+  "proposed_origin": {
+    "name": "ClojureScript",
+    "origin": "https://github.com/clojure/clojurescript-site/blob/4893f9b51a9511a781ac6c05b8fd26897d6b4c1e/README.adoc#L7",
+    "outcome": "supports-exact-source-language-intake",
+    "reasoning": "The immutable project-site README explicitly names the ClojureScript programming language at the supplied origin. It unambiguously supplies a new distinct discovery origin. Canonical dialect admission depends on qualification of the full identity value and the parent relation.",
+    "scope": {
+      "commit": "4893f9b51a9511a781ac6c05b8fd26897d6b4c1e",
+      "git_blob": "90886840b602441c01c94c2d8e0975e16b5d1108",
+      "path": "README.adoc",
+      "span": {
+        "end_byte_exclusive": 225,
+        "first_line": 7,
+        "last_line": 7,
+        "sha256": "233fbf2afdd5380214e406298b18e02dd3d91addb55d74feee40628b2d562b2a",
+        "start_byte": 63
+      }
+    }
+  }
+}

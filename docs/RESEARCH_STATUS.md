@@ -59,3 +59,5 @@ The [Japanese language follow-up](../research/campaigns/regional-language-intake
 The next research cut adds four [historical Dolittle claims](../research/campaigns/regional-language-intake.md#dolittle-author-copy) and five [ABAP CDS DCL technical claims](../research/campaigns/abap-dcl-profile-depth.md) for Release 754. The two broad ABAP CDS discovery scopes remain unresolved.
 
 The [STRling host-language follow-up](../research/campaigns/strling-host-context.md) resolves nine exact leads at their documented language scope and preserves the C catalog representation gap.
+
+The [Clojure notation investigation](../research/campaigns/clojure-notation-boundaries.md) preserves the mixed source classifier, records the base EDN format boundary, and adds a distinct ClojureScript source origin.
