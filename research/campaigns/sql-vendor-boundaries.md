@@ -10,4 +10,4 @@ The first vendor batch investigates the original MySQL, SQL Server, and DuckDB p
 
 Independent verification supported 12 of the 13 original claim revisions against five exact source revisions. The first ordered `TOP` revision, its review and the counterevidence remain in the research record. The separately verified revision 2 requires effective `SET ROWCOUNT 0`, sufficient rows, a unique order on the same query, and the absence of `PERCENT` and `WITH TIES`. Its scope concerns rows selected at that query boundary.
 
-These records and the scoped entity proposals are reserved for a later selection. The frozen rc.4 release remains the 226-claim selection at its original source revision.
+The successor selection includes three scoped dialect identities and 13 independently supported claims, including the revised ordered `TOP` claim. The original regex facility leads remain open pending evidence binding each facility locator to a specific dialect identity. The original ordered `TOP` revision remains preserved with its inconclusive disposition.

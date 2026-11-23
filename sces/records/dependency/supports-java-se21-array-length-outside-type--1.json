@@ -1,0 +1,1 @@
+{"basis":{"id":"java-se21-jls-arrays","kind":"source","revision":1},"citation":{"locator":"Section 10.1, paragraph jls-10.1-210","modality":"required"},"claim":{"id":"java-se21-array-length-outside-type","kind":"claim","revision":1},"id":"supports-java-se21-array-length-outside-type","kind":"dependency","relation":"support","revision":1}

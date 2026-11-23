@@ -1,0 +1,1 @@
+{"aliases":[],"id":"479f89feefe04068b176329b01b9d2f2","identity_claim":{"id":"setlx-v270-dialect-identity","kind":"claim","revision":1},"kind":"dialect","name":"SetlX","relations":[{"claim":{"id":"setlx-v270-dialect-of-setl","kind":"claim","revision":1},"target":{"id":"55c408d7384c4724ac4bcffe59af17c8"},"type":"dialect-of"}],"state":"active"}

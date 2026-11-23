@@ -1,0 +1,1 @@
+{"aliases":[],"id":"90f7ae0a40074883afa1ed80d4e7d017","identity_claim":{"id":"mysql-84-sql-dialect-identity","kind":"claim","revision":1},"kind":"dialect","name":"MySQL SQL dialect","relations":[{"claim":{"id":"mysql-84-sql-dialect-parent","kind":"claim","revision":1},"target":{"id":"b97a2dbaf9d644488c87e934193b55ff"},"type":"dialect-of"}],"state":"active"}

@@ -1,0 +1,1 @@
+{"basis":{"id":"java-se21-jls-arrays","kind":"source","revision":1},"citation":{"locator":"Section 10.2, paragraph on length after creation","modality":"required"},"claim":{"id":"java-se21-array-length-fixed","kind":"claim","revision":1},"id":"supports-java-se21-array-length-fixed","kind":"dependency","relation":"support","revision":1}

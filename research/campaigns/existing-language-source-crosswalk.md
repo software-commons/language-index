@@ -7,4 +7,4 @@ The primary and independent investigations examined eight exact original leads a
 - The Enterprise COBOL manual supports the product or implementation context and leaves the broad language-label equivalence open.
 - RPG IV and TSO/E REXX both retain the exact original HTTP 403 capture gap. Supplemental documentation provides useful scope distinctions.
 
-These remain follow-on discovery dispositions. The rc.4 registry and its associated coverage report retain their frozen state.
+The successor registry links the four confirmed language-level leads to their existing identities. Gallina, Enterprise COBOL, RPG IV, and TSO/E REXX retain the exact limits above in their lead records. The rc.4 registry and associated coverage report remain available at the frozen source revision.
