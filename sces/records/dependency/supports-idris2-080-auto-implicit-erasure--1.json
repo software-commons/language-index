@@ -1,0 +1,1 @@
+{"basis":{"id":"idris2-080-multiplicities","kind":"source","revision":1},"citation":{"locator":"Implicitly introduced names and erased annotations, source lines 42–55","modality":"descriptive"},"claim":{"id":"idris2-080-auto-implicit-erasure","kind":"claim","revision":1},"id":"supports-idris2-080-auto-implicit-erasure","kind":"dependency","relation":"support","revision":1}

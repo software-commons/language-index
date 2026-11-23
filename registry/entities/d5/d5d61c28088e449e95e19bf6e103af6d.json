@@ -1,0 +1,1 @@
+{"aliases":[],"id":"d5d61c28088e449e95e19bf6e103af6d","identity_claim":{"id":"idris2-edition-identity","kind":"claim","revision":1},"kind":"edition","name":"Idris 2","relations":[{"claim":{"id":"idris2-edition-of-idris","kind":"claim","revision":1},"target":{"id":"29a5585450524fc299398b447dc9847a"},"type":"edition-of"}],"state":"active"}
