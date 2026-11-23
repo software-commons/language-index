@@ -1,0 +1,1 @@
+{"basis":{"id":"w3c-wasm-core-1-rec-20191205","kind":"source","revision":1},"citation":{"locator":"Core 1.0 §§3.3.2.2 and 4.4.2.2, select validation and reduction","modality":"conditional"},"claim":{"id":"wasm-core-10-select-type-and-choice","kind":"claim","revision":1},"id":"supports-wasm-core-10-select-type-and-choice","kind":"dependency","relation":"support","revision":1}

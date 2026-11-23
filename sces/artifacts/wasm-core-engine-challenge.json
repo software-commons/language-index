@@ -1,0 +1,81 @@
+{
+  "node": "v24.4.1",
+  "v8": "13.6.233.10-node.17",
+  "binary": {
+    "empty": {
+      "bytes_sha256": "93a44bbb96c751218e4c00d479e4c14358122a389acca16205b1e4d0dc5f9476",
+      "valid": true
+    },
+    "custom_sections_interspersed": {
+      "bytes_sha256": "b4f0237138ba6c23460a3fb5e5c0e1f04cbccbf032ad1a8a5ac5162604405355",
+      "valid": true
+    },
+    "wrong_version": {
+      "bytes_sha256": "593ab0b4d166fc4aa2d6956ea38019e2c575134f8139b0a18235f7abd595103f",
+      "valid": false
+    },
+    "repeated_type_section": {
+      "bytes_sha256": "d59778aa04abb22c5d93bc78b91c011afa88a64634da5a664d0a4c6ad18c9fdb",
+      "valid": false
+    },
+    "out_of_order": {
+      "bytes_sha256": "7a7789a4f9c53e87756494cfd9ace4bc8b13a1b742bb468287aeabccd7e44d32",
+      "valid": false
+    },
+    "invalid_start_reference": {
+      "bytes_sha256": "724eeaf91e3b99482e9b9e184e3193183ca3bc9e5675988e26f9b89a1e589d45",
+      "valid": false
+    }
+  },
+  "selection": {
+    "bytes_sha256": "e5293c46f541a622416f1097641dac420149df29a5b16a950521f4542913a4d0",
+    "zero": 29,
+    "nonzero": 17,
+    "negative": 17,
+    "mismatched_operands": {
+      "bytes_sha256": "e2983099a3c6a98bdadcdae68d74fb2483568b1437230a70841c3818f6a4d119",
+      "valid": false
+    }
+  },
+  "memory": {
+    "at_limit": {
+      "bytes_sha256": "974bde5319de7ed75dc9e95301b0134b56fcef7bf3681b8fb01d7b9190edd32d",
+      "valid": true
+    },
+    "over_limit": {
+      "bytes_sha256": "bb1ac3e4ae851d307f84eb98e528768db865c74b846d2323c802d346bc06293e",
+      "valid": false
+    },
+    "reversed": {
+      "bytes_sha256": "6accec0a183a004c62a17acbfa31a7bfeae548c82f3fdd228db56fa93042cd56",
+      "valid": false
+    },
+    "without_maximum": {
+      "bytes_sha256": "d7f602df8d1cb581cc5c886a4ff8809793c50627e305ef45f6d770f27e0261cc",
+      "valid": true
+    }
+  },
+  "load": {
+    "bytes_sha256": "0f9e67936b0ea9c612a478bef5c2aadb8afe78e6265762a072837fc47755ff1f",
+    "memory_bytes": 65536,
+    "exactly_in_bounds": {
+      "return_value": 2018915346
+    },
+    "one_past_end": {
+      "trap": true
+    },
+    "offset_does_not_wrap": {
+      "trap": true
+    }
+  },
+  "growth": {
+    "bytes_sha256": "f24c80ea27c2aaf5b122a43c78ca92fac73c4ade0cd3b4c447b7a37295f3ee10",
+    "start_bytes": 65536,
+    "at_zero_delta": 1,
+    "grows_to_maximum": 1,
+    "exceeds_maximum": -1,
+    "unsigned_large_delta": -1,
+    "end_bytes": 131072
+  },
+  "limits": "Current engine context for independently constructed small cases. Only the dated recommendation governs the exact clauses. No resource-induced in-range failure was forced."
+}

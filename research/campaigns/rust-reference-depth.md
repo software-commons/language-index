@@ -1,0 +1,5 @@
+# Rust Reference profile depth
+
+Seven additional claims use the exact Rust Reference revision `c9cc32825b03fc206d9c6fe73e9ca6a2f3576d6c`. They cover ordered destruction of struct fields, scopes for selected `let` bindings, expressly unspecified drop order for value captures of closures, `.await` context and polling, `async move` captures, and the edition-specific explicit binding-mode rule in Rust 2024. The two Codex executions independently inspected the cited clauses and their surrounding exceptions. [Research receipts](../../sces/artifacts/rust-reference-depth-proof-research.jsonl) · [Independent review receipts](../../sces/artifacts/rust-reference-depth-proof-review.jsonl) · [Independent source witnesses](../../sces/artifacts/rust-reference-depth-witnesses.json)
+
+The Rust 2024 rule applies at the specified pattern binding positions. The `.await` and drop-order findings carry their individual scopes. An expressly unspecified order gives implementations latitude. It does not establish any particular closure capture drop order.
