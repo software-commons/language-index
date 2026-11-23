@@ -1,5 +1,5 @@
 diff --git a/tests/test_review_gate.py b/tests/test_review_gate.py
-index 1aafd8b..d0d1b2b 100644
+index 1aafd8b..5c1472b 100644
 --- a/tests/test_review_gate.py
 +++ b/tests/test_review_gate.py
 @@ -13,9 +13,10 @@ from unittest.mock import Mock, patch
@@ -15,7 +15,7 @@ index 1aafd8b..d0d1b2b 100644
 
  EXECUTION = "90c3284d-c009-4e34-bc00-beb41319adad"
  SNAPSHOT = PullSnapshot(repository_id=1468281504, number=1, base="a" * 40, head="b" * 40, merge="c" * 40)
-@@ -65,6 +66,76 @@ class ReviewGateTests(unittest.TestCase):
+@@ -65,6 +66,83 @@ class ReviewGateTests(unittest.TestCase):
          for token in ("ghp_" + "a" * 36, "ghs_short", LEGACY_TOKEN + "\r\nAuthorization: fixture"):
              self.assertIsNone(APP_TOKEN.fullmatch(token))
 
@@ -53,19 +53,26 @@ index 1aafd8b..d0d1b2b 100644
 +    def test_language_requires_both_ci_checks_on_the_exact_test_merge(self):
 +        snapshot = replace(SNAPSHOT, repository_id=LANGUAGE.repository_id, target=LANGUAGE)
 +        github = Mock()
-+        github._get_json.return_value = [
-+            {"type": name} for name in ("pull_request", "deletion", "non_fast_forward")
-+        ] + [{"type": "required_status_checks", "parameters": {
-+            "required_status_checks": [
-+                {"context": context, "integration_id": ACTIONS_APP_ID} for context in CI_CONTEXTS
-+            ] + [{"context": CHECK_NAME, "integration_id": 123}],
-+            "strict_required_status_checks_policy": True, "do_not_enforce_on_create": False,
-+        }}]
++        rules = {
++            "active_rulesets_explicitly_without_bypass": False, "pull_request_required": True,
++            "deletion_blocked": True, "force_push_blocked": True,
++            "contexts": {name: {"strict_source_bound": True} for name in (*CI_CONTEXTS, CHECK_NAME)},
++        }
 +        head = {context: {"classification": "matching-success"} for context in CI_CONTEXTS}
 +        head[CHECK_NAME] = {"check_run_ids": [], "classic_status_present": False}
 +        merge = {context: {"classification": "missing"} for context in CI_CONTEXTS}
 +        checks = {"head": {"contexts": head}, "test_merge": {"contexts": merge}}
-+        with patch("tools.review_commission.read_checks", return_value=checks):
++        with (patch("tools.review_commission.OwnerGitHub") as owner,
++              patch("tools.review_commission.read_protection", return_value=rules) as protection,
++              patch("tools.review_commission.read_checks", return_value=checks) as read_checks):
++            with self.assertRaisesRegex(DataError, "no-bypass"):
++                require_language_controls(github, snapshot, 123)
++            owner.assert_called_once_with(target=LANGUAGE)
++            protection.assert_called_once_with(owner.return_value,
++                                               {**dict.fromkeys(CI_CONTEXTS, ACTIONS_APP_ID), CHECK_NAME: 123},
++                                               LANGUAGE)
++            read_checks.assert_not_called()
++            rules["active_rulesets_explicitly_without_bypass"] = True
 +            with self.assertRaisesRegex(DataError, "exact CI result unconfirmed on test merge"):
 +                require_language_controls(github, snapshot, 123)
 +            for context in CI_CONTEXTS:
@@ -92,7 +99,7 @@ index 1aafd8b..d0d1b2b 100644
      def test_issuer_publishes_only_to_the_current_merge_result(self):
          with TemporaryDirectory() as directory:
              state = Path(directory)
-@@ -235,7 +306,16 @@ class ReviewGateTests(unittest.TestCase):
+@@ -235,7 +313,16 @@ class ReviewGateTests(unittest.TestCase):
              config.chmod(0o600)
              reviewer = Reviewer(4001, 4002, root / "reviewer-home")
              with patch("tools.review_gate.load_reviewer", return_value=reviewer):
@@ -361,7 +368,7 @@ index 259ba29..c6cc7a0 100644
          return 0 if result["status"] == "matching-observations" else 1
      except (OSError, SnapshotError, TypeError, ValueError, KeyError, AttributeError) as error:
 diff --git a/tools/review_gate.py b/tools/review_gate.py
-index 5561d3a..dc3af0d 100644
+index 5561d3a..aeaa5d8 100644
 --- a/tools/review_gate.py
 +++ b/tools/review_gate.py
 @@ -5,6 +5,7 @@ from __future__ import annotations
@@ -471,31 +478,24 @@ index 5561d3a..dc3af0d 100644
              ),
          },
      }, check_id=check_id)
-@@ -204,7 +225,38 @@ def create_check(github, snapshot, app_id, token, decision, publisher):
+@@ -204,7 +225,31 @@ def create_check(github, snapshot, app_id, token, decision, publisher):
      return result
 
 
 -def run(args, github, *, token_input=None, publisher=write_check):
 +def require_language_controls(github, snapshot, app_id):
 +    """Confirm the live required contexts before the credential can be requested."""
-+    from .review_commission import read_checks
++    from .review_commission import OwnerGitHub, read_checks, read_protection
 +
-+    repo = snapshot.target.repository
-+    branch = snapshot.target.base_ref
-+    rules = github._get_json(f"/repos/{repo}/rules/branches/{branch}?per_page=100")
-+    require(isinstance(rules, list) and len(rules) < 100 and
-+            {"pull_request", "deletion", "non_fast_forward"} <= {rule["type"] for rule in rules},
-+            "live pull request or branch protection could not be confirmed")
 +    sources = {**dict.fromkeys(CI_CONTEXTS, ACTIONS_APP_ID), CHECK_NAME: app_id}
-+    for context, source in sources.items():
-+        bindings = [
-+            (check.get("integration_id"), rule.get("strict_required_status_checks_policy"),
-+             rule.get("do_not_enforce_on_create"))
-+            for entry in rules if entry["type"] == "required_status_checks"
-+            for rule in [entry["parameters"]]
-+            for check in rule["required_status_checks"] if check.get("context") == context
-+        ]
-+        require(bindings and all(binding == (source, True, False) for binding in bindings),
++    owner_reader = OwnerGitHub(target=snapshot.target)
++    protection = read_protection(owner_reader, sources, snapshot.target)
++    require(all(protection.get(control) is True for control in (
++        "active_rulesets_explicitly_without_bypass", "pull_request_required", "deletion_blocked",
++        "force_push_blocked",
++    )), "live no-bypass ruleset and branch protections could not be confirmed")
++    for context in sources:
++        require(protection["contexts"][context]["strict_source_bound"] is True,
 +                f"live strict source binding not confirmed for {context}")
 +    observations = read_checks(github, snapshot, sources, datetime.now(timezone.utc), None)
 +    for context in CI_CONTEXTS:
@@ -511,7 +511,7 @@ index 5561d3a..dc3af0d 100644
      state = args.state_dir.resolve()
      require(state.is_dir(), "configure an existing issuer-owned state directory")
      reviewer = getattr(args, "reviewer", None)
-@@ -212,29 +264,54 @@ def run(args, github, *, token_input=None, publisher=write_check):
+@@ -212,29 +257,54 @@ def run(args, github, *, token_input=None, publisher=write_check):
      audit = state / str(uuid4())
      audit.mkdir(mode=0o700)
      snapshot = github.get_pull(args.pull)
@@ -571,20 +571,18 @@ index 5561d3a..dc3af0d 100644
      decision = {"binding": binding, "execution": execution, "model": args.model,
                  "started_at": started_at, "completed_at": completed_at,
                  "trace_sha256": sha256(trace).hexdigest(), "decision": verdict["decision"],
-@@ -248,8 +325,12 @@ def run(args, github, *, token_input=None, publisher=write_check):
-     require(github.get_pull(snapshot.number) == snapshot, "pull request changed after review")
-     result["status"] = "reviewed-locally"
+@@ -250,6 +320,10 @@ def run(args, github, *, token_input=None, publisher=write_check):
      if args.app_id is not None:
-+        if snapshot.target.bind_sces:
-+            require_language_controls(github, snapshot, args.app_id)
          # A protected caller, not the reviewer, provides a short-lived installation token.
          installation_token = token_input().strip()
++        if snapshot.target.bind_sces:
++            require_language_controls(github, snapshot, args.app_id)
 +        if publisher is None:
 +            publisher = partial(write_check, target=snapshot.target)
          check = create_check(github, snapshot, args.app_id, installation_token, decision, publisher)
          save(audit / "issued-check.json", encode(check))
          result.update(status="check-issued", check_id=check["id"])
-@@ -300,10 +381,18 @@ def load_issuer(path):
+@@ -300,10 +374,18 @@ def load_issuer(path):
      protected_path(path.parent, directory=True)
      protected_path(path, directory=False)
      settings = decode(path.read_bytes())
@@ -604,7 +602,7 @@ index 5561d3a..dc3af0d 100644
      audit = Path(settings["audit_dir"])
      protected_path(audit, directory=True)
      reviewer = load_reviewer(settings)
-@@ -312,7 +401,7 @@ def load_issuer(path):
+@@ -312,7 +394,7 @@ def load_issuer(path):
      with codex.open("rb") as executable:
          require(file_digest(executable, "sha256").hexdigest() == settings["codex_sha256"],
                  "Codex executable differs from the protected issuer pin")
@@ -613,7 +611,7 @@ index 5561d3a..dc3af0d 100644
 
 
  def load_reviewer(settings):
-@@ -340,20 +429,24 @@ def main(argv=None):
+@@ -340,20 +422,24 @@ def main(argv=None):
      parser.add_argument("--codex", type=Path, help="absolute path to an issuer-controlled Codex CLI")
      parser.add_argument("--model", help="model name for the fresh Codex execution")
      parser.add_argument("--issuer-config", type=Path, help="protected issuer configuration, installation token read from stdin")
@@ -642,7 +640,7 @@ index 5561d3a..dc3af0d 100644
          parser.exit(1, f"review gate: {error}\n")
      sys.stdout.buffer.write(encode(result))
 diff --git a/tools/review_snapshot.py b/tools/review_snapshot.py
-index 4d30656..40fa4ea 100644
+index 4d30656..a9e3632 100644
 --- a/tools/review_snapshot.py
 +++ b/tools/review_snapshot.py
 @@ -6,17 +6,19 @@ import os
@@ -683,8 +681,8 @@ index 4d30656..40fa4ea 100644
 +TARGETS = {target.repository: target for target in (LICENSE, LANGUAGE)}
 +CONTROL_PATHS = (
 +    ".github", ".gitattributes", "AGENTS.md", "docs/PUBLICATION.md", "docs/TRUSTED_REVIEW.md",
-+    "research/review", "research/reviews", "schemas/domain", "sces/adoption.json", "sces/advisories",
-+    "sces/publication.json", "sces/releases", "tools/index.py",
++    "research/review", "research/reviews", "schemas", "sces/adoption.json", "sces/advisories",
++    "sces/publication.json", "sces/releases", "tests", "tools",
 +)
 +
 +
