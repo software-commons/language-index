@@ -1,0 +1,1 @@
+{"basis":{"id":"ecma262-15-2024","kind":"source","revision":1},"citation":{"locator":"§7.4.9 IteratorClose (#sec-iteratorclose), steps 3–8","modality":"required"},"claim":{"id":"ecma262-15-iterator-close-original-throw-precedence","kind":"claim","revision":1},"id":"supports-ecma262-15-iterator-close-original-throw-precedence","kind":"dependency","relation":"support","revision":1}
