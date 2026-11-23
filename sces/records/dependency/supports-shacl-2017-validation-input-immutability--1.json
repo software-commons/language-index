@@ -1,0 +1,1 @@
+{"basis":{"id":"w3c-shacl-20170720","kind":"source","revision":1},"citation":{"locator":"SHACL §§3.1 and 3.4, physical HTML lines 2256–2269 and 2338–2348","modality":"required"},"claim":{"id":"shacl-2017-validation-input-immutability","kind":"claim","revision":1},"id":"supports-shacl-2017-validation-input-immutability","kind":"dependency","relation":"support","revision":1}

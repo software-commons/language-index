@@ -1,0 +1,9 @@
+# SPARQL Query and SHACL
+
+The SPARQL Query profile uses the W3C Recommendation dated March 21, 2013. Its independently supported statements address the query language identity, bounded `OPTIONAL` and `BIND` cases, filter evaluation, and named-graph dataset construction. SPARQL Update, protocol and result formats, later editions, and processor behavior have separate scopes. [SPARQL 1.1 Query Recommendation](https://www.w3.org/TR/2013/REC-sparql11-query-20130321/)
+
+The initial projection claim remains in the evidence history with an adverse review. The dated Recommendation’s sequence comprehension and its cardinality equation give different results on the same two-mapping example. The W3C erratum and later draft provide separate context for the discrepancy. The rejected revision is excluded from selection. [W3C projection erratum](https://github.com/w3c/sparql-query/issues/80)
+
+The SHACL profile uses the July 20, 2017 W3C Recommendation. Its claims cover targets, deactivation, count constraints, validation outcomes and report scope, and the data and shapes graphs. The documented cases preserve Core, SPARQL-based constraints, optional report content, and unresolved recursion as distinct contexts. [SHACL Recommendation](https://www.w3.org/TR/2017/REC-shacl-20170720/)
+
+Both W3C originals support scoped language links. The two complete Linguist specimens support a SPARQL Query association. The pinned grammar also covers Update and leaves the full classifier aggregate unresolved. [Pinned Linguist entry](https://github.com/github-linguist/linguist/blob/cfd7a0113aa1efab99faeff38756f0ed4d48add8/lib/linguist/languages.yml#L7310) · [Lead decisions](../../sces/artifacts/sparql-shacl-origin-review.json) · [Independent source witnesses](../../sces/artifacts/sparql-shacl-source-witnesses.json)
