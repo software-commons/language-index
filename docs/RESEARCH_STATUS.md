@@ -50,6 +50,6 @@ The separate [Visual Basic classifier follow-up](../research/campaigns/visual-ba
 
 The [Delphi 7 visibility follow-up](../research/campaigns/november-23-depth-and-identity.md#delphi-7-visibility-follow-up) corrects one citation and supplies two separately scoped visibility claims for the next selection. The earlier inconclusive revision remains in the evidence history.
 
-The [hardware description profiles](../research/campaigns/hdl-profiles.md) cover three language identities and six exact lead links. The [formal notation profiles](../research/campaigns/formal-notation-profiles.md) cover six identities and eight lead links. The original TLA+ module extension statement remains withheld pending a precisely scoped revision.
+The [hardware description profiles](../research/campaigns/hdl-profiles.md) cover three language identities and six exact lead links. The [formal notation profiles](../research/campaigns/formal-notation-profiles.md) cover six identities and eight lead links, with a narrower successor for the original TLA+ module extension statement.
 
-The [Japanese language follow-up](../research/campaigns/regional-language-intake.md) preserves the two existing Nadeshiko leads and adds exact publisher and author origins for HSP3 and Dolittle. The new origins remain provisional while their claim records and receipt bindings are reviewed.
+The [Japanese language follow-up](../research/campaigns/regional-language-intake.md) preserves the two existing Nadeshiko leads, resolves the exact HSP3.7 origin, and adds the original Dolittle paper as a provisional lead. The [Ruby and C++ profiles](../research/campaigns/ruby-cpp-profiles.md) qualify their first edition-scoped claims and preserve two regex facility boundaries.
