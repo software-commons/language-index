@@ -20,6 +20,8 @@ DISPOSITIONS = {"canonical", "dialect", "family", "alias", "implementation", "ou
                 "duplicate", "rejected", "unresolved"}
 SCES_COMMIT = "ab26f278422772f2d9e5d4dd016407d14372a710"
 REPOSITORY = "software-commons/language-index"
+DATASET = "language-index"
+DOMAIN_SCHEMA = "registry-v1"
 RELATIONS = {"dialect-of", "edition-of", "member-of", "derived-from", "forked-from",
              "supersedes", "split-from", "merged-from", "implemented-by", "external"}
 LINEAGE = {"dialect-of", "edition-of", "member-of", "derived-from", "forked-from",
@@ -110,7 +112,6 @@ class Index:
         self.root = root.resolve()
         require(self.root.is_dir(), f"Index root does not exist: {root}")
         self.kinds = kinds
-        self.entity_paths = {}
         self.entity_blobs = {}
         self.entities = self.load("entities", self.check_entity)
         self.candidates = self.load("candidates", self.check_candidate)
@@ -142,8 +143,7 @@ class Index:
         for path in sorted(snapshots.glob("*")):
             require(path.resolve() == path and path.is_file() and path.suffix == ".json",
                     f"Unexpected coverage artifact: {path}")
-            data = path.read_bytes()
-            row = decode(data)
+            row = read(path)
             self.check_coverage(row)
             require(path.stem == row["snapshot"], f"Misplaced coverage snapshot: {path}")
         if not current.exists():
@@ -212,7 +212,8 @@ class Index:
             if path.is_dir():
                 continue
             require(path.suffix == ".json", f"Unexpected registry file {path}")
-            row = read(path)
+            data = path.read_bytes()
+            row = decode(data)
             require(type(row) is dict and text(row.get("id")) and ID.fullmatch(row["id"]),
                     f"Invalid identity in {path}")
             validator(row)
@@ -220,7 +221,6 @@ class Index:
             require(expected == path and row["id"] not in records, f"Misplaced or duplicate identity: {path}")
             records[row["id"]] = row
             if section == "entities":
-                self.entity_paths[row["id"]] = path
                 self.entity_blobs[path.relative_to(self.root).as_posix()] = git_blob_id(data)
         return records
 
@@ -334,6 +334,8 @@ class Index:
         payload = read(directory / "claims.json")
         require(report["repository"] == REPOSITORY and not report["synthetic"],
                 "Synthetic or foreign release cannot qualify Language Index")
+        require(report["dataset"] == DATASET and report["schema_version"] == DOMAIN_SCHEMA,
+                "The publication does not name the Language Index dataset and domain schema")
         commit = report["source_commit"]
         declared = git_blobs(self.root, commit, "registry/entities")
         require(self.entity_blobs == declared, "Entity bytes differ from the exact SCES source commit")
@@ -389,8 +391,7 @@ class Index:
     def check_history(self, base):
         require(re.fullmatch(r"[0-9a-f]{40}", base), "Use a full Git commit ID for the history base")
         old = git_blobs(self.root, base, "registry/entities")
-        existing = {path.relative_to(self.root).as_posix() for path in self.entity_paths.values()}
-        require(old.keys() <= existing, "Accepted identities must be retained at their permanent paths")
+        require(old.keys() <= self.entity_blobs.keys(), "Accepted identities must be retained at their permanent paths")
         past_candidates = git_blobs(self.root, base, "registry/candidates")
         candidates = {f"registry/candidates/{identifier[:2]}/{identifier}.json" for identifier in self.candidates}
         require(past_candidates.keys() <= candidates, "Discovered candidates must be retained in the ledger")
@@ -426,11 +427,16 @@ class Index:
         return {"claims": selected, "sources": [sources[key] for key in sorted(sources)]}
 
     def coverage(self, claims):
+        facets = Counter(
+            (value["claim"]["predicate"], value["claim"]["scope"].get("facet", "unspecified"))
+            for value in claims.values() if value["claim"]["predicate"] in PROFILE_PREDICATES)
         return {"entities": dict(sorted(Counter(row["kind"] for row in self.entities.values()).items())),
                 "aliases": sum(len(row["aliases"]) for row in self.entities.values()),
                 "candidates": dict(sorted(Counter(row["disposition"] for row in self.candidates.values()).items())),
                 "qualified_claims_by_predicate": dict(sorted(Counter(
                     value["claim"]["predicate"] for value in claims.values()).items())),
+                "profile_depth": [{"predicate": predicate, "facet": facet, "claims": count}
+                                  for (predicate, facet), count in sorted(facets.items())],
                 "discovery": self.discovery}
 
     def lookup(self, query, exact=False):

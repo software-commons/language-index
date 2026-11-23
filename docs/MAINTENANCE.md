@@ -40,7 +40,7 @@ The [domain schema](../schemas/domain/registry-v1.schema.json) describes stored 
 4. Store each relationship once on its source entity. An edge's claim value is its type, a colon, and the canonical JSON target. Local edges use predicate `identity-boundary`. External edges use `cross-index-relationship` and a target of `{index, id, revision}` with an exact Git or dataset revision. The claim's target revision scope must equal the external reference. Relative links and moving aliases do not supply link identity. A dialect and edition each need one qualified parent edge.
 5. Freeze the SCES evidence and entity files in the same exact source commit. Follow [publication control](PUBLICATION.md) to prepare an active selection and verify all evidence gates. Work in progress can stay in a candidate ledger and research notes pending acceptance.
 
-Each published language needs a qualified identity plus at least one qualified design, history, semantics, implementation, or compatibility claim. This is an admission floor. Track the breadth and depth of researched facets as separate measures.
+Each published language needs a qualified identity plus at least one qualified design, history, semantics, implementation, or compatibility claim. This is an admission floor. Track the breadth and depth of researched facets as separate measures. Use the claim scope's `facet` field to identify dimensions such as `syntax`, `type-system`, `evaluation`, `memory`, `concurrency`, or `modules`. Coverage reports the qualified count by facet and records unspecified facets explicitly.
 
 ## Build a consumer export
 
@@ -49,6 +49,6 @@ python -B tools/index.py --policy /path/to/pinned/.github validate
 python -B tools/index.py --policy /path/to/pinned/.github build --output build/language-index.json
 ```
 
-The build requires an active qualified SCES bundle. It validates exact entity bytes against the SCES source commit and checks each identity, alias, crosswalk, and relationship against the selected claim. It then generates sorted UTF-8 JSON with the report, registry records, and qualified claims. The digest is reported by the command. Build outputs are disposable and ignored by Git. The export becomes a release payload only through the approved claim-to-output mapping and release decision required by SCES. Validation reads the repository without writing its registry or artifacts.
+Use `language-index` as the SCES dataset identity and `registry-v1` as the domain schema version. The build requires an active qualified SCES bundle. It validates exact entity bytes against the SCES source commit and checks each identity, alias, crosswalk, and relationship against the selected claim. It then generates sorted UTF-8 JSON with the report, registry records, and qualified claims. The digest is reported by the command. Build outputs are disposable and ignored by Git. The export becomes a release payload only through the approved claim-to-output mapping and release decision required by SCES. Validation reads the repository without writing its registry or artifacts.
 
 Every evidence, identity, or coverage update belongs in a governed pull request. A new source, alias, relationship, or discovery cutoff affects only its owning records and directly affected evidence, review, or coverage files. Release artifacts change when the selected release changes.
