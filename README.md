@@ -2,6 +2,7 @@
 
 Language Index is Software Commons' evidence-governed reference for software language identities, editions, design, history, and relationships.
 
+- [Index Repository Standard (SCIRS-1.0)](https://github.com/software-commons/.github/blob/f23ffb93c5ad8d6b96d8652186ba20befee3bca8/docs/standards/INDEX_REPOSITORY_STANDARD.md)
 - [Scope and identity model](docs/SCOPE.md)
 - [Maintenance and offline CLI](docs/MAINTENANCE.md)
 - [Publication control](docs/PUBLICATION.md)
