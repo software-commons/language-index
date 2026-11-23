@@ -23,7 +23,7 @@ Registry tests run in a separate worker from the required validation job in the 
 
 ## Standing commissioning authorization
 
-On 2026-11-23, the Software Commons owner authorized the remaining commissioning and backlog integration for `software-commons/language-index` and `software-commons/license-index`. The scope covers protected-control and revised-candidate reviews, verified governance activation, protected merges, and cleanup of integrated or superseded work after its ancestry and evidence have been verified. The authorization ends when both commissioning and integration backlogs are cleared or the owner revokes it.
+On 2026-11-23, the Software Commons owner authorized the remaining commissioning and backlog integration for `software-commons/language-index` and `software-commons/license-index`. The scope covers protected-control and revised-candidate reviews, verified governance activation, protected merges, and cleanup of integrated or superseded work after its ancestry and evidence have been verified. The authorization ends when both commissioning and integration backlogs are cleared or the owner revokes it. [Signed owner decision](standing-commissioning-authorization.json)
 
 During this authorization, the issuer operator may pin each exact current test-merge or live merge-group SHA under `authorized_control_merge` without requesting a new administrative decision. Verify the repository, phase, head, base, diff, protected paths, and applicable evidence before recording the pin in protected issuer state. Each SHA still requires its own independent technical review, applicable SCES scientific verification, and required CI. Preserve all branch protections and evidence. Dataset publication requires its own exact-artifact authorization.
 
