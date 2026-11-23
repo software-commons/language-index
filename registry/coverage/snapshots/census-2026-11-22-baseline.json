@@ -1,0 +1,12 @@
+{
+  "snapshot": "census-2026-11-22-baseline",
+  "campaign": "Predecessor fallback and public catalog intake",
+  "cutoff": "2026-11-22",
+  "scope": "All 849 pinned Linguist catalog labels and 47 bounded Regex Conformance fallback leads.",
+  "method": "Enumerate exact public catalog labels and retain a separate candidate for each distinct pinned source row. Preserve all leads for identity adjudication.",
+  "limitations": [
+    "The detailed historical Regex Conformance ledger was unavailable.",
+    "The private Atlas extraction is excluded from the public ledger.",
+    "Labels do not establish language identity. Alias, implementation, dialect and out-of-scope classifications require individual investigation."
+  ]
+}
