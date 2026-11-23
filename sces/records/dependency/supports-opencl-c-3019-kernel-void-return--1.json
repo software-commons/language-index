@@ -1,0 +1,1 @@
+{"basis":{"id":"khronos-opencl-c-v3019-pdf","kind":"source","revision":1},"citation":{"locator":"§6.11 Restrictions, item l. Physical PDF pages 63","modality":"required"},"claim":{"id":"opencl-c-3019-kernel-void-return","kind":"claim","revision":1},"id":"supports-opencl-c-3019-kernel-void-return","kind":"dependency","relation":"support","revision":1}
