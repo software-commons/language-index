@@ -1,9 +1,9 @@
 diff --git a/tests/test_review_authorization.py b/tests/test_review_authorization.py
 new file mode 100644
-index 0000000000000000000000000000000000000000..fd94f37b4150b7d6ed8c7d89412c90f87b804b46
+index 0000000000000000000000000000000000000000..422d9c97ea8efde769f45a2a4b5e98ca605e728b
 --- /dev/null
 +++ b/tests/test_review_authorization.py
-@@ -0,0 +1,138 @@
+@@ -0,0 +1,156 @@
 +"""Synthetic checks for protected exact-candidate authorization."""
 +
 +from base64 import b64encode
@@ -48,6 +48,8 @@ index 0000000000000000000000000000000000000000..fd94f37b4150b7d6ed8c7d89412c90f8
 +            "kind": GRANT_KIND, "scope": GRANT_SCOPE, "repositories": list(REPOSITORY_RULESETS),
 +            "rulesets": list(REPOSITORY_RULESETS.values()), "expiry": "completion-or-owner-revocation",
 +            "actions": GRANT_ACTIONS, "publication_authorization": "required-separately",
++            "integration_prs": {"software-commons/language-index": list(range(3, 24)),
++                                "software-commons/license-index": [1]},
 +            "issued_on": datetime.now(timezone.utc).date().isoformat(),
 +        }
 +        self.commit = {
@@ -93,7 +95,8 @@ index 0000000000000000000000000000000000000000..fd94f37b4150b7d6ed8c7d89412c90f8
 +        for path in (self.record_path, self.state_path):
 +            self.protected.assert_any_call(path, directory=False)
 +        self.assertEqual(self.github._get_json.call_count, 4)
-+        self.binding.update(repository="software-commons/license-index", phase="queue-merge", sces_evidence_sha256=None)
++        self.binding.update(repository="software-commons/license-index", number=1,
++                            phase="queue-merge", sces_evidence_sha256=None)
 +        self.set_grant(self.grant)
 +        self.assertEqual(self.verify()["grant_commit"], GRANT_COMMIT)
 +
@@ -115,6 +118,21 @@ index 0000000000000000000000000000000000000000..fd94f37b4150b7d6ed8c7d89412c90f8
 +            with self.subTest(status=status), self.assertRaisesRegex(DataError, "inactive"):
 +                self.verify()
 +        self.github._get_json.assert_not_called()
++
++    def test_matching_record_cannot_authorize_pull_outside_its_signed_repository_scope(self):
++        for repository, number in (("software-commons/language-index", 24), ("software-commons/license-index", 6)):
++            self.binding.update(repository=repository, number=number)
++            self.set_grant(self.grant)
++            self.assertEqual(self.record["candidate"], candidate_identity(self.binding))
++            with self.subTest(repository=repository, number=number), self.assertRaisesRegex(DataError, "outside the signed"):
++                self.verify()
++
++    def test_invalid_signed_request_scope_cannot_be_used(self):
++        key = "software-commons/language-index"
++        for invalid in ([6, 6], [6, True], ["6"], [9, 6], []):
++            self.set_grant({**self.grant, "integration_prs": {**self.grant["integration_prs"], key: invalid}})
++            with self.subTest(integration=invalid), self.assertRaisesRegex(DataError, "outside the signed"):
++                self.verify()
 +
 +    def test_active_owner_and_web_flow_verified_signature_are_both_required(self):
 +        for path, change in (
@@ -1362,7 +1380,7 @@ index c9398d9c4d4c41121b70db6ebc4af50e93b9f95e..36252d9025d2b269009c3301bf6e1799
          for changes in ({"id": 19}, {"event": "push"}, {"path": ".github/workflows/other.yml"},
                          {"path": DOMAIN_PATH + "@main"}, {"head_branch": BRANCH.replace("pr-17-", "pr-18-")},
 diff --git a/tests/test_review_snapshot.py b/tests/test_review_snapshot.py
-index 90a3be09910e0a7e0ef142602fefe7aeb1379c89..d12f59c397dd98a76adc41d73d408343d91efff7 100644
+index 90a3be09910e0a7e0ef142602fefe7aeb1379c89..3229f5e97b4d58e9e39432d68b9a7ba42ec4d268 100644
 --- a/tests/test_review_snapshot.py
 +++ b/tests/test_review_snapshot.py
 @@ -1,5 +1,7 @@
@@ -1373,16 +1391,19 @@ index 90a3be09910e0a7e0ef142602fefe7aeb1379c89..d12f59c397dd98a76adc41d73d408343
  import os
  from pathlib import Path
  import subprocess
-@@ -8,7 +10,7 @@ import unittest
+@@ -7,8 +9,10 @@ from tempfile import TemporaryDirectory
+ import unittest
  from unittest.mock import patch
 
++from tools.review_authorization import GRANT_PATH
  from tools.review_snapshot import (
 -    REPOSITORY, REPOSITORY_ID, GitHub, PullSnapshot, SnapshotError, capture_diff,
-+    LANGUAGE, REPOSITORY, REPOSITORY_ID, GitHub, PullSnapshot, SnapshotError, capture_diff, capture_sces,
++    LANGUAGE, LICENSE, REPOSITORY, REPOSITORY_ID, GitHub, PullSnapshot, SnapshotError, capture_control_paths,
++    capture_diff, capture_sces,
  )
 
 
-@@ -63,6 +65,19 @@ class PullTests(unittest.TestCase):
+@@ -63,6 +67,19 @@ class PullTests(unittest.TestCase):
                  with self.assertRaisesRegex(SnapshotError, diagnostic):
                      self.read({**pull_response(), key: value})
 
@@ -1402,7 +1423,7 @@ index 90a3be09910e0a7e0ef142602fefe7aeb1379c89..d12f59c397dd98a76adc41d73d408343
 
  class CaptureTests(unittest.TestCase):
      def setUp(self):
-@@ -89,13 +104,16 @@ class CaptureTests(unittest.TestCase):
+@@ -89,13 +106,16 @@ class CaptureTests(unittest.TestCase):
          self.git("update-ref", "refs/pull/1/merge", self.merge)
 
      def git(self, *arguments):
@@ -1421,7 +1442,29 @@ index 90a3be09910e0a7e0ef142602fefe7aeb1379c89..d12f59c397dd98a76adc41d73d408343
              return capture_diff(snapshot, self.root / "snapshot", **options)
 
      def test_captures_exact_complete_diff_without_checking_out(self):
-@@ -138,6 +156,45 @@ class CaptureTests(unittest.TestCase):
+@@ -111,6 +131,21 @@ class CaptureTests(unittest.TestCase):
+         with self.assertRaisesRegex(SnapshotError, "changed during capture"):
+             self.capture(merge="c" * 40)
+
++    def test_grant_only_change_is_a_protected_control_in_both_repositories(self):
++        grant = self.source / GRANT_PATH
++        grant.parent.mkdir()
++        grant.write_bytes(b'{"fixture":"synthetic grant"}\n')
++        self.git("add", "--", GRANT_PATH)
++        self.git("commit", "--quiet", "-m", "Change only the signed grant path")
++        head = self.git("rev-parse", "HEAD")
++        tree = self.git("rev-parse", "HEAD^{tree}")
++        merge = self.git("commit-tree", tree, "-p", self.head, "-p", head, "-m", "Grant-only merge")
++        self.assertEqual(self.git("diff", "--name-only", self.head, merge), GRANT_PATH)
++        for target in (LANGUAGE, LICENSE):
++            with self.subTest(repository=target.repository):
++                snapshot = PullSnapshot(target.repository_id, 1, self.head, head, merge, target)
++                self.assertEqual(capture_control_paths(self.source, snapshot), [GRANT_PATH])
++
+     def test_rejects_ordered_parent_mismatch(self):
+         with self.assertRaisesRegex(SnapshotError, "ordered base and head parents"):
+             self.capture(head="d" * 40)
+@@ -138,6 +173,45 @@ class CaptureTests(unittest.TestCase):
          with self.assertRaisesRegex(SnapshotError, "single-parent"):
              self.capture(head=self.merge, merge=replay, linear_head=True)
 
@@ -1469,10 +1512,10 @@ index 90a3be09910e0a7e0ef142602fefe7aeb1379c89..d12f59c397dd98a76adc41d73d408343
      unittest.main()
 diff --git a/tools/review_authorization.py b/tools/review_authorization.py
 new file mode 100644
-index 0000000000000000000000000000000000000000..d7c640b9b6cf944f40fdf8f7b7db9ef60a67d42f
+index 0000000000000000000000000000000000000000..dd88e24ce3bb432397feb821356c0712709ddade
 --- /dev/null
 +++ b/tools/review_authorization.py
-@@ -0,0 +1,148 @@
+@@ -0,0 +1,154 @@
 +"""Bind a protected integration authorization to an independently signed owner grant."""
 +
 +from base64 import b64decode
@@ -1573,16 +1616,22 @@ index 0000000000000000000000000000000000000000..d7c640b9b6cf944f40fdf8f7b7db9ef6
 +    return decode(raw)
 +
 +
-+def _grant_applies(grant, repository):
++def _grant_applies(grant, repository, number):
 +    expected = {
 +        "kind": GRANT_KIND, "scope": GRANT_SCOPE, "repositories": list(REPOSITORY_RULESETS),
 +        "rulesets": list(REPOSITORY_RULESETS.values()), "expiry": "completion-or-owner-revocation",
 +        "actions": GRANT_ACTIONS, "publication_authorization": "required-separately",
 +    }
-+    require(isinstance(grant, dict) and grant.keys() == {*expected, "issued_on"}
++    require(isinstance(grant, dict) and grant.keys() == {*expected, "issued_on", "integration_prs"}
 +            and all(grant[key] == value for key, value in expected.items())
 +            and repository in REPOSITORY_RULESETS,
 +            "the signed owner grant does not cover this protected integration scope")
++    integration = grant["integration_prs"]
++    require(isinstance(integration, dict) and integration.keys() == REPOSITORY_RULESETS.keys()
++            and all(isinstance(numbers, list) and numbers and all(map(_positive_integer, numbers))
++                    and numbers == sorted(set(numbers)) for numbers in integration.values())
++            and _positive_integer(number) and number in integration[repository],
++            "the exact pull request is outside the signed owner integration scope")
 +    issued = grant["issued_on"]
 +    require(_matches(re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}"), issued)
 +            and date.fromisoformat(issued) <= datetime.now(timezone.utc).date(),
@@ -1618,7 +1667,7 @@ index 0000000000000000000000000000000000000000..d7c640b9b6cf944f40fdf8f7b7db9ef6
 +            and _positive_integer(state["owner_id"]) and _matches(_LOGIN, state["owner_login"])
 +            and _positive_integer(state["signer_id"]) and state["signer_login"] == "web-flow",
 +            "the protected standing owner grant is absent, inactive, or mismatched")
-+    _grant_applies(_verified_grant(github, state), candidate["repository"])
++    _grant_applies(_verified_grant(github, state), candidate["repository"], candidate["number"])
 +    return {"grant_commit": state["commit"], "grant_sha256": state["sha256"],
 +            "record_sha256": record_digest, "state_sha256": state_digest}
 diff --git a/tools/review_commission.py b/tools/review_commission.py
@@ -2895,10 +2944,10 @@ index 8b8292098eeac021263bb31bb106a71b3e036188..e9dfd58305f3099846027ede73a4819d
 -            "queue_ref": f"refs/heads/{branch}", "observed_run_id": run_id, "workflows": workflows}
 +            "queue_ref": f"refs/heads/{branch}", "observed_run_id": run_id, "workflows": observed}
 diff --git a/tools/review_snapshot.py b/tools/review_snapshot.py
-index 67163aa9af81a323b712a724aa87672258dd9090..0acb4cae96de611ab8283d65c3b2b9f92319f6f6 100644
+index 67163aa9af81a323b712a724aa87672258dd9090..963eaaae756362f04fc7aa879c202a2524a3edbf 100644
 --- a/tools/review_snapshot.py
 +++ b/tools/review_snapshot.py
-@@ -1,22 +1,26 @@
+@@ -1,22 +1,27 @@
  """Capture an exact GitHub pull-request merge candidate without checking it out."""
 
 +from contextlib import nullcontext
@@ -2915,6 +2964,7 @@ index 67163aa9af81a323b712a724aa87672258dd9090..0acb4cae96de611ab8283d65c3b2b9f9
  from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 +from .records import decode
++from .review_authorization import GRANT_PATH
 +
 
  REPOSITORY = "software-commons/license-index"
@@ -2926,7 +2976,7 @@ index 67163aa9af81a323b712a724aa87672258dd9090..0acb4cae96de611ab8283d65c3b2b9f9
  _API_URL = "https://api.github.com"
  _SHA = re.compile(r"[0-9a-f]{40}")
  _API_TIMEOUT = 20
-@@ -47,6 +51,32 @@ def token_is_target_only(github, repository_id, repository):
+@@ -47,6 +52,33 @@ def token_is_target_only(github, repository_id, repository):
      return type(row.get("id")) is int and row["id"] == repository_id and row.get("full_name") == repository
 
 
@@ -2943,6 +2993,7 @@ index 67163aa9af81a323b712a724aa87672258dd9090..0acb4cae96de611ab8283d65c3b2b9f9
 +TARGETS = {target.repository: target for target in (LICENSE, LANGUAGE)}
 +CONTROL_PATHS = (
 +    ".github", ".gitattributes", "AGENTS.md", "docs/PUBLICATION.md", "docs/TRUSTED_REVIEW.md",
++    GRANT_PATH,
 +    "research/review", "research/reviews", "research/tools", "schemas", "sces/adoption.json", "sces/advisories",
 +    "sces/publication.json", "sces/releases", "tests", "tools",
 +)
@@ -2959,7 +3010,7 @@ index 67163aa9af81a323b712a724aa87672258dd9090..0acb4cae96de611ab8283d65c3b2b9f9
  def _is_sha(value):
      return isinstance(value, str) and _SHA.fullmatch(value) is not None
 
-@@ -58,9 +88,11 @@ class PullSnapshot:
+@@ -58,9 +90,11 @@ class PullSnapshot:
      base: str
      head: str
      merge: str
@@ -2972,7 +3023,7 @@ index 67163aa9af81a323b712a724aa87672258dd9090..0acb4cae96de611ab8283d65c3b2b9f9
              raise SnapshotError("GitHub returned an unexpected repository identifier")
          if type(self.number) is not int or self.number < 1:
              raise SnapshotError("Expected a positive pull-request number")
-@@ -77,7 +109,10 @@ class _NoRedirects(HTTPRedirectHandler):
+@@ -77,7 +111,10 @@ class _NoRedirects(HTTPRedirectHandler):
  class GitHub:
      """Read the fixed repository from GitHub without following redirects."""
 
@@ -2984,7 +3035,7 @@ index 67163aa9af81a323b712a724aa87672258dd9090..0acb4cae96de611ab8283d65c3b2b9f9
          self._headers = {
              "Accept": "application/vnd.github+json",
              "Cache-Control": "no-cache",
-@@ -107,21 +142,21 @@ class GitHub:
+@@ -107,21 +144,21 @@ class GitHub:
      def get_pull(self, number):
          if type(number) is not int or number < 1:
              raise SnapshotError("Expected a positive pull-request number")
@@ -3010,7 +3061,7 @@ index 67163aa9af81a323b712a724aa87672258dd9090..0acb4cae96de611ab8283d65c3b2b9f9
          )
 
 
-@@ -132,21 +167,26 @@ def _isolated_git_environment():
+@@ -132,21 +169,26 @@ def _isolated_git_environment():
          "GIT_CONFIG_GLOBAL": os.devnull,
          "GIT_TERMINAL_PROMPT": "0",
          "GIT_OPTIONAL_LOCKS": "0",
@@ -3042,7 +3093,7 @@ index 67163aa9af81a323b712a724aa87672258dd9090..0acb4cae96de611ab8283d65c3b2b9f9
      except OSError as error:
          raise SnapshotError("Cannot start Git for isolated review capture") from error
 
-@@ -202,7 +242,7 @@ def capture_diff(snapshot, directory: Path, *, queue_ref=None, linear_head=False
+@@ -202,7 +244,7 @@ def capture_diff(snapshot, directory: Path, *, queue_ref=None, linear_head=False
          raise SnapshotError("Expected a validated pull-request snapshot")
      ref = f"refs/pull/{snapshot.number}/merge"
      if queue_ref is not None:
@@ -3051,7 +3102,7 @@ index 67163aa9af81a323b712a724aa87672258dd9090..0acb4cae96de611ab8283d65c3b2b9f9
          if not isinstance(queue_ref, str) or not queue_ref.startswith(prefix) or not _is_sha(queue_ref[len(prefix):]):
              raise SnapshotError("Expected the exact GitHub merge-queue branch for this pull request")
          ref = queue_ref
-@@ -215,7 +255,7 @@ def capture_diff(snapshot, directory: Path, *, queue_ref=None, linear_head=False
+@@ -215,7 +257,7 @@ def capture_diff(snapshot, directory: Path, *, queue_ref=None, linear_head=False
      _git(directory, "init", "--bare", "--quiet", "--template=", "--object-format=sha1")
      _git(
          directory, "fetch", "--quiet", "--depth=2", "--no-tags", "--no-recurse-submodules",
@@ -3060,7 +3111,7 @@ index 67163aa9af81a323b712a724aa87672258dd9090..0acb4cae96de611ab8283d65c3b2b9f9
          config=("http.followRedirects=false", "fetch.fsckObjects=true"),
      )
      fetched = _git(directory, "rev-parse", "--verify", "FETCH_HEAD^{commit}").strip()
-@@ -236,3 +276,63 @@ def capture_diff(snapshot, directory: Path, *, queue_ref=None, linear_head=False
+@@ -236,3 +278,63 @@ def capture_diff(snapshot, directory: Path, *, queue_ref=None, linear_head=False
      if not diff:
          raise SnapshotError("The GitHub test merge makes no changes relative to its base")
      return tree, diff
