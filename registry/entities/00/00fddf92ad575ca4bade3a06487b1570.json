@@ -1,0 +1,1 @@
+{"aliases":[],"id":"00fddf92ad575ca4bade3a06487b1570","identity_claim":{"id":"smalltalk80-bluebook-edition-identity","kind":"claim","revision":1},"kind":"edition","name":"Smalltalk-80","relations":[{"claim":{"id":"smalltalk80-edition-of-smalltalk","kind":"claim","revision":1},"target":{"id":"d81ebc74b46f58b6b51ba85d1dee4f5f"},"type":"edition-of"}],"state":"active"}
