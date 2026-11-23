@@ -1,0 +1,1 @@
+{"basis":{"id":"dhall-semantics-56b0997","kind":"source","revision":1},"citation":{"locator":"Multi-line string literals, source lines 167–195","modality":"required"},"claim":{"id":"dhall-56b0997-multiline-string-desugaring","kind":"claim","revision":1},"id":"supports-dhall-56b0997-multiline-string-desugaring","kind":"dependency","relation":"support","revision":1}
