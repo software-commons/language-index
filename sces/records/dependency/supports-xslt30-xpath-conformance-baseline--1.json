@@ -1,0 +1,1 @@
+{"basis":{"id":"w3c-xslt-30-20170608","kind":"source","revision":1},"citation":{"locator":"§27 Conformance (#conformance) and §27.7 XPath 3.1 Feature (#xpath31-feature)","modality":"required"},"claim":{"id":"xslt30-xpath-conformance-baseline","kind":"claim","revision":1},"id":"supports-xslt30-xpath-conformance-baseline","kind":"dependency","relation":"support","revision":1}
