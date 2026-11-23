@@ -1,3 +1,5 @@
 # Research status
 
-The first discovery campaign tracks provisional language leads separately from accepted identities and qualified releases. Review the campaign records for source provenance, cutoff, exceptions, and remaining adjudication. The protected release procedure applies to every change that activates a canonical dataset.
+The [2026-11-22 census](../research/campaigns/census-2026-11-22.md) preserved 1,120 source-linked public discovery leads. Every candidate has an unresolved identity disposition. See [individual profiles](../research/profiles/README.md) and the [first independent review record](../research/reviews/core-provenance.json) for claim-level scope, evidence, and limitations.
+
+An active dataset requires the protected release process defined under [publication control](PUBLICATION.md).
