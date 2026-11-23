@@ -96,12 +96,16 @@ def assemble(batch, review, primary, independent, label, held):
             record(row)
 
     research = defaultdict(list)
+    research_limitations = defaultdict(list)
     for row in batch["research_assessments"]:
         claim_id = key(row["claim"])
         require(claim_id in claims, "Research verdict has no frozen claim")
         require(row["claim_sha256"] == sha256(encode(claims[claim_id])).hexdigest(),
                 "Research verdict binds different claim bytes")
         research[claim_id].append(row["assessment"])
+        limits = row.get("limitations", [])
+        require(isinstance(limits, list), "Primary verification limitations must be an array")
+        research_limitations[claim_id].extend(limits)
 
     concluded = set()
     for row in review["independent_assessments"]:
@@ -141,10 +145,16 @@ def assemble(batch, review, primary, independent, label, held):
             require(phase_conclusion != "supported" or supported, "Supported verdict contains a failed binding")
             identifier = f"{label}-{role}-{claim['id']}-r{claim['revision']}"
             refs[role] = make_ref("verification", identifier)
+            limitations = row["limitations"] if role == "independent-review" else (
+                claim["limitations"] or list(dict.fromkeys(research_limitations[claim_id]))
+            )
+            require(isinstance(limitations, list) and limitations and
+                    all(isinstance(limit, str) and limit.strip() for limit in limitations),
+                    "Verification requires recorded limitations")
             verification = dict(refs[role], claim=reference(claim), claim_sha256=digest, phase=role, run=run,
                                 acquisitions=acquisitions, assessments=assessments, conclusion=phase_conclusion,
                                 reasoning="\n\n".join(item["reasoning"] for item in assessments),
-                                limitations=claim["limitations"] if role == "research" else row["limitations"])
+                                limitations=limitations)
             if role == "independent-review":
                 verification["challenge"] = row["challenge"]
                 if "reproduction" in row:
