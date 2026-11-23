@@ -1,0 +1,1 @@
+{"aliases":[],"id":"37eb2656527841e093a809eec322d856","identity_claim":{"id":"luau-project-scripting-language-identity","kind":"claim","revision":1},"kind":"dialect","name":"Luau","relations":[{"claim":{"id":"luau-dialect-of-lua-51-baseline","kind":"claim","revision":1},"target":{"id":"002e17249d79451892f420427051a56d"},"type":"dialect-of"}],"state":"active"}

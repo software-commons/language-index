@@ -1,0 +1,1 @@
+{"aliases":[],"id":"d79a04cd2420449c8b2c17facfc0d004","identity_claim":{"id":"teal-source-language-identity-v0248","kind":"claim","revision":1},"kind":"dialect","name":"Teal","relations":[{"claim":{"id":"teal-v0248-dialect-of-lua","kind":"claim","revision":1},"target":{"id":"002e17249d79451892f420427051a56d"},"type":"dialect-of"}],"state":"active"}
