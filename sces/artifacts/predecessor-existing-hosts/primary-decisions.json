@@ -1,0 +1,1486 @@
+{
+  "acquisition_log_sha256": "ff453728b778e130f12371b82fb09e579bfdbeee233b77ac3092234b5415d689",
+  "disclosures": [
+    "No source code, sample, or facility was executed.",
+    "Shared URLs or full bodies denote common original provenance, even if reacquired under separate tool requests.",
+    "SCES markers with pred-context IDs describe observed bodies, rather than receipts for differently hashed previously selected records.",
+    "The frozen original candidate bytes and row line include their final LF in their respective hashes."
+  ],
+  "findings": [
+    {
+      "candidate_path": "registry/candidates/d6/d611b308623f44698f35fb2096d66a29.json",
+      "candidate_sha256": "30936388a365a5c1a2482b7428c0c6b15d1862abff11a031828f6f18336ed518",
+      "lead_id": "d611b308623f44698f35fb2096d66a29",
+      "limitations": [
+        "PCRE2 is a separately owned library. The row does not attest C language equivalence, standard-library inclusion, or ISO C edition conformance.",
+        "Fresh IEC HTML variant identifies the same ISO publication label and C description, but did not reproduce the registered whole-body hash. Keep the exact C source dependency on hold.",
+        "The rolling PCRE2 releases page body differs from discovery; the pinned 10.47 documentation and exact source row retain the scoped interface context."
+      ],
+      "origin": {
+        "end_byte_exclusive": 3392,
+        "line": 60,
+        "line_has_lf": true,
+        "line_sha256": "6f6b4f58730346a9c15422c3b828d799f1324d3c073f1660ef60f283c64bd6ff",
+        "original_publisher_locator": "https://github.com/PCRE2Project/pcre2/releases",
+        "predecessor_body_sha256": "0601c2c948b19c7f5265bd53260c7c8a47478d12d3dc79e863a2f2f8e411f9f8",
+        "predecessor_locator": "https://github.com/strling-lang/regex-conformance/blob/62084ca0ef9b05a28711dd28bf10885c6ed0cb5d/registries/universe/full-known-universe-2026-08-15.v1.json#L60",
+        "row": {
+          "archetype": "standalone-library-surface",
+          "category": "standalone-engine",
+          "current_profiles": 6,
+          "current_representatives": [
+            "10=10.47"
+          ],
+          "historical_profiles": {
+            "expected": 6,
+            "lower": 6,
+            "upper": 6
+          },
+          "key": "pcre2",
+          "name": "PCRE2 C API",
+          "release_line_model": "major API line; 8/16/32-bit ordinary and DFA matcher profiles",
+          "source": "https://github.com/PCRE2Project/pcre2/releases"
+        },
+        "start_byte": 3018
+      },
+      "primary_context_finding": "The frozen PCRE2 C API row points to a standalone engine release listing. Its 10.47 native API documentation supplies C-facing declarations and the pcre2.h header, which associate the API with the accepted C language as interface context.",
+      "primary_state": "context-supported-exact-iec-binding-hold",
+      "publisher_bindings": [
+        {
+          "discovery_sha256": "16409a91e35d16568d7d16d05c727c847d5c61b40f5c9dbb989c11b12153824c",
+          "effective_locator": "https://github.com/PCRE2Project/pcre2/releases",
+          "locator": "https://github.com/PCRE2Project/pcre2/releases",
+          "matches_registered_identity": null,
+          "registered_identity_sha256": null,
+          "source": {
+            "id": "pred-context-original-pcre2",
+            "kind": "source",
+            "revision": 1
+          },
+          "source_key": "original-pcre2",
+          "source_sha256": "10dea259e63d341b4f96c51ee4a3b689653f27e96d091e219e2b0b18b78d5294",
+          "witnessed_windows": [
+            {
+              "end_byte_exclusive": 120612,
+              "first_line": 451,
+              "last_line": 451,
+              "locator_term": "\"anchorId\":\"release-pcre2-10.47\",\"label\":\"PCRE2 10.47\"",
+              "representation_sha256": "10dea259e63d341b4f96c51ee4a3b689653f27e96d091e219e2b0b18b78d5294",
+              "section_key": "release-listing-tag",
+              "sha256": "ebcd252b043644863b7784d8b9346e8e8b147601de484a22edc5a327b0568f9f",
+              "start_byte": 120558
+            }
+          ]
+        },
+        {
+          "discovery_sha256": "e6a7f227cace7ce570244ae8d2aef4981784bf2125372ce9dd60a93bd5bf57c2",
+          "effective_locator": "https://raw.githubusercontent.com/PCRE2Project/pcre2/pcre2-10.47/doc/pcre2api.3",
+          "locator": "https://raw.githubusercontent.com/PCRE2Project/pcre2/pcre2-10.47/doc/pcre2api.3",
+          "matches_registered_identity": null,
+          "registered_identity_sha256": null,
+          "source": {
+            "id": "pred-context-pcre2-c-api",
+            "kind": "source",
+            "revision": 1
+          },
+          "source_key": "pcre2-c-api",
+          "source_sha256": "e6a7f227cace7ce570244ae8d2aef4981784bf2125372ce9dd60a93bd5bf57c2",
+          "witnessed_windows": [
+            {
+              "end_byte_exclusive": 1009,
+              "first_line": 5,
+              "last_line": 31,
+              "locator_term": ".B #include <pcre2.h>",
+              "representation_sha256": "e6a7f227cace7ce570244ae8d2aef4981784bf2125372ce9dd60a93bd5bf57c2",
+              "section_key": "native-c-interface",
+              "sha256": "c91d6010b91d7b8ac6552952ccd49fd094c28e9f1553e1b4e329c823c23b256d",
+              "start_byte": 118
+            }
+          ]
+        },
+        {
+          "discovery_sha256": "80587d37028c9456079173d327e8d1b3825d174765adae05b715a818f9743f07",
+          "effective_locator": "https://webstore.iec.ch/en/publication/102886",
+          "locator": "https://webstore.iec.ch/en/publication/102886",
+          "matches_registered_identity": false,
+          "registered_identity_sha256": "49e07042b7f0da92e411c170bc8e73423e76a43be149baf773d47481fbd7c78b",
+          "source": {
+            "id": "pred-context-identity-c-iec-2024-catalog",
+            "kind": "source",
+            "revision": 1
+          },
+          "source_key": "identity-c-iec-2024-catalog",
+          "source_sha256": "00d084317497da813ef8f61996f98d0eedf18d59089c770697912306550336fc",
+          "witnessed_windows": [
+            {
+              "end_byte_exclusive": 221195,
+              "first_line": 2834,
+              "last_line": 2840,
+              "locator_term": "Information technology - Programming languages - C",
+              "representation_sha256": "00d084317497da813ef8f61996f98d0eedf18d59089c770697912306550336fc",
+              "section_key": "iec-c-title",
+              "sha256": "e1a7fc84f0409169a64baeb2166ed34b5c8064d540de96cba032e3ed9f81de8f",
+              "start_byte": 220630
+            },
+            {
+              "end_byte_exclusive": 271,
+              "first_line": 5,
+              "last_line": 6,
+              "locator_term": "<meta name=\"title\" content=\"ISO/IEC 9899:2024 | IEC\"",
+              "representation_sha256": "00d084317497da813ef8f61996f98d0eedf18d59089c770697912306550336fc",
+              "section_key": "iec-edition",
+              "sha256": "fb28742cfb078f822e80ccafa40727941a403b9e630db6f0fcfa1945afd87cc4",
+              "start_byte": 159
+            }
+          ]
+        }
+      ],
+      "target": {
+        "entity_id": "13ee7d49820d5273b393a252955956df",
+        "entity_sha256": "8b30f664c5a43446027fcf7d52d3c2f590490e1439b5e959cca2e6b6e93ed185",
+        "identity_claim": {
+          "id": "iso-c-language-identity",
+          "kind": "claim",
+          "revision": 1
+        },
+        "identity_claim_scope": {
+          "authority": "iec-publication-catalog",
+          "edition": "iso-iec-9899-2024",
+          "facet": "identity",
+          "revision": "iso-iec-9899-2024-iec-edition-5-catalog"
+        },
+        "identity_claim_sha256": "cfe287522883fcde29a46adaee1bb8d17fdbb2158d15d46b8ce2ad52667d44e6",
+        "name": "C",
+        "selected_release": "verified-language-cohort-rc8"
+      }
+    },
+    {
+      "candidate_path": "registry/candidates/61/613dadafab424f499be7aec5128021c1.json",
+      "candidate_sha256": "5bf2119c29d6f6310cf94d9fa72170cc661f4a0b87c1745c66c41dd3fedebd4b",
+      "lead_id": "613dadafab424f499be7aec5128021c1",
+      "limitations": [
+        "The row's recorded representative is 1.13.1. The fresh /latest route displays 1.13.2 and differs in whole-body digest. It cannot be used as proof of 1.13.1.",
+        "The separately reacquired 1.13.1 route also differs from its earlier captured HTML digest. The visible 1.13.1 title and Rust package description remain scoped fresh observations.",
+        "Library and language identity, version selection and regex behavior remain separate."
+      ],
+      "origin": {
+        "end_byte_exclusive": 6264,
+        "line": 68,
+        "line_has_lf": true,
+        "line_sha256": "ff3364b428c862fed11e8e71b79a9a11ab7106259a86bd63d82b747d0ec2d6d4",
+        "original_publisher_locator": "https://docs.rs/crate/regex/latest",
+        "predecessor_body_sha256": "0601c2c948b19c7f5265bd53260c7c8a47478d12d3dc79e863a2f2f8e411f9f8",
+        "predecessor_locator": "https://github.com/strling-lang/regex-conformance/blob/62084ca0ef9b05a28711dd28bf10885c6ed0cb5d/registries/universe/full-known-universe-2026-08-15.v1.json#L68",
+        "row": {
+          "archetype": "linear-or-dfa-surface",
+          "category": "standalone-library",
+          "current_profiles": 1,
+          "current_representatives": [
+            "1=1.13.1"
+          ],
+          "historical_profiles": {
+            "expected": 1,
+            "lower": 1,
+            "upper": 2
+          },
+          "key": "rust-regex",
+          "name": "Rust regex crate",
+          "release_line_model": "SemVer major line",
+          "source": "https://docs.rs/crate/regex/latest"
+        },
+        "start_byte": 5940
+      },
+      "primary_context_finding": "The frozen standalone Rust regex crate row has Rust programming-language context. The versioned docs.rs 1.13.1 package route confirms that version and describes the crate for Rust, while the accepted Rust Reference identifies the language.",
+      "primary_state": "context-supported-rolling-and-pinned-representations-separated",
+      "publisher_bindings": [
+        {
+          "discovery_sha256": "be412f1a1dea3542467f9ea46320f98a23d6f636cbbd64000be2d24be3cbcc0b",
+          "effective_locator": "https://docs.rs/crate/regex/latest",
+          "locator": "https://docs.rs/crate/regex/latest",
+          "matches_registered_identity": null,
+          "registered_identity_sha256": null,
+          "source": {
+            "id": "pred-context-original-rust-regex",
+            "kind": "source",
+            "revision": 1
+          },
+          "source_key": "original-rust-regex",
+          "source_sha256": "3c68f76b4484e5dce62bd7fd90dcfccec6b4a8cd9fd856b83cb80a5bd5f59282",
+          "witnessed_windows": [
+            {
+              "end_byte_exclusive": 795,
+              "first_line": 12,
+              "last_line": 12,
+              "locator_term": "<title>regex 1.13.2 - Docs.rs</title>",
+              "representation_sha256": "3c68f76b4484e5dce62bd7fd90dcfccec6b4a8cd9fd856b83cb80a5bd5f59282",
+              "section_key": "served-version",
+              "sha256": "d09f14cbedbdbcc0f7b8a36830c52291eda3a77acb606e58a76252b45d668b68",
+              "start_byte": 758
+            },
+            {
+              "end_byte_exclusive": 2801,
+              "first_line": 58,
+              "last_line": 58,
+              "locator_term": "An implementation of regular expressions for Rust.",
+              "representation_sha256": "3c68f76b4484e5dce62bd7fd90dcfccec6b4a8cd9fd856b83cb80a5bd5f59282",
+              "section_key": "crate-intro",
+              "sha256": "020b173e0ee323316792c84c8f4cbe2d36cd16a622e0d2596945428bdf274ec0",
+              "start_byte": 2751
+            }
+          ]
+        },
+        {
+          "discovery_sha256": "a7e3e8d6beda083d93f01b3f187337462ba30fa7a0699ab88209088af9ee0d26",
+          "effective_locator": "https://docs.rs/crate/regex/1.13.1",
+          "locator": "https://docs.rs/crate/regex/1.13.1",
+          "matches_registered_identity": null,
+          "registered_identity_sha256": null,
+          "source": {
+            "id": "pred-context-rust-regex-crate",
+            "kind": "source",
+            "revision": 1
+          },
+          "source_key": "rust-regex-crate",
+          "source_sha256": "a3946cac90b715f3c1dc4fb60518c0af94c5f11dd304e9e916db5ea35eefd79a",
+          "witnessed_windows": [
+            {
+              "end_byte_exclusive": 795,
+              "first_line": 12,
+              "last_line": 12,
+              "locator_term": "<title>regex 1.13.1 - Docs.rs</title>",
+              "representation_sha256": "a3946cac90b715f3c1dc4fb60518c0af94c5f11dd304e9e916db5ea35eefd79a",
+              "section_key": "pinned-version",
+              "sha256": "54d4212f1bf3d3777a722f498385dee0aea0999e58fb74c08f059bd7bb5b2411",
+              "start_byte": 758
+            },
+            {
+              "end_byte_exclusive": 2801,
+              "first_line": 58,
+              "last_line": 58,
+              "locator_term": "An implementation of regular expressions for Rust.",
+              "representation_sha256": "a3946cac90b715f3c1dc4fb60518c0af94c5f11dd304e9e916db5ea35eefd79a",
+              "section_key": "crate-intro",
+              "sha256": "020b173e0ee323316792c84c8f4cbe2d36cd16a622e0d2596945428bdf274ec0",
+              "start_byte": 2751
+            }
+          ]
+        },
+        {
+          "discovery_sha256": "b1a3a55ef35472cab5fdf4f526cfa9e254cd786176c62c38f2ec4791eba569fd",
+          "effective_locator": "https://raw.githubusercontent.com/rust-lang/reference/c9cc32825b03fc206d9c6fe73e9ca6a2f3576d6c/src/introduction.md",
+          "locator": "https://raw.githubusercontent.com/rust-lang/reference/c9cc32825b03fc206d9c6fe73e9ca6a2f3576d6c/src/introduction.md",
+          "matches_registered_identity": true,
+          "registered_identity_sha256": "b1a3a55ef35472cab5fdf4f526cfa9e254cd786176c62c38f2ec4791eba569fd",
+          "source": {
+            "id": "rust-reference-intro",
+            "kind": "source",
+            "revision": 1
+          },
+          "source_key": "identity-rust-reference-intro",
+          "source_sha256": "b1a3a55ef35472cab5fdf4f526cfa9e254cd786176c62c38f2ec4791eba569fd",
+          "witnessed_windows": [
+            {
+              "end_byte_exclusive": 85,
+              "first_line": 3,
+              "last_line": 3,
+              "locator_term": "This book is the primary reference for the Rust programming language.",
+              "representation_sha256": "b1a3a55ef35472cab5fdf4f526cfa9e254cd786176c62c38f2ec4791eba569fd",
+              "section_key": "language-name",
+              "sha256": "69213aac1d13c9fc82422f8a3b66c910a6eb967036c2352f9c0fa02ac2e6e909",
+              "start_byte": 16
+            }
+          ]
+        }
+      ],
+      "target": {
+        "entity_id": "6a3719392c5d4f2eab5329d10fa70754",
+        "entity_sha256": "e4ea67ed386fbaf64fc188aeec6b62c8a3fd9237d0d45fdd3676da032ae37b39",
+        "identity_claim": {
+          "id": "rust-language-identity",
+          "kind": "claim",
+          "revision": 1
+        },
+        "identity_claim_scope": {
+          "authority": "rust-project",
+          "edition": "c9cc32825b03fc206d9c6fe73e9ca6a2f3576d6c",
+          "facet": "identity",
+          "revision": "c9cc32825b03fc206d9c6fe73e9ca6a2f3576d6c"
+        },
+        "identity_claim_sha256": "cc45ef633799a0a4cbe5cbffb91d311e61e92866cfaf47a069656d5f9f60dbb7",
+        "name": "Rust",
+        "selected_release": "verified-language-cohort-rc8"
+      }
+    },
+    {
+      "candidate_path": "registry/candidates/17/17f2e43d5bb74a52bd3de47b9ff56bf8.json",
+      "candidate_sha256": "fc9c90be5e5d5602a3849505ee61dfb60b6038dc9f6e432cfb78f828d0dfedac",
+      "lead_id": "17f2e43d5bb74a52bd3de47b9ff56bf8",
+      "limitations": [
+        "The downloads index is a release route. The exact CPython 3.14.6 module documentation supplies facility evidence and the 3.13 language reference supplies existing identity context.",
+        "No implementation, module behavior or compatibility is transferred between the 3.14.6 facility and the 3.13 identity source."
+      ],
+      "origin": {
+        "end_byte_exclusive": 8883,
+        "line": 75,
+        "line_has_lf": true,
+        "line_sha256": "b74064ced128e78ceb7128dada2dc732aa539220ace5933b824ce4498964098f",
+        "original_publisher_locator": "https://www.python.org/downloads/",
+        "predecessor_body_sha256": "0601c2c948b19c7f5265bd53260c7c8a47478d12d3dc79e863a2f2f8e411f9f8",
+        "predecessor_locator": "https://github.com/strling-lang/regex-conformance/blob/62084ca0ef9b05a28711dd28bf10885c6ed0cb5d/registries/universe/full-known-universe-2026-08-15.v1.json#L75",
+        "row": {
+          "archetype": "host-runtime-surface",
+          "category": "language-runtime",
+          "current_profiles": 5,
+          "current_representatives": [
+            "3.10=official-latest",
+            "3.11=official-latest",
+            "3.12=official-latest",
+            "3.13=official-latest",
+            "3.14=3.14.6"
+          ],
+          "historical_profiles": {
+            "expected": 23,
+            "lower": 20,
+            "upper": 25
+          },
+          "key": "python-re",
+          "name": "Python standard-library re",
+          "release_line_model": "Python major.minor maintenance line",
+          "source": "https://www.python.org/downloads/"
+        },
+        "start_byte": 8438
+      },
+      "primary_context_finding": "The frozen Python standard-library re row has Python language context. The linked downloads page identifies the row's Python 3.14.6 representative and the exact CPython 3.14.6 library reference describes re as a separately documented module.",
+      "primary_state": "context-supported",
+      "publisher_bindings": [
+        {
+          "discovery_sha256": "a00e35f80dc0947afcb7c0cb8ebc0880d2aa0c5255ee3bb7e2b845b4983b47f4",
+          "effective_locator": "https://www.python.org/downloads/",
+          "locator": "https://www.python.org/downloads/",
+          "matches_registered_identity": null,
+          "registered_identity_sha256": null,
+          "source": {
+            "id": "pred-context-original-python-re",
+            "kind": "source",
+            "revision": 1
+          },
+          "source_key": "original-python-re",
+          "source_sha256": "a00e35f80dc0947afcb7c0cb8ebc0880d2aa0c5255ee3bb7e2b845b4983b47f4",
+          "witnessed_windows": [
+            {
+              "end_byte_exclusive": 32724,
+              "first_line": 682,
+              "last_line": 683,
+              "locator_term": "href=\"/downloads/release/python-3146/\">Python 3.14.6",
+              "representation_sha256": "a00e35f80dc0947afcb7c0cb8ebc0880d2aa0c5255ee3bb7e2b845b4983b47f4",
+              "section_key": "release-link",
+              "sha256": "ed4f9c064a8adb160f470c42a4d0e960507137c4583083cc5a5fe530fd7acd59",
+              "start_byte": 32612
+            }
+          ]
+        },
+        {
+          "discovery_sha256": "a6f16624570eeec5182528098093bfcb346deabc9351ef3d05985361df83e81f",
+          "effective_locator": "https://raw.githubusercontent.com/python/cpython/v3.14.6/Doc/library/re.rst",
+          "locator": "https://raw.githubusercontent.com/python/cpython/v3.14.6/Doc/library/re.rst",
+          "matches_registered_identity": null,
+          "registered_identity_sha256": null,
+          "source": {
+            "id": "pred-context-cpython-3146-re",
+            "kind": "source",
+            "revision": 1
+          },
+          "source_key": "cpython-3146-re",
+          "source_sha256": "a6f16624570eeec5182528098093bfcb346deabc9351ef3d05985361df83e81f",
+          "witnessed_windows": [
+            {
+              "end_byte_exclusive": 404,
+              "first_line": 1,
+              "last_line": 15,
+              "locator_term": ":mod:`!re` --- Regular expression operations",
+              "representation_sha256": "a6f16624570eeec5182528098093bfcb346deabc9351ef3d05985361df83e81f",
+              "section_key": "module-and-context",
+              "sha256": "c492f698dac58f4c41d102ea0f6eebb78e85ef0bcef960f4e46dee4e85007852",
+              "start_byte": 0
+            }
+          ]
+        },
+        {
+          "discovery_sha256": "41aa1f7bcef53ac043e336112a6bb44ec17e99aa1bb77dbb0830a946965f9295",
+          "effective_locator": "https://raw.githubusercontent.com/python/cpython/60403a5409ff2c3f3b07dd2ca91a7a3e096839c7/Doc/reference/introduction.rst",
+          "locator": "https://raw.githubusercontent.com/python/cpython/60403a5409ff2c3f3b07dd2ca91a7a3e096839c7/Doc/reference/introduction.rst",
+          "matches_registered_identity": true,
+          "registered_identity_sha256": "41aa1f7bcef53ac043e336112a6bb44ec17e99aa1bb77dbb0830a946965f9295",
+          "source": {
+            "id": "python-313-introduction",
+            "kind": "source",
+            "revision": 1
+          },
+          "source_key": "identity-python-313-introduction",
+          "source_sha256": "41aa1f7bcef53ac043e336112a6bb44ec17e99aa1bb77dbb0830a946965f9295",
+          "witnessed_windows": [
+            {
+              "end_byte_exclusive": 124,
+              "first_line": 8,
+              "last_line": 8,
+              "locator_term": "This reference manual describes the Python programming language.",
+              "representation_sha256": "41aa1f7bcef53ac043e336112a6bb44ec17e99aa1bb77dbb0830a946965f9295",
+              "section_key": "reference-identity",
+              "sha256": "2db0e38714accdf0f3e699b9001ea39050c9f4bd4a2e0c264d40342f2df473ed",
+              "start_byte": 60
+            }
+          ]
+        }
+      ],
+      "target": {
+        "entity_id": "fa7ef34c99ea49b697b43076d17ca783",
+        "entity_sha256": "f9c98004de94b25ff6926b6ea20591d2857b298ddec50076c33c5d8094d16c26",
+        "identity_claim": {
+          "id": "python-313-language-identity",
+          "kind": "claim",
+          "revision": 2
+        },
+        "identity_claim_scope": {
+          "authority": "python-software-foundation",
+          "edition": "3.13.0",
+          "facet": "identity",
+          "revision": "60403a5409ff2c3f3b07dd2ca91a7a3e096839c7"
+        },
+        "identity_claim_sha256": "5f8fa5e305cda1b37660cfb9f09419ea520674d2da279d103734629b3149b35e",
+        "name": "Python",
+        "selected_release": "verified-language-cohort-rc8"
+      }
+    },
+    {
+      "candidate_path": "registry/candidates/af/af639ec40cfd4aa3ba1aed5225d5c03e.json",
+      "candidate_sha256": "206408aaf44d9b2b6924fc0db49978282ebbb321f1bd884c3c62a9afa0fde98e",
+      "lead_id": "af639ec40cfd4aa3ba1aed5225d5c03e",
+      "limitations": [
+        "The java.util.regex.Pattern class is a Java library API, distinct from the language as governed by the JLS.",
+        "The SE 25 API publication and the SE 21 identity source have different scopes. No cross-edition equivalence or runtime behavior is asserted."
+      ],
+      "origin": {
+        "end_byte_exclusive": 10539,
+        "line": 79,
+        "line_has_lf": true,
+        "line_sha256": "fed551ec30461c38263269625b9b0576f5443c313e728553c9985ea5f26c9828",
+        "original_publisher_locator": "https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/regex/Pattern.html",
+        "predecessor_body_sha256": "0601c2c948b19c7f5265bd53260c7c8a47478d12d3dc79e863a2f2f8e411f9f8",
+        "predecessor_locator": "https://github.com/strling-lang/regex-conformance/blob/62084ca0ef9b05a28711dd28bf10885c6ed0cb5d/registries/universe/full-known-universe-2026-08-15.v1.json#L79",
+        "row": {
+          "archetype": "host-runtime-surface",
+          "category": "language-runtime",
+          "current_profiles": 5,
+          "current_representatives": [
+            "8=latest-update",
+            "11=latest-update",
+            "17=latest-update",
+            "21=latest-update",
+            "25=25.0.4"
+          ],
+          "historical_profiles": {
+            "expected": 22,
+            "lower": 20,
+            "upper": 24
+          },
+          "key": "java-pattern",
+          "name": "Java java.util.regex.Pattern",
+          "release_line_model": "Java feature/LTS line with latest update",
+          "source": "https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/regex/Pattern.html"
+        },
+        "start_byte": 10047
+      },
+      "primary_context_finding": "The frozen java.util.regex.Pattern row has Java program/library context. The Oracle Java SE 25 API names Pattern in module java.base and package java.util.regex, while the independently selected Java identity source is Java SE 21.",
+      "primary_state": "context-supported",
+      "publisher_bindings": [
+        {
+          "discovery_sha256": "e7c3e630261eda2d90cd927396919bfa4c8c9d4925f7968978603f335b36165b",
+          "effective_locator": "https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/regex/Pattern.html",
+          "locator": "https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/regex/Pattern.html",
+          "matches_registered_identity": null,
+          "registered_identity_sha256": null,
+          "source": {
+            "id": "pred-context-original-java-pattern",
+            "kind": "source",
+            "revision": 1
+          },
+          "source_key": "original-java-pattern",
+          "source_sha256": "e7c3e630261eda2d90cd927396919bfa4c8c9d4925f7968978603f335b36165b",
+          "witnessed_windows": [
+            {
+              "end_byte_exclusive": 367,
+              "first_line": 8,
+              "last_line": 8,
+              "locator_term": "module: java.base, package: java.util.regex, class: Pattern",
+              "representation_sha256": "e7c3e630261eda2d90cd927396919bfa4c8c9d4925f7968978603f335b36165b",
+              "section_key": "api-identification",
+              "sha256": "02c85633c360252cf1eb4a0c42f2de2c5dcf2c30b8f83d1f6ce875a2d579e2b6",
+              "start_byte": 308
+            },
+            {
+              "end_byte_exclusive": 10071,
+              "first_line": 165,
+              "last_line": 165,
+              "locator_term": "A compiled representation of a regular expression.",
+              "representation_sha256": "e7c3e630261eda2d90cd927396919bfa4c8c9d4925f7968978603f335b36165b",
+              "section_key": "class-intro",
+              "sha256": "a355378286abc66e51523580b9350073b3774f76553e6dcc4e66667315511ebd",
+              "start_byte": 10021
+            }
+          ]
+        },
+        {
+          "discovery_sha256": "e7c3e630261eda2d90cd927396919bfa4c8c9d4925f7968978603f335b36165b",
+          "effective_locator": "https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/regex/Pattern.html",
+          "locator": "https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/regex/Pattern.html",
+          "matches_registered_identity": null,
+          "registered_identity_sha256": null,
+          "source": {
+            "id": "pred-context-java-25-pattern",
+            "kind": "source",
+            "revision": 1
+          },
+          "source_key": "java-25-pattern",
+          "source_sha256": "e7c3e630261eda2d90cd927396919bfa4c8c9d4925f7968978603f335b36165b",
+          "witnessed_windows": [
+            {
+              "end_byte_exclusive": 367,
+              "first_line": 8,
+              "last_line": 8,
+              "locator_term": "module: java.base, package: java.util.regex, class: Pattern",
+              "representation_sha256": "e7c3e630261eda2d90cd927396919bfa4c8c9d4925f7968978603f335b36165b",
+              "section_key": "api-identification",
+              "sha256": "02c85633c360252cf1eb4a0c42f2de2c5dcf2c30b8f83d1f6ce875a2d579e2b6",
+              "start_byte": 308
+            },
+            {
+              "end_byte_exclusive": 10071,
+              "first_line": 165,
+              "last_line": 165,
+              "locator_term": "A compiled representation of a regular expression.",
+              "representation_sha256": "e7c3e630261eda2d90cd927396919bfa4c8c9d4925f7968978603f335b36165b",
+              "section_key": "class-intro",
+              "sha256": "a355378286abc66e51523580b9350073b3774f76553e6dcc4e66667315511ebd",
+              "start_byte": 10021
+            }
+          ]
+        },
+        {
+          "discovery_sha256": "6781977deb9c33f1eb4af0b972cc454df137c1cfcd31743fc97c00ba9159f299",
+          "effective_locator": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-1.html",
+          "locator": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-1.html",
+          "matches_registered_identity": true,
+          "registered_identity_sha256": "6781977deb9c33f1eb4af0b972cc454df137c1cfcd31743fc97c00ba9159f299",
+          "source": {
+            "id": "java-se21-jls-introduction",
+            "kind": "source",
+            "revision": 2
+          },
+          "source_key": "identity-java-se21-jls-introduction",
+          "source_sha256": "6781977deb9c33f1eb4af0b972cc454df137c1cfcd31743fc97c00ba9159f299",
+          "witnessed_windows": [
+            {
+              "end_byte_exclusive": 4426,
+              "first_line": 59,
+              "last_line": 61,
+              "locator_term": "The Java programming language is related to C and C++",
+              "representation_sha256": "6781977deb9c33f1eb4af0b972cc454df137c1cfcd31743fc97c00ba9159f299",
+              "section_key": "language-name",
+              "sha256": "a271694a25dc85f1eb38e52baaa687cb718d1738baea83f5fd014d198562003a",
+              "start_byte": 4263
+            }
+          ]
+        }
+      ],
+      "target": {
+        "entity_id": "1a760a9d627b4be79f68ce795485a4f8",
+        "entity_sha256": "9585b34f49ab57e4497b6fd985bdbe12c893aa5fa8417b320578710ec4aa5fd4",
+        "identity_claim": {
+          "id": "java-se21-jls-language-identity",
+          "kind": "claim",
+          "revision": 1
+        },
+        "identity_claim_scope": {
+          "authority": "oracle",
+          "edition": "java-se-21",
+          "facet": "identity",
+          "revision": "jls-java-se-21"
+        },
+        "identity_claim_sha256": "e90aef2938ca57a50d4abcb17fa886d8b54a1910eb08ea75d20eb6cc2302ce86",
+        "name": "Java",
+        "selected_release": "verified-language-cohort-rc8"
+      }
+    },
+    {
+      "candidate_path": "registry/candidates/47/477e872cc6c844d5b9507647617120d6.json",
+      "candidate_sha256": "0fba23c1011674e461a7b0aca4c8197a985b948a16c48ec4faefd7441fc9739f",
+      "lead_id": "477e872cc6c844d5b9507647617120d6",
+      "limitations": [
+        "Release index evidence is navigation, and the two exact package snapshots are distinct Go version scopes.",
+        "No package promise is inferred for Go 1.23 or all Go versions."
+      ],
+      "origin": {
+        "end_byte_exclusive": 12184,
+        "line": 83,
+        "line_has_lf": true,
+        "line_sha256": "0477c766af982786429bc9985fed3de9dddf75beecfb1e7c00986120d8a19b13",
+        "original_publisher_locator": "https://go.dev/doc/devel/release",
+        "predecessor_body_sha256": "0601c2c948b19c7f5265bd53260c7c8a47478d12d3dc79e863a2f2f8e411f9f8",
+        "predecessor_locator": "https://github.com/strling-lang/regex-conformance/blob/62084ca0ef9b05a28711dd28bf10885c6ed0cb5d/registries/universe/full-known-universe-2026-08-15.v1.json#L83",
+        "row": {
+          "archetype": "linear-or-dfa-surface",
+          "category": "language-runtime",
+          "current_profiles": 2,
+          "current_representatives": [
+            "1.25=1.25.12",
+            "1.26=1.26.5"
+          ],
+          "historical_profiles": {
+            "expected": 27,
+            "lower": 26,
+            "upper": 28
+          },
+          "key": "go-regexp",
+          "name": "Go regexp package",
+          "release_line_model": "Go 1.x minor release line with latest patch",
+          "source": "https://go.dev/doc/devel/release"
+        },
+        "start_byte": 11817
+      },
+      "primary_context_finding": "The frozen Go regexp package row has Go language context. The original Go release index names the row's Go 1.25.12 and 1.26.5 representatives, and each corresponding upstream source describes package regexp. The Go 1.23 README supplies the separately selected language identity.",
+      "primary_state": "context-supported",
+      "publisher_bindings": [
+        {
+          "discovery_sha256": "516ce7d271d59f8246610d969ccd67261573a8a3f9cae4ea525f710f984345e5",
+          "effective_locator": "https://go.dev/doc/devel/release",
+          "locator": "https://go.dev/doc/devel/release",
+          "matches_registered_identity": null,
+          "registered_identity_sha256": null,
+          "source": {
+            "id": "pred-context-original-go-regexp",
+            "kind": "source",
+            "revision": 1
+          },
+          "source_key": "original-go-regexp",
+          "source_sha256": "516ce7d271d59f8246610d969ccd67261573a8a3f9cae4ea525f710f984345e5",
+          "witnessed_windows": [
+            {
+              "end_byte_exclusive": 34988,
+              "first_line": 1061,
+              "last_line": 1069,
+              "locator_term": "<p id=\"go1.25.12\">",
+              "representation_sha256": "516ce7d271d59f8246610d969ccd67261573a8a3f9cae4ea525f710f984345e5",
+              "section_key": "go-12512",
+              "sha256": "d00b5390c58fd37f922457ebeaed77aa6f3b5e1abda365a18341cfd60f9359e1",
+              "start_byte": 34860
+            },
+            {
+              "end_byte_exclusive": 25420,
+              "first_line": 667,
+              "last_line": 675,
+              "locator_term": "<p id=\"go1.26.5\">",
+              "representation_sha256": "516ce7d271d59f8246610d969ccd67261573a8a3f9cae4ea525f710f984345e5",
+              "section_key": "go-1265",
+              "sha256": "39c58cd658936c9bbd16af399697de9e516c229de1dde2aa45e07df71777a26b",
+              "start_byte": 25293
+            }
+          ]
+        },
+        {
+          "discovery_sha256": "3c6b372bf6e658c167d100093f946741ddd4bfb2717d71455d2bf6a4c515b406",
+          "effective_locator": "https://raw.githubusercontent.com/golang/go/go1.25.12/src/regexp/regexp.go",
+          "locator": "https://raw.githubusercontent.com/golang/go/go1.25.12/src/regexp/regexp.go",
+          "matches_registered_identity": null,
+          "registered_identity_sha256": null,
+          "source": {
+            "id": "pred-context-go-12512-regexp",
+            "kind": "source",
+            "revision": 1
+          },
+          "source_key": "go-12512-regexp",
+          "source_sha256": "3c6b372bf6e658c167d100093f946741ddd4bfb2717d71455d2bf6a4c515b406",
+          "witnessed_windows": [
+            {
+              "end_byte_exclusive": 215,
+              "first_line": 5,
+              "last_line": 5,
+              "locator_term": "// Package regexp implements regular expression search.",
+              "representation_sha256": "3c6b372bf6e658c167d100093f946741ddd4bfb2717d71455d2bf6a4c515b406",
+              "section_key": "package-intro",
+              "sha256": "a50d6bf2337e532fdf4d945baceaed8f506c75afaba73542ccd1b81145c41417",
+              "start_byte": 160
+            }
+          ]
+        },
+        {
+          "discovery_sha256": "addd07fbda0b622c063e0f5516b55c684d48ab9cc5d3a4a9f90d82b19c527772",
+          "effective_locator": "https://raw.githubusercontent.com/golang/go/go1.26.5/src/regexp/regexp.go",
+          "locator": "https://raw.githubusercontent.com/golang/go/go1.26.5/src/regexp/regexp.go",
+          "matches_registered_identity": null,
+          "registered_identity_sha256": null,
+          "source": {
+            "id": "pred-context-go-1265-regexp",
+            "kind": "source",
+            "revision": 1
+          },
+          "source_key": "go-1265-regexp",
+          "source_sha256": "addd07fbda0b622c063e0f5516b55c684d48ab9cc5d3a4a9f90d82b19c527772",
+          "witnessed_windows": [
+            {
+              "end_byte_exclusive": 215,
+              "first_line": 5,
+              "last_line": 5,
+              "locator_term": "// Package regexp implements regular expression search.",
+              "representation_sha256": "addd07fbda0b622c063e0f5516b55c684d48ab9cc5d3a4a9f90d82b19c527772",
+              "section_key": "package-intro",
+              "sha256": "a50d6bf2337e532fdf4d945baceaed8f506c75afaba73542ccd1b81145c41417",
+              "start_byte": 160
+            }
+          ]
+        },
+        {
+          "discovery_sha256": "8247b7c5de1e74854aac1a08aa5894444d1d33b4045c70d5cc3367ad0e25c3f3",
+          "effective_locator": "https://raw.githubusercontent.com/golang/go/6885bad7dd86880be6929c02085e5c7a67ff2887/README.md",
+          "locator": "https://raw.githubusercontent.com/golang/go/6885bad7dd86880be6929c02085e5c7a67ff2887/README.md",
+          "matches_registered_identity": true,
+          "registered_identity_sha256": "8247b7c5de1e74854aac1a08aa5894444d1d33b4045c70d5cc3367ad0e25c3f3",
+          "source": {
+            "id": "go-123-readme",
+            "kind": "source",
+            "revision": 1
+          },
+          "source_key": "identity-go-123-readme",
+          "source_sha256": "8247b7c5de1e74854aac1a08aa5894444d1d33b4045c70d5cc3367ad0e25c3f3",
+          "witnessed_windows": [
+            {
+              "end_byte_exclusive": 172,
+              "first_line": 3,
+              "last_line": 6,
+              "locator_term": "Go is an open source programming language",
+              "representation_sha256": "8247b7c5de1e74854aac1a08aa5894444d1d33b4045c70d5cc3367ad0e25c3f3",
+              "section_key": "language-intro",
+              "sha256": "478459ef62c843bd650d739bacc13389d2473be17adf5f1e332675e497ce9f13",
+              "start_byte": 31
+            }
+          ]
+        }
+      ],
+      "target": {
+        "entity_id": "4c6a381715b14acb9906b57efe7bdef2",
+        "entity_sha256": "a7c1250ea44945db96f73d74f92e7a3dc88d114762f86ab832c5cd814e50a512",
+        "identity_claim": {
+          "id": "go123-language-identity",
+          "kind": "claim",
+          "revision": 1
+        },
+        "identity_claim_scope": {
+          "authority": "the-go-authors",
+          "edition": "go1.23",
+          "facet": "identity",
+          "revision": "6885bad7dd86880be6929c02085e5c7a67ff2887"
+        },
+        "identity_claim_sha256": "94d4ee461790be972318fdc7c18faa3a089d0dc45f2d03b37b4225dd436bf0d7",
+        "name": "Go",
+        "selected_release": "verified-language-cohort-rc8"
+      }
+    },
+    {
+      "candidate_path": "registry/candidates/2b/2bca5c502c4945488c340339fd435ce4.json",
+      "candidate_sha256": "a9d46bbc1b9c5f521f8b7333f75a511ada09d4a537385d2ede3634dffdee4fed",
+      "lead_id": "2bca5c502c4945488c340339fd435ce4",
+      "limitations": [
+        "The living TC39 document is a rolling draft and the matched section title does not establish text or semantic equivalence with the fixed 15th edition.",
+        "The predecessor's normative-only label remains scoped to that catalog row. This proposal adds no RegExp semantics claim."
+      ],
+      "origin": {
+        "end_byte_exclusive": 34146,
+        "line": 141,
+        "line_has_lf": true,
+        "line_sha256": "e477d7fe158de539acca2c721fefdc947ebc7176d114d35850dacdf47a23f326",
+        "original_publisher_locator": "https://tc39.es/ecma262/multipage/text-processing.html",
+        "predecessor_body_sha256": "0601c2c948b19c7f5265bd53260c7c8a47478d12d3dc79e863a2f2f8e411f9f8",
+        "predecessor_locator": "https://github.com/strling-lang/regex-conformance/blob/62084ca0ef9b05a28711dd28bf10885c6ed0cb5d/registries/universe/full-known-universe-2026-08-15.v1.json#L141",
+        "row": {
+          "disposition": "normative-only",
+          "key": "ecmascript-regexp-standard",
+          "name": "ECMAScript RegExp specification",
+          "source": "https://tc39.es/ecma262/multipage/text-processing.html"
+        },
+        "start_byte": 33966
+      },
+      "primary_context_finding": "The frozen ECMAScript RegExp specification row has ECMAScript language context. The living TC39 text-processing route and the fixed 15th-edition Ecma HTML each identify a RegExp Objects section, and the printable 15th-edition cover anchors the selected language identity.",
+      "primary_state": "context-supported",
+      "publisher_bindings": [
+        {
+          "discovery_sha256": "25529c680d138ff17118e74006cd2349a42e7f5617365fd4e755c6e8e5409a26",
+          "effective_locator": "https://tc39.es/ecma262/multipage/text-processing.html",
+          "locator": "https://tc39.es/ecma262/multipage/text-processing.html",
+          "matches_registered_identity": null,
+          "registered_identity_sha256": null,
+          "source": {
+            "id": "pred-context-original-ecmascript-regexp-standard",
+            "kind": "source",
+            "revision": 1
+          },
+          "source_key": "original-ecmascript-regexp-standard",
+          "source_sha256": "25529c680d138ff17118e74006cd2349a42e7f5617365fd4e755c6e8e5409a26",
+          "witnessed_windows": [
+            {
+              "end_byte_exclusive": 720558,
+              "first_line": 577,
+              "last_line": 579,
+              "locator_term": "<emu-clause id=sec-regexp-regular-expression-objects>",
+              "representation_sha256": "25529c680d138ff17118e74006cd2349a42e7f5617365fd4e755c6e8e5409a26",
+              "section_key": "regexp-section-living",
+              "sha256": "4c1f54a032fe7f7be53f296073f2321cdefadc2f896e02d1c9742f76b82ee991",
+              "start_byte": 720355
+            }
+          ]
+        },
+        {
+          "discovery_sha256": "eabb3c1fc6c5b0610b143ef7bea8de7c0f323a777d669a453e47c39a2986c846",
+          "effective_locator": "https://262.ecma-international.org/15.0/",
+          "locator": "https://262.ecma-international.org/15.0/",
+          "matches_registered_identity": null,
+          "registered_identity_sha256": null,
+          "source": {
+            "id": "pred-context-ecma-15-published-html",
+            "kind": "source",
+            "revision": 1
+          },
+          "source_key": "ecma-15-published-html",
+          "source_sha256": "eabb3c1fc6c5b0610b143ef7bea8de7c0f323a777d669a453e47c39a2986c846",
+          "witnessed_windows": [
+            {
+              "end_byte_exclusive": 5169301,
+              "first_line": 36174,
+              "last_line": 36176,
+              "locator_term": "<emu-clause id=\"sec-regexp-regular-expression-objects\">",
+              "representation_sha256": "eabb3c1fc6c5b0610b143ef7bea8de7c0f323a777d669a453e47c39a2986c846",
+              "section_key": "regexp-section-2024",
+              "sha256": "fd48fbe3e110df7be0fb5ff45aa2c7790f08b6ac540d52c864641e2be3652f7a",
+              "start_byte": 5169091
+            },
+            {
+              "end_byte_exclusive": 465625,
+              "first_line": 69,
+              "last_line": 72,
+              "locator_term": "<h1 class=\"title\">ECMA-262, 15<sup>th</sup> edition, June 2024",
+              "representation_sha256": "eabb3c1fc6c5b0610b143ef7bea8de7c0f323a777d669a453e47c39a2986c846",
+              "section_key": "published-edition",
+              "sha256": "96e007a0fb8007eb27f9a3f3042de1e20779ab1a4bcb2432626873a9b1df5d6d",
+              "start_byte": 465493
+            }
+          ]
+        },
+        {
+          "discovery_sha256": "c7558ec49d7b6ed7fdc2b375655cbfb1fb0e0f30f64a26c2f29811401fd19853",
+          "effective_locator": "https://ecma-international.org/wp-content/uploads/ECMA-262_15th_edition_june_2024.pdf",
+          "locator": "https://ecma-international.org/wp-content/uploads/ECMA-262_15th_edition_june_2024.pdf",
+          "matches_registered_identity": true,
+          "registered_identity_sha256": "c7558ec49d7b6ed7fdc2b375655cbfb1fb0e0f30f64a26c2f29811401fd19853",
+          "source": {
+            "id": "ecma262-15-2024-printed",
+            "kind": "source",
+            "revision": 1
+          },
+          "source_key": "identity-ecma262-15-2024-printed",
+          "source_sha256": "c7558ec49d7b6ed7fdc2b375655cbfb1fb0e0f30f64a26c2f29811401fd19853",
+          "witnessed_windows": [
+            {
+              "end_byte_exclusive": 74,
+              "extract_version": "pypdf 6.19.0",
+              "first_line": 1,
+              "last_line": 4,
+              "locator_term": "ECMA-262",
+              "pdf_page_one_based": 1,
+              "representation_path": "ecma-15-pdf-cover.extract.txt",
+              "representation_sha256": "c7ed5e4f2de27e50c7098a2e75db446bec01f806881744259167717eb734eaf0",
+              "section_key": "fixed-15th-edition-pdf-cover",
+              "sha256": "c7ed5e4f2de27e50c7098a2e75db446bec01f806881744259167717eb734eaf0",
+              "start_byte": 0
+            }
+          ]
+        }
+      ],
+      "target": {
+        "entity_id": "c91c5dfff49342479e244b2118015aa3",
+        "entity_sha256": "3c35f2a325d21447d50ae3e1a2d0fa1d7f5e1c11a988a5267bb3af125237b740",
+        "identity_claim": {
+          "id": "ecma262-15-language-identity",
+          "kind": "claim",
+          "revision": 1
+        },
+        "identity_claim_scope": {
+          "authority": "ecma-international",
+          "edition": "ecma-262-15",
+          "facet": "identity",
+          "revision": "ecma-262-15-june-2024"
+        },
+        "identity_claim_sha256": "98078142b0cdfce053bf94bfab8fc246c9afb43b926e0303b1d7cab8fb1d8f02",
+        "name": "ECMAScript",
+        "selected_release": "verified-language-cohort-rc8"
+      }
+    },
+    {
+      "candidate_path": "registry/candidates/c2/c2ae9e0ee0fa4db8b850aa31d320edb7.json",
+      "candidate_sha256": "c1c7bd25f71c9940c90ff925b5e400d54c4146c6949829a51b497f59a18dc5b5",
+      "lead_id": "c2ae9e0ee0fa4db8b850aa31d320edb7",
+      "limitations": [
+        "The predecessor's alias-to-facility target java-pattern is internal to its facility catalog. It supplies no Kotlin-to-Java language identity or cross-platform mapping.",
+        "The inspected library documentation has platform-specific rows. JVM association does not generalize to Kotlin/JS, Native, or other targets."
+      ],
+      "origin": {
+        "end_byte_exclusive": 35400,
+        "line": 148,
+        "line_has_lf": true,
+        "line_sha256": "ea86afdd8c07ce30c7e902b056fed180c98ce4eb15c59a505ba4ab6495e81337",
+        "original_publisher_locator": "https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/-regex/",
+        "predecessor_body_sha256": "0601c2c948b19c7f5265bd53260c7c8a47478d12d3dc79e863a2f2f8e411f9f8",
+        "predecessor_locator": "https://github.com/strling-lang/regex-conformance/blob/62084ca0ef9b05a28711dd28bf10885c6ed0cb5d/registries/universe/full-known-universe-2026-08-15.v1.json#L148",
+        "row": {
+          "disposition": "alias-to-facility",
+          "key": "kotlin-regex",
+          "name": "Kotlin/JVM Regex candidate",
+          "source": "https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/-regex/",
+          "target": "java-pattern"
+        },
+        "start_byte": 35201
+      },
+      "primary_context_finding": "The frozen Kotlin/JVM Regex candidate has Kotlin/JVM context. The Kotlin library reference names Regex and a JVM-filtered toPattern entry linked to Java's Pattern; the separate Kotlin specification source identifies the Kotlin language.",
+      "primary_state": "context-supported",
+      "publisher_bindings": [
+        {
+          "discovery_sha256": "d65c0470ee60fbba3a6253a064110d85653fd325fd6ebcf86f4a7ea9ec4ff45d",
+          "effective_locator": "https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/-regex/",
+          "locator": "https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/-regex/",
+          "matches_registered_identity": null,
+          "registered_identity_sha256": null,
+          "source": {
+            "id": "pred-context-original-kotlin-regex",
+            "kind": "source",
+            "revision": 1
+          },
+          "source_key": "original-kotlin-regex",
+          "source_sha256": "d65c0470ee60fbba3a6253a064110d85653fd325fd6ebcf86f4a7ea9ec4ff45d",
+          "witnessed_windows": [
+            {
+              "end_byte_exclusive": 179233,
+              "first_line": 448,
+              "last_line": 465,
+              "locator_term": "anchor-label=\"toPattern\"",
+              "representation_sha256": "d65c0470ee60fbba3a6253a064110d85653fd325fd6ebcf86f4a7ea9ec4ff45d",
+              "section_key": "jvm-to-pattern",
+              "sha256": "e680fdbaaf717bcd99b3cbd48dbba7fa10f2f28b46ba65633886a933b4bf50e8",
+              "start_byte": 177129
+            }
+          ]
+        },
+        {
+          "discovery_sha256": "d65c0470ee60fbba3a6253a064110d85653fd325fd6ebcf86f4a7ea9ec4ff45d",
+          "effective_locator": "https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/-regex/",
+          "locator": "https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.text/-regex/",
+          "matches_registered_identity": null,
+          "registered_identity_sha256": null,
+          "source": {
+            "id": "pred-context-kotlin-regex-reference",
+            "kind": "source",
+            "revision": 1
+          },
+          "source_key": "kotlin-regex-reference",
+          "source_sha256": "d65c0470ee60fbba3a6253a064110d85653fd325fd6ebcf86f4a7ea9ec4ff45d",
+          "witnessed_windows": [
+            {
+              "end_byte_exclusive": 179233,
+              "first_line": 448,
+              "last_line": 465,
+              "locator_term": "anchor-label=\"toPattern\"",
+              "representation_sha256": "d65c0470ee60fbba3a6253a064110d85653fd325fd6ebcf86f4a7ea9ec4ff45d",
+              "section_key": "jvm-to-pattern",
+              "sha256": "e680fdbaaf717bcd99b3cbd48dbba7fa10f2f28b46ba65633886a933b4bf50e8",
+              "start_byte": 177129
+            }
+          ]
+        },
+        {
+          "discovery_sha256": "c6d8179e36625f370e1fcf34dea843abc149b68088a1feb5cbe5cfca5da2a76d",
+          "effective_locator": "https://raw.githubusercontent.com/Kotlin/kotlin-spec/0f762a2314a9304e4b3fc386b1aceef1d56c7e4c/docs/src/md/kotlin.core/introduction.md",
+          "locator": "https://raw.githubusercontent.com/Kotlin/kotlin-spec/0f762a2314a9304e4b3fc386b1aceef1d56c7e4c/docs/src/md/kotlin.core/introduction.md",
+          "matches_registered_identity": true,
+          "registered_identity_sha256": "c6d8179e36625f370e1fcf34dea843abc149b68088a1feb5cbe5cfca5da2a76d",
+          "source": {
+            "id": "kotlin-spec-intro",
+            "kind": "source",
+            "revision": 1
+          },
+          "source_key": "identity-kotlin-spec-intro",
+          "source_sha256": "c6d8179e36625f370e1fcf34dea843abc149b68088a1feb5cbe5cfca5da2a76d",
+          "witnessed_windows": [
+            {
+              "end_byte_exclusive": 343,
+              "first_line": 4,
+              "last_line": 5,
+              "locator_term": "being a programming language useful for day-to-day development",
+              "representation_sha256": "c6d8179e36625f370e1fcf34dea843abc149b68088a1feb5cbe5cfca5da2a76d",
+              "section_key": "language-context",
+              "sha256": "7157d527822976687e695a4854711d5937086c1c4c13e7284ebdd990674be940",
+              "start_byte": 201
+            }
+          ]
+        }
+      ],
+      "target": {
+        "entity_id": "02bc0d97091745e69afda5c289bd0755",
+        "entity_sha256": "9694361cd32de0fc08e81d37fc9e7cd5f2cb3955dd332fa00130e2da56b1cae4",
+        "identity_claim": {
+          "id": "kotlin-language-identity",
+          "kind": "claim",
+          "revision": 1
+        },
+        "identity_claim_scope": {
+          "authority": "kotlin-project",
+          "edition": "0f762a2314a9304e4b3fc386b1aceef1d56c7e4c",
+          "facet": "identity",
+          "revision": "0f762a2314a9304e4b3fc386b1aceef1d56c7e4c"
+        },
+        "identity_claim_sha256": "ecc14f794a19db89996b8bab83fe657a55cee9dd34c494d1efc0f20bc95105c5",
+        "name": "Kotlin",
+        "selected_release": "verified-language-cohort-rc8"
+      }
+    },
+    {
+      "candidate_path": "registry/candidates/d4/d4abdc8685de483abacf03498141922c.json",
+      "candidate_sha256": "ccf0da6d3e3a770f37c579eefc246a85ae10a3185d690f2d5a5589af09fb32e3",
+      "lead_id": "d4abdc8685de483abacf03498141922c",
+      "limitations": [
+        "The live original page reports project version 3.10.1. Preserve that separately from the pinned 2.13.13 API document and the 2.13 specification used for identity.",
+        "The predecessor's internal alias-to-facility relation supplies no Scala-Java language equivalence or cross-version API equivalence."
+      ],
+      "origin": {
+        "end_byte_exclusive": 35601,
+        "line": 149,
+        "line_has_lf": true,
+        "line_sha256": "e2e541e4d9dc104364bd2fbb3eb720eb5564f5ee8cd30ef92acac45dccc690f5",
+        "original_publisher_locator": "https://www.scala-lang.org/api/current/scala/util/matching/Regex.html",
+        "predecessor_body_sha256": "0601c2c948b19c7f5265bd53260c7c8a47478d12d3dc79e863a2f2f8e411f9f8",
+        "predecessor_locator": "https://github.com/strling-lang/regex-conformance/blob/62084ca0ef9b05a28711dd28bf10885c6ed0cb5d/registries/universe/full-known-universe-2026-08-15.v1.json#L149",
+        "row": {
+          "disposition": "alias-to-facility",
+          "key": "scala-regex",
+          "name": "Scala JVM Regex candidate",
+          "source": "https://www.scala-lang.org/api/current/scala/util/matching/Regex.html",
+          "target": "java-pattern"
+        },
+        "start_byte": 35400
+      },
+      "primary_context_finding": "The frozen Scala JVM Regex candidate has Scala/JVM context. The original rolling API page and the separately pinned Scala 2.13.13 library page each document Scala's Regex class referring to Java's java.util.regex package; the selected identity is supported by the Scala 2.13 language specification.",
+      "primary_state": "context-supported-rolling-and-pinned-representations-separated",
+      "publisher_bindings": [
+        {
+          "discovery_sha256": "b89e64add527f14d316c1eecf98ab48642499a1d1778a373e62766c9148fe3d3",
+          "effective_locator": "https://www.scala-lang.org/api/current/scala/util/matching/Regex.html",
+          "locator": "https://www.scala-lang.org/api/current/scala/util/matching/Regex.html",
+          "matches_registered_identity": null,
+          "registered_identity_sha256": null,
+          "source": {
+            "id": "pred-context-original-scala-regex",
+            "kind": "source",
+            "revision": 1
+          },
+          "source_key": "original-scala-regex",
+          "source_sha256": "b89e64add527f14d316c1eecf98ab48642499a1d1778a373e62766c9148fe3d3",
+          "witnessed_windows": [
+            {
+              "end_byte_exclusive": 3701,
+              "first_line": 1,
+              "last_line": 1,
+              "locator_term": "<div class=\"projectVersion\">3.10.1</div>",
+              "representation_sha256": "b89e64add527f14d316c1eecf98ab48642499a1d1778a373e62766c9148fe3d3",
+              "section_key": "rolling-project-version",
+              "sha256": "dafbe332b73b76e46010ece11874188596cf6c3f36bb73379940a0b305709fd2",
+              "start_byte": 3661
+            },
+            {
+              "end_byte_exclusive": 328351,
+              "first_line": 20,
+              "last_line": 20,
+              "locator_term": "This class delegates to the",
+              "representation_sha256": "b89e64add527f14d316c1eecf98ab48642499a1d1778a373e62766c9148fe3d3",
+              "section_key": "rolling-api",
+              "sha256": "1f15146d4cd78cc2438e24bab4c2e3adc09c578834d51c398dd8c64874df6bb9",
+              "start_byte": 328149
+            }
+          ]
+        },
+        {
+          "discovery_sha256": "74ad813261c3eaa4fddef675ee8b7e33068f02eeac4c8e274760ea420a7b1fb5",
+          "effective_locator": "https://www.scala-lang.org/api/2.13.13/scala/util/matching/Regex.html",
+          "locator": "https://www.scala-lang.org/api/2.13.13/scala/util/matching/Regex.html",
+          "matches_registered_identity": null,
+          "registered_identity_sha256": null,
+          "source": {
+            "id": "pred-context-scala-regex-21313-reference",
+            "kind": "source",
+            "revision": 1
+          },
+          "source_key": "scala-regex-21313-reference",
+          "source_sha256": "74ad813261c3eaa4fddef675ee8b7e33068f02eeac4c8e274760ea420a7b1fb5",
+          "witnessed_windows": [
+            {
+              "end_byte_exclusive": 263,
+              "first_line": 1,
+              "last_line": 1,
+              "locator_term": "<title>Scala Standard Library 2.13.13 - scala.util.matching.Regex</title>",
+              "representation_sha256": "74ad813261c3eaa4fddef675ee8b7e33068f02eeac4c8e274760ea420a7b1fb5",
+              "section_key": "edition-title",
+              "sha256": "3a83d68a7e91705200af75cd64e8d6117689fcb308997216a19cc30151c4c0cc",
+              "start_byte": 190
+            },
+            {
+              "end_byte_exclusive": 14855,
+              "first_line": 15,
+              "last_line": 16,
+              "locator_term": "This class delegates to the",
+              "representation_sha256": "74ad813261c3eaa4fddef675ee8b7e33068f02eeac4c8e274760ea420a7b1fb5",
+              "section_key": "pinned-api",
+              "sha256": "d91f1e6043a9271a5a3d473e8b9efc8525e961c02a3300b8713f11c6289a69c3",
+              "start_byte": 14648
+            }
+          ]
+        },
+        {
+          "discovery_sha256": "09e879fd47a8fb774040faf4ce20a70d921e2a77e48875bcbed8f77be22ebcb7",
+          "effective_locator": "https://www.scala-lang.org/files/archive/spec/2.13/",
+          "locator": "https://www.scala-lang.org/files/archive/spec/2.13/",
+          "matches_registered_identity": true,
+          "registered_identity_sha256": "09e879fd47a8fb774040faf4ce20a70d921e2a77e48875bcbed8f77be22ebcb7",
+          "source": {
+            "id": "scala-213-spec-preface",
+            "kind": "source",
+            "revision": 1
+          },
+          "source_key": "identity-scala-213-spec-preface",
+          "source_sha256": "09e879fd47a8fb774040faf4ce20a70d921e2a77e48875bcbed8f77be22ebcb7",
+          "witnessed_windows": [
+            {
+              "end_byte_exclusive": 5962,
+              "first_line": 177,
+              "last_line": 179,
+              "locator_term": "Scala is a Java-like programming language",
+              "representation_sha256": "09e879fd47a8fb774040faf4ce20a70d921e2a77e48875bcbed8f77be22ebcb7",
+              "section_key": "language-intro",
+              "sha256": "49104ae60312589eabc26e436fa0e911ad0e54e01884ad9397032863e97a09e6",
+              "start_byte": 5821
+            }
+          ]
+        }
+      ],
+      "target": {
+        "entity_id": "50070564261048318f005f55b54874d3",
+        "entity_sha256": "c0dc124d4f46a67f3e45af84e95bc2b12abd6fb2779e845680c55fd1e4664e9a",
+        "identity_claim": {
+          "id": "scala-language-identity",
+          "kind": "claim",
+          "revision": 1
+        },
+        "identity_claim_scope": {
+          "authority": "scala-language-project",
+          "edition": "2.13",
+          "facet": "identity",
+          "revision": "2.13"
+        },
+        "identity_claim_sha256": "bc559519d89dc5b3f6310fc4d041e8810b107b50657a4f7de7343bd51c79a575",
+        "name": "Scala",
+        "selected_release": "verified-language-cohort-rc8"
+      }
+    },
+    {
+      "candidate_path": "registry/candidates/d0/d002f0542e9549fb9576275b02d21e01.json",
+      "candidate_sha256": "70346a04f4aac2ab2bfd76db74b9a3d461846d0e7676cb75d9a0a790261a8707",
+      "lead_id": "d002f0542e9549fb9576275b02d21e01",
+      "limitations": [
+        "The predecessor's Java facility alias remains at facility scope. Returning a Java Pattern object supplies no language alias or equivalence.",
+        "Reader notation and the resulting object type were inspected from documentation. Runtime behavior and portability were outside the task."
+      ],
+      "origin": {
+        "end_byte_exclusive": 35783,
+        "line": 150,
+        "line_has_lf": true,
+        "line_sha256": "57ea357153f7b25a1822afae5dc3cf9e9af92b9ea907800d561a76964c548462",
+        "original_publisher_locator": "https://clojure.org/reference/reader#_dispatch",
+        "predecessor_body_sha256": "0601c2c948b19c7f5265bd53260c7c8a47478d12d3dc79e863a2f2f8e411f9f8",
+        "predecessor_locator": "https://github.com/strling-lang/regex-conformance/blob/62084ca0ef9b05a28711dd28bf10885c6ed0cb5d/registries/universe/full-known-universe-2026-08-15.v1.json#L150",
+        "row": {
+          "disposition": "alias-to-facility",
+          "key": "clojure-regex",
+          "name": "Clojure JVM regex candidate",
+          "source": "https://clojure.org/reference/reader#_dispatch",
+          "target": "java-pattern"
+        },
+        "start_byte": 35601
+      },
+      "primary_context_finding": "The frozen Clojure JVM regex candidate has Clojure reader context. The exact official reader dispatch guide documents regex notation producing a Java Pattern object. The independently selected language identity is grounded in the project rationale.",
+      "primary_state": "context-supported",
+      "publisher_bindings": [
+        {
+          "discovery_sha256": "7ceb2d8c2b491e0175971733059fd255a0d85177132b9d5c98994044e18b3b6e",
+          "effective_locator": "https://clojure.org/reference/reader#_dispatch",
+          "locator": "https://clojure.org/reference/reader#_dispatch",
+          "matches_registered_identity": null,
+          "registered_identity_sha256": null,
+          "source": {
+            "id": "pred-context-original-clojure-regex",
+            "kind": "source",
+            "revision": 1
+          },
+          "source_key": "original-clojure-regex",
+          "source_sha256": "7ceb2d8c2b491e0175971733059fd255a0d85177132b9d5c98994044e18b3b6e",
+          "witnessed_windows": [
+            {
+              "end_byte_exclusive": 24863,
+              "first_line": 465,
+              "last_line": 479,
+              "locator_term": "Regex patterns (#\"pattern\")",
+              "representation_sha256": "7ceb2d8c2b491e0175971733059fd255a0d85177132b9d5c98994044e18b3b6e",
+              "section_key": "reader-dispatch",
+              "sha256": "82657d0190d241fb53357e9f9f3df8ef96be33c8930cb6163c536045728bb1f4",
+              "start_byte": 24136
+            }
+          ]
+        },
+        {
+          "discovery_sha256": "7ceb2d8c2b491e0175971733059fd255a0d85177132b9d5c98994044e18b3b6e",
+          "effective_locator": "https://clojure.org/reference/reader#_dispatch",
+          "locator": "https://clojure.org/reference/reader#_dispatch",
+          "matches_registered_identity": null,
+          "registered_identity_sha256": null,
+          "source": {
+            "id": "pred-context-clojure-reader",
+            "kind": "source",
+            "revision": 1
+          },
+          "source_key": "clojure-reader",
+          "source_sha256": "7ceb2d8c2b491e0175971733059fd255a0d85177132b9d5c98994044e18b3b6e",
+          "witnessed_windows": [
+            {
+              "end_byte_exclusive": 24863,
+              "first_line": 465,
+              "last_line": 479,
+              "locator_term": "Regex patterns (#\"pattern\")",
+              "representation_sha256": "7ceb2d8c2b491e0175971733059fd255a0d85177132b9d5c98994044e18b3b6e",
+              "section_key": "reader-dispatch",
+              "sha256": "82657d0190d241fb53357e9f9f3df8ef96be33c8930cb6163c536045728bb1f4",
+              "start_byte": 24136
+            }
+          ]
+        },
+        {
+          "discovery_sha256": "dad978ff616731a2b82d9a126925ce06b527520f6b0b4306cc00ca85cff6a1e0",
+          "effective_locator": "https://clojure.org/about/rationale",
+          "locator": "https://clojure.org/about/rationale",
+          "matches_registered_identity": true,
+          "registered_identity_sha256": "dad978ff616731a2b82d9a126925ce06b527520f6b0b4306cc00ca85cff6a1e0",
+          "source": {
+            "id": "clojure-official-rationale",
+            "kind": "source",
+            "revision": 1
+          },
+          "source_key": "identity-clojure-official-rationale",
+          "source_sha256": "dad978ff616731a2b82d9a126925ce06b527520f6b0b4306cc00ca85cff6a1e0",
+          "witnessed_windows": [
+            {
+              "end_byte_exclusive": 8914,
+              "first_line": 138,
+              "last_line": 138,
+              "locator_term": "Clojure is an effort in pragmatic dynamic language design",
+              "representation_sha256": "dad978ff616731a2b82d9a126925ce06b527520f6b0b4306cc00ca85cff6a1e0",
+              "section_key": "project-language-description",
+              "sha256": "e9e34df7e2f687328a9356386794c19ddbae02b00d4db5507ca9c847b4a8e19a",
+              "start_byte": 8732
+            }
+          ]
+        }
+      ],
+      "target": {
+        "entity_id": "89f891b32910408b9e4baece3deaa407",
+        "entity_sha256": "c7291c0801dee7d8bba40f570fd786447578622cc8b429a0c4c3e159506a6e43",
+        "identity_claim": {
+          "id": "clojure-language-identity",
+          "kind": "claim",
+          "revision": 1
+        },
+        "identity_claim_scope": {
+          "authority": "clojure-project",
+          "facet": "identity",
+          "publisher-view": "clojure-language-rationale",
+          "revision": "sha256-dad978ff616731a2b82d9a126925ce06b527520f6b0b4306cc00ca85cff6a1e0"
+        },
+        "identity_claim_sha256": "dd02a75c6755d35abf3078ec642d7aa435168c9ccc4a06e057e38b1fb05d8ca9",
+        "name": "Clojure",
+        "selected_release": "verified-language-cohort-rc8"
+      }
+    },
+    {
+      "candidate_path": "registry/candidates/e2/e2b856e4785349858fc2571c50fa10cd.json",
+      "candidate_sha256": "04cff664223439cada600c32ed3e8c520c0d818d2bd77ee0498ea73e091af06b",
+      "lead_id": "e2b856e4785349858fc2571c50fa10cd",
+      "limitations": [
+        "The predecessor's not-a-regex-facility disposition concerns the named catalog row. This scoped association adds no equivalence with another regex engine or language.",
+        "The pattern notation and library facility remain distinguished from the host language identity."
+      ],
+      "origin": {
+        "end_byte_exclusive": 36144,
+        "line": 152,
+        "line_has_lf": true,
+        "line_sha256": "774a415eda911874b547a97c46ff322762b497fa7c0301941470a3d756003fcc",
+        "original_publisher_locator": "https://www.lua.org/manual/5.4/manual.html#6.4.1",
+        "predecessor_body_sha256": "0601c2c948b19c7f5265bd53260c7c8a47478d12d3dc79e863a2f2f8e411f9f8",
+        "predecessor_locator": "https://github.com/strling-lang/regex-conformance/blob/62084ca0ef9b05a28711dd28bf10885c6ed0cb5d/registries/universe/full-known-universe-2026-08-15.v1.json#L152",
+        "row": {
+          "disposition": "not-a-regex-facility",
+          "key": "lua-patterns",
+          "name": "Lua string patterns",
+          "source": "https://www.lua.org/manual/5.4/manual.html#6.4.1"
+        },
+        "start_byte": 35990
+      },
+      "primary_context_finding": "The frozen Lua string-pattern row has Lua 5.4 language/library context. The original manual anchor documents Lua patterns and the same manual's introduction supplies the already selected Lua identity.",
+      "primary_state": "context-supported",
+      "publisher_bindings": [
+        {
+          "discovery_sha256": "139df56e1fad429aa336fff43392e929bea3aa32372ca3026c45156d5ffdae86",
+          "effective_locator": "https://www.lua.org/manual/5.4/manual.html#6.4.1",
+          "locator": "https://www.lua.org/manual/5.4/manual.html#6.4.1",
+          "matches_registered_identity": null,
+          "registered_identity_sha256": null,
+          "source": {
+            "id": "pred-context-original-lua-patterns",
+            "kind": "source",
+            "revision": 1
+          },
+          "source_key": "original-lua-patterns",
+          "source_sha256": "139df56e1fad429aa336fff43392e929bea3aa32372ca3026c45156d5ffdae86",
+          "witnessed_windows": [
+            {
+              "end_byte_exclusive": 292638,
+              "first_line": 9505,
+              "last_line": 9513,
+              "locator_term": "<a name=\"6.4.1\">Patterns</a>",
+              "representation_sha256": "139df56e1fad429aa336fff43392e929bea3aa32372ca3026c45156d5ffdae86",
+              "section_key": "language-manual-patterns",
+              "sha256": "f0a37bc6a5214a5b07a666c3ea22eb8a3117ba60f6f126b9e810f01c0908c7c8",
+              "start_byte": 292375
+            }
+          ]
+        },
+        {
+          "discovery_sha256": "139df56e1fad429aa336fff43392e929bea3aa32372ca3026c45156d5ffdae86",
+          "effective_locator": "https://www.lua.org/manual/5.4/manual.html#6.4.1",
+          "locator": "https://www.lua.org/manual/5.4/manual.html#6.4.1",
+          "matches_registered_identity": null,
+          "registered_identity_sha256": null,
+          "source": {
+            "id": "pred-context-lua54-manual-patterns",
+            "kind": "source",
+            "revision": 1
+          },
+          "source_key": "lua54-manual-patterns",
+          "source_sha256": "139df56e1fad429aa336fff43392e929bea3aa32372ca3026c45156d5ffdae86",
+          "witnessed_windows": [
+            {
+              "end_byte_exclusive": 292638,
+              "first_line": 9505,
+              "last_line": 9513,
+              "locator_term": "<a name=\"6.4.1\">Patterns</a>",
+              "representation_sha256": "139df56e1fad429aa336fff43392e929bea3aa32372ca3026c45156d5ffdae86",
+              "section_key": "language-manual-patterns",
+              "sha256": "f0a37bc6a5214a5b07a666c3ea22eb8a3117ba60f6f126b9e810f01c0908c7c8",
+              "start_byte": 292375
+            }
+          ]
+        },
+        {
+          "discovery_sha256": "139df56e1fad429aa336fff43392e929bea3aa32372ca3026c45156d5ffdae86",
+          "effective_locator": "https://www.lua.org/manual/5.4/manual.html",
+          "locator": "https://www.lua.org/manual/5.4/manual.html",
+          "matches_registered_identity": true,
+          "registered_identity_sha256": "139df56e1fad429aa336fff43392e929bea3aa32372ca3026c45156d5ffdae86",
+          "source": {
+            "id": "lua54-manual",
+            "kind": "source",
+            "revision": 1
+          },
+          "source_key": "identity-lua54-manual",
+          "source_sha256": "139df56e1fad429aa336fff43392e929bea3aa32372ca3026c45156d5ffdae86",
+          "witnessed_windows": [
+            {
+              "end_byte_exclusive": 1104,
+              "first_line": 46,
+              "last_line": 46,
+              "locator_term": "Lua is a powerful, efficient, lightweight, embeddable scripting language.",
+              "representation_sha256": "139df56e1fad429aa336fff43392e929bea3aa32372ca3026c45156d5ffdae86",
+              "section_key": "language-intro",
+              "sha256": "0de3d935acceee2aa4be632f03e56bd864b654071a12953f96326722f1a94045",
+              "start_byte": 1031
+            }
+          ]
+        }
+      ],
+      "target": {
+        "entity_id": "002e17249d79451892f420427051a56d",
+        "entity_sha256": "0dba2416d0c8c0cb60c4b3060de09db97ba3c44b6c23436bbda1ec250387f44d",
+        "identity_claim": {
+          "id": "lua54-language-identity",
+          "kind": "claim",
+          "revision": 1
+        },
+        "identity_claim_scope": {
+          "authority": "lua-authors",
+          "edition": "Lua-5.4",
+          "facet": "identity",
+          "revision": "Lua-5.4-reference-manual"
+        },
+        "identity_claim_sha256": "6e8ea9e713a75cf55b282401d09874a2b83c6a9cc1ead75df6c22baf815a0f14",
+        "name": "Lua",
+        "selected_release": "verified-language-cohort-rc8"
+      }
+    }
+  ],
+  "frozen_registry": "218456e77d6eedff90b4819c7146da4aab1b1485",
+  "native_export_input_sha256": "ce6c9c9d3536caa6f7747240a2104c1567fa61b8a43606abc13267532e65c263",
+  "native_marker_count": 32,
+  "neutral_output_sha256": "59ffb66813fd4e46e3ec55248067d43f8679addd83334d47656899f884bc4dce",
+  "publication": {
+    "release": "verified-language-cohort-rc8",
+    "selection_sha256": "bab0696834c41cd3276a710b70cb025ba52efcd94dc741d907cd94d36a9b4d5e",
+    "source_commit": "be39341993de56d708a66dd295e4b3f95493f417"
+  },
+  "record_boundary": "Only contextual association to already selected language identities. No registry changes, equivalence, new entities, or technical claims.",
+  "status": "primary contextual crosswalk; independent exact review pending",
+  "variant_observations": [
+    {
+      "discovery": "80587d37028c9456079173d327e8d1b3825d174765adae05b715a818f9743f07",
+      "fresh": "00d084317497da813ef8f61996f98d0eedf18d59089c770697912306550336fc",
+      "previously_registered": "49e07042b7f0da92e411c170bc8e73423e76a43be149baf773d47481fbd7c78b",
+      "source_key": "identity-c-iec-2024-catalog"
+    },
+    {
+      "discovery": "16409a91e35d16568d7d16d05c727c847d5c61b40f5c9dbb989c11b12153824c",
+      "fresh": "10dea259e63d341b4f96c51ee4a3b689653f27e96d091e219e2b0b18b78d5294",
+      "previously_registered": null,
+      "source_key": "original-pcre2"
+    },
+    {
+      "discovery": "be412f1a1dea3542467f9ea46320f98a23d6f636cbbd64000be2d24be3cbcc0b",
+      "fresh": "3c68f76b4484e5dce62bd7fd90dcfccec6b4a8cd9fd856b83cb80a5bd5f59282",
+      "previously_registered": null,
+      "source_key": "original-rust-regex"
+    },
+    {
+      "discovery": "a7e3e8d6beda083d93f01b3f187337462ba30fa7a0699ab88209088af9ee0d26",
+      "fresh": "a3946cac90b715f3c1dc4fb60518c0af94c5f11dd304e9e916db5ea35eefd79a",
+      "previously_registered": null,
+      "source_key": "rust-regex-crate"
+    }
+  ]
+}
