@@ -1,0 +1,1 @@
+{"aliases":[],"id":"85746ac966734e55b0c570457ee58ab1","identity_claim":{"id":"jsoftware-help802-j-dialect-identity","kind":"claim","revision":1},"kind":"dialect","name":"J","relations":[{"claim":{"id":"hui-j-dialect-of-apl-dictionary-line","kind":"claim","revision":1},"target":{"id":"f57cdb60967b400d9ab0c93f79db3271"},"type":"dialect-of"}],"state":"active"}

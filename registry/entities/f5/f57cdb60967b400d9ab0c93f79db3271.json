@@ -1,0 +1,1 @@
+{"aliases":[],"id":"f57cdb60967b400d9ab0c93f79db3271","identity_claim":{"id":"apl-falkoff-iverson-language-identity","kind":"claim","revision":1},"kind":"language","name":"APL","relations":[{"claim":{"id":"apl-implemented-by-ibm-apl360","kind":"claim","revision":1},"target":{"id":"38afe730743c47f4b5f788b014e06f74"},"type":"implemented-by"}],"state":"active"}
