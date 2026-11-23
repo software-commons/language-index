@@ -117,3 +117,5 @@ The archival, IBM and configuration profiles add 28 independently reviewed claim
 Additional independently reviewed claims deepen eight existing proposed language profiles and cover Metal Shading Language and OpenCL C. The 1,126-lead ledger has 150 resolved and 976 unresolved leads, including 870 awaiting initial investigation. [Metal and OpenCL C](../research/campaigns/metal-opencl-language-boundaries.md)
 
 The preview includes scoped technical claims for KuMir, Pikto and eight language identities from the PLOC 2023 editorial archive, and a separately verified Calcit dialect relationship. The 1,126-lead ledger has 159 resolved and 967 unresolved leads, including 859 awaiting initial investigation. [KuMir and Pikto](../research/campaigns/kumir-piktomir.md) · [PLOC 2023](../research/campaigns/ploc-2023-regional-languages.md)
+
+The preview adds scoped claims for Self, Pure Data, Elm and Gleam. The 1,126-lead ledger has 162 resolved and 964 unresolved leads, including 855 awaiting initial investigation. [Self and Pure Data](../research/campaigns/self-pure-data.md) · [Elm and Gleam](../research/campaigns/elm-gleam.md)
