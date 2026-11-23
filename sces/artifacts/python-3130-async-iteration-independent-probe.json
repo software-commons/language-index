@@ -1,0 +1,82 @@
+{
+  "acquired_package_sha256": "01c32d0737432240adcf0bbc1d32327f0976d3a1e1427774bc8febc8f1c03111",
+  "cpython": "3.13.0 (tags/v3.13.0:60403a5, Oct  7 2024, 09:38:07) [MSC v.1941 64 bit (AMD64)]",
+  "end_async_for_handlers": [
+    {
+      "depth": 1,
+      "end": 18,
+      "lasti": false,
+      "start": 10,
+      "target": 148
+    },
+    {
+      "depth": 1,
+      "end": 26,
+      "lasti": false,
+      "start": 20,
+      "target": 148
+    },
+    {
+      "depth": 1,
+      "end": 146,
+      "lasti": false,
+      "start": 144,
+      "target": 148
+    }
+  ],
+  "instruction_offsets": {
+    "END_ASYNC_FOR": 148,
+    "GET_ANEXT": 10,
+    "STORE_ATTR": 28
+  },
+  "package": "https://www.python.org/ftp/python/3.13.0/python-3.13.0-embed-amd64.zip",
+  "probe_source_sha256": "edb0f1b4c403334e756a5e5124bc8886558258cb69d49b7458893f341429a819",
+  "publisher_md5": "9d2a0301c2bba8df05c8815c954a2fc0",
+  "publisher_release": "https://www.python.org/downloads/release/python-3130/",
+  "python_executable_sha256": "62ebc90a2884bb63a0cd67e789cafdd51e771eee043587e2354327b4ccc9bb05",
+  "tests": {
+    "aiter_exception": {
+      "events": [],
+      "message": "aiter",
+      "outcome": "StopAsyncIteration",
+      "suspensions": 0
+    },
+    "awaited_anext_exhaustion": {
+      "events": [
+        [
+          "body",
+          42
+        ],
+        [
+          "else",
+          null
+        ]
+      ],
+      "outcome": "completed",
+      "suspensions": 2
+    },
+    "different_anext_exception": {
+      "events": [],
+      "message": "anext",
+      "outcome": "ValueError",
+      "suspensions": 1
+    },
+    "loop_body_exception": {
+      "events": [
+        [
+          "body",
+          42
+        ]
+      ],
+      "message": "body",
+      "outcome": "StopAsyncIteration",
+      "suspensions": 1
+    },
+    "target_assignment_exception": {
+      "events": [],
+      "message": "target setter",
+      "outcome": "StopAsyncIteration",
+      "suspensions": 1
+    }
+  }
+}
