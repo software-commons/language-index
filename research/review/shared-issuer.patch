@@ -207,10 +207,10 @@ index 1863d1130f1e65e59a85d98cf28dc0caea911682..1362af915de4c2d8ae94fbd49e8189e9
          for update in ({"integration_id": ACTIONS_APP_ID}, {"integration_id": None}):
 diff --git a/tests/test_review_evidence.py b/tests/test_review_evidence.py
 new file mode 100644
-index 0000000000000000000000000000000000000000..3d832e7201830bdaf037d697dc35eb17f8c36e5d
+index 0000000000000000000000000000000000000000..bf963021d582659ff4f18236aaf01e23d937688b
 --- /dev/null
 +++ b/tests/test_review_evidence.py
-@@ -0,0 +1,572 @@
+@@ -0,0 +1,613 @@
 +"""Synthetic Git-object fixtures for the protected SCES review inputs."""
 +
 +from base64 import b64encode
@@ -377,7 +377,7 @@ index 0000000000000000000000000000000000000000..3d832e7201830bdaf037d697dc35eb17
 +
 +        _git(self.root, "switch", "--quiet", "--detach", candidate)
 +        rewrite = self.commit(select_release(publication, "test-release", older_link), "change active lineage")
-+        with self.assertRaisesRegex(DataError, "active publication selection differs"):
++        with self.assertRaisesRegex(DataError, "must preserve exact verified base release"):
 +            self.capture(rewrite)
 +
 +        replacement = _canonical({**decode(original), "fixture": "replacement"})
@@ -385,7 +385,7 @@ index 0000000000000000000000000000000000000000..3d832e7201830bdaf037d697dc35eb17
 +        for link, extra, message in (
 +            (None, {}, "successor must identify the verified base release"),
 +            (older_link, {}, "successor must identify the verified base release"),
-+            (replacement_link, {path: replacement}, "previous report path or blob differs"),
++            (replacement_link, {path: replacement}, "must preserve exact verified base release"),
 +        ):
 +            with self.subTest(link=link):
 +                _git(self.root, "switch", "--quiet", "--detach", base)
@@ -432,8 +432,9 @@ index 0000000000000000000000000000000000000000..3d832e7201830bdaf037d697dc35eb17
 +            ({}, "requires a new withdrawal advisory"),
 +            ({"sces/advisories/other.json": _canonical(advice)}, "requires a new withdrawal advisory"),
 +            ({advice_path: _canonical(wrong_digest)}, "does not bind the exact verified base qualification"),
-+            ({advice_path: _canonical(rehashed), path: replacement}, "must preserve the exact verified base qualification blob"),
++            ({advice_path: _canonical(rehashed), path: replacement}, "must preserve exact verified base release"),
 +            ({advice_path: _canonical({**advice, "affected": [ref("claim", "other")]})}, "lists invalid affected claims"),
++            ({advice_path: _canonical({**advice, "recorded": "9999-01-01T00:00:00Z"})}, "timestamp is in the future"),
 +        ):
 +            with self.subTest(message=message, paths=sorted(files)):
 +                _git(self.root, "switch", "--quiet", "--detach", base)
@@ -450,6 +451,26 @@ index 0000000000000000000000000000000000000000..3d832e7201830bdaf037d697dc35eb17
 +                                                   path: report, advice_path: _canonical(advice)})
 +        with self.assertRaisesRegex(DataError, "requires the exact verified pull-request base"):
 +            capture_selected_evidence(self.root, candidate, LANGUAGE)
++
++        for paths in ((advice_path,), (path,), (advice_path, path, RELEASE + "claims.json")):
++            with self.subTest(paths=paths):
++                _git(self.root, "switch", "--quiet", "--detach", candidate)
++                for removed in paths:
++                    (self.root / removed).unlink()
++                erased = self.commit({}, "try erasing inherited withdrawal history while inactive")
++                with self.assertRaisesRegex(DataError, "must preserve exact verified base release and withdrawal"):
++                    self.capture(erased)
++
++        _git(self.root, "switch", "--quiet", "--detach", candidate)
++        replay = self.commit({SELECTION: publication[SELECTION]}, "try reselecting the already advised release")
++        with self.assertRaisesRegex(DataError, "active publication is already withdrawn"):
++            self.capture(replay)
++
++        _git(self.root, "switch", "--quiet", "--detach", candidate)
++        idle = self.commit({"sces/artifacts/idle.txt": b"unrelated review"}, "keep withdrawal history while inactive")
++        self.assertEqual(self.capture(idle), {})
++        revived = self.commit(select_release(publication, "revived", link), "reactivate using the retained withdrawal")
++        self.assertEqual(self.capture(revived)[advice_path], _canonical(advice))
 +
 +    def test_inactive_base_requires_an_exact_withdrawal_advisory_for_archived_lineage(self):
 +        inputs, publication = fixture()
@@ -472,7 +493,7 @@ index 0000000000000000000000000000000000000000..3d832e7201830bdaf037d697dc35eb17
 +        unbound = {**advice, "report": {**link, "sha256": "f" * 64}}
 +        self.commit({advisory: _canonical(unbound)}, "archive advisory with a different subject digest")
 +        candidate = self.commit(successor, "claim lineage to an unbound archived report")
-+        with self.assertRaisesRegex(DataError, "withdrawal advisory does not bind the archived predecessor"):
++        with self.assertRaisesRegex(DataError, "withdrawal advisory does not bind the exact verified base qualification"):
 +            self.capture(candidate)
 +
 +        _git(self.root, "switch", "--quiet", "--detach", unadvised)
@@ -489,46 +510,64 @@ index 0000000000000000000000000000000000000000..3d832e7201830bdaf037d697dc35eb17
 +        with self.assertRaisesRegex(DataError, "requires the exact verified pull-request base"):
 +            capture_selected_evidence(self.root, candidate, LANGUAGE)
 +
-+    def test_inactive_predecessor_uses_latest_matching_utc_withdrawal_and_rejects_ties(self):
++    def test_inactive_predecessor_follows_verified_lineage_independently_of_advisory_time(self):
 +        inputs, publication = fixture()
 +        source = self.commit(inputs, "freeze evidence")
 +        publication = pin_source(publication, source)
 +
-+        def archive(slug, recorded, dataset=None):
-+            files = select_release(publication, slug, dataset=dataset)
-+            del files[SELECTION]
++        def archive(slug, recorded, predecessor=None, *, dataset=None):
++            files = select_release(publication, slug, predecessor, dataset=dataset)
 +            path = f"sces/releases/{slug}/qualification.json"
 +            link = {"path": path, "sha256": digest(files[path])}
-+            files[f"sces/advisories/{slug}.json"] = _canonical({
++            advisory = _canonical({
 +                "report": link, "affected": [ref("claim", "selected")], "reason": "Synthetic withdrawal",
 +                "recorded": recorded,
 +            })
-+            return files, link
++            return files, link, {f"sces/advisories/{slug}.json": advisory}
 +
-+        first, first_link = archive("older", "2026-10-01T00:00:00Z")
-+        latest, latest_link = archive("newest", "2026-10-02T00:00:00Z")
-+        unrelated, _ = archive("other", "2026-10-03T00:00:00Z", "other-index")
-+        base = self.commit({**first, **latest, **unrelated}, "retain qualified archives and their withdrawals")
++        first, first_link, first_advice = archive("older", "2026-10-02T00:00:00Z")
++        first_base = self.commit(first, "publish the first release")
++        latest, latest_link, _ = archive("newest", "2026-10-02T00:00:00Z", first_link)
++        replacement = self.commit({**latest, **first_advice}, "replace and withdraw the old active release")
++        self.assertEqual(self.capture(replacement)["base:sces/publication.json"], first[SELECTION])
 +
++        _git(self.root, "switch", "--quiet", "--detach", first_base)
++        unadvised = self.commit(latest, "replace without withdrawing the prior release yet")
++        _, _, latest_advice = archive("newest", "2026-10-02T00:00:00Z", first_link)
++        (self.root / SELECTION).unlink()
++        partial = self.commit(latest_advice, "leave an older unadvised release without an active selection")
++        with self.assertRaisesRegex(DataError, "inactive publication retains a qualification without a withdrawal advisory"):
++            self.capture(partial)
++        _git(self.root, "switch", "--quiet", "--detach", unadvised)
++        active = self.commit(first_advice, "append historical withdrawal without changing current selection")
++        self.assertEqual(self.capture(active)["sces/advisories/older.json"], first_advice["sces/advisories/older.json"])
++
++        successor = select_release(publication, "test-release", latest_link)
++        for timestamp in ("2026-10-01T00:00:00Z", "2026-10-02T00:00:00Z"):
++            with self.subTest(timestamp=timestamp):
++                _git(self.root, "switch", "--quiet", "--detach", active)
++                _, _, latest_advice = archive("newest", timestamp, first_link)
++                (self.root / SELECTION).unlink()
++                withdrawn = self.commit(latest_advice, "withdraw the newer release")
++                self.assertIn("sces/advisories/newest.json", self.capture(withdrawn))
++                previous = self.commit(select_release(publication, "test-release", first_link), "select an older ancestor")
++                with self.assertRaisesRegex(DataError, "reactivation must identify the verified dataset's latest withdrawn"):
++                    self.capture(previous)
++                _git(self.root, "switch", "--quiet", "--detach", withdrawn)
++                candidate = self.commit(successor, "link to the newest qualified descendant")
++                self.assertEqual(self.capture(candidate)[latest_link["path"]], latest[latest_link["path"]])
++
++        _git(self.root, "switch", "--quiet", "--detach", withdrawn)
 +        brand_new = self.commit(select_release(publication, "test-release", dataset="new-index"),
 +                                "bootstrap a dataset without matching history")
 +        self.assertIn(SELECTION, self.capture(brand_new))
 +
-+        _git(self.root, "switch", "--quiet", "--detach", base)
-+        older = self.commit(select_release(publication, "test-release", first_link), "link past the latest match")
-+        with self.assertRaisesRegex(DataError, "reactivation must identify the verified dataset's latest withdrawn"):
-+            self.capture(older)
-+
-+        _git(self.root, "switch", "--quiet", "--detach", base)
-+        successor = select_release(publication, "test-release", latest_link)
-+        candidate = self.commit(successor, "link to the newest matching archived report")
-+        self.assertEqual(self.capture(candidate)[latest_link["path"]], latest[latest_link["path"]])
-+
-+        _git(self.root, "switch", "--quiet", "--detach", base)
-+        tied, _ = archive("tied", "2026-10-02T00:00:00Z")
-+        self.commit(tied, "retain a matching withdrawal at the same exact timestamp")
-+        candidate = self.commit(successor, "try reactivation with ambiguous newest withdrawals")
-+        with self.assertRaisesRegex(DataError, "ambiguous at the latest withdrawal timestamp"):
++        _git(self.root, "switch", "--quiet", "--detach", withdrawn)
++        unrelated, _, advice = archive("disconnected", "2026-10-03T00:00:00Z")
++        del unrelated[SELECTION]
++        self.commit({**unrelated, **advice}, "seed legacy history with an unrelated same-dataset root")
++        candidate = self.commit(successor, "try reactivation with two protected lineage tips")
++        with self.assertRaisesRegex(DataError, "no unique successor tip"):
 +            self.capture(candidate)
 +
 +    def test_selected_claim_and_inherited_premise_require_independent_execution_pairs(self):
@@ -598,20 +637,22 @@ index 0000000000000000000000000000000000000000..3d832e7201830bdaf037d697dc35eb17
 +
 +    def test_qualification_cannot_omit_review_or_claim_dependencies(self):
 +        inputs, publication = fixture()
-+        publication = pin_source(publication, self.commit(inputs, "freeze evidence"))
++        source = self.commit(inputs, "freeze evidence")
++        publication = pin_source(publication, source)
 +        path = RELEASE + "qualification.json"
 +        report = decode(publication[path])
 +        report["verifications"].pop()
 +        candidate = self.commit({**inputs, **publication, path: _canonical(report)}, "omit verification in report")
 +        with self.assertRaisesRegex(DataError, "omits or changes selected verification records"):
 +            self.capture(candidate)
++        _git(self.root, "switch", "--quiet", "--detach", source)
 +        report = decode(publication[path])
 +        claims_path = RELEASE + "claims.json"
 +        incomplete = decode(publication[claims_path])
 +        incomplete[0]["dependencies"] = []
 +        altered = _canonical(incomplete)
 +        report["artifacts"][0]["sha256"] = digest(altered)
-+        candidate = self.commit({path: _canonical(report), claims_path: altered}, "omit dependency in payload")
++        candidate = self.commit({**publication, path: _canonical(report), claims_path: altered}, "omit dependency in payload")
 +        with self.assertRaisesRegex(DataError, "omits or changes selected evidence"):
 +            self.capture(candidate)
 +
@@ -625,7 +666,7 @@ index 0000000000000000000000000000000000000000..3d832e7201830bdaf037d697dc35eb17
 +        report["artifacts"].append({"path": extra_path, "sha256": digest(extra)})
 +        candidate = self.commit({**publication, report_path: _canonical(report), extra_path: extra},
 +                                "add an unsupported release artifact")
-+        with self.assertRaisesRegex(DataError, "do not bind the exact publication"):
++        with self.assertRaisesRegex(DataError, "introduces release files outside the active qualification"):
 +            self.capture(candidate)
 +
 +    def test_self_consistent_candidate_rejects_changed_frozen_input(self):
@@ -2214,15 +2255,15 @@ index d213d62143ea097a48f01697f606e7c61a21ee10..f4e6d504992e6e3dcee47ebfe9bdb873
 
 diff --git a/tools/review_evidence.py b/tools/review_evidence.py
 new file mode 100644
-index 0000000000000000000000000000000000000000..e173f283565d1d63fa6b9b44b0d4083069ad06d3
+index 0000000000000000000000000000000000000000..61a60735b750896a06184cc3117b1c232c234396
 --- /dev/null
 +++ b/tools/review_evidence.py
-@@ -0,0 +1,532 @@
+@@ -0,0 +1,589 @@
 +"""Capture the active SCES publication inputs as inert bytes from a reviewed Git tree."""
 +
 +from base64 import b64decode, b64encode
 +from collections import defaultdict
-+from datetime import datetime
++from datetime import datetime, timezone
 +from hashlib import sha256
 +import os
 +from pathlib import Path
@@ -2554,86 +2595,140 @@ index 0000000000000000000000000000000000000000..e173f283565d1d63fa6b9b44b0d40830
 +    return datetime.strptime(recorded, "%Y-%m-%dT%H:%M:%S%z")
 +
 +
-+def _capture_withdrawal(directory, commit, base, base_selection_tree, target):
-+    base_bytes = _blobs(directory, base_selection_tree, [_SELECTION], limit=_MAX_EVIDENCE)[_SELECTION]
-+    base_selection = decode(base_bytes)
-+    slug = base_selection["release"]
-+    require(isinstance(slug, str) and _SLUG.fullmatch(slug), "invalid SCES base release name")
-+    report_path = f"sces/releases/{slug}/qualification.json"
-+    advisory_path = f"sces/advisories/{slug}.json"
-+    base_paths = _inventory(directory, base, report_path, advisory_path)
-+    candidate_paths = _inventory(directory, commit, _ADOPTION, report_path, advisory_path)
-+    require(advisory_path not in base_paths and advisory_path in candidate_paths,
-+            "SCES active publication removal requires a new withdrawal advisory for the verified base release")
-+    require(report_path in base_paths and candidate_paths.get(report_path) == base_paths[report_path],
-+            "SCES withdrawal must preserve the exact verified base qualification blob")
-+    staged = _blobs(directory, candidate_paths, [_ADOPTION, report_path, advisory_path],
-+                    limit=_MAX_EVIDENCE - len(base_bytes))
-+    adoption = decode(staged[_ADOPTION])
-+    require(adoption["policy"] == "SCES-1.0" and adoption["policy_sha256"] == POLICY_DIGEST
-+            and adoption["repository"] == target.repository and adoption["mode"] == "index",
-+            "invalid protected SCES adoption for a withdrawal")
-+    report, advisory = decode(staged[report_path]), decode(staged[advisory_path])
-+    _qualification_identity(report, slug, target)
-+    _bind_base_qualification(report, base_selection, base_bytes)
-+    require(advisory["report"] == {"path": report_path, "sha256": _digest(staged[report_path])},
++def _assert_retained_history(directory, commit, base, selection_tree):
++    prefixes = ("sces/releases", "sces/advisories")
++    inherited = _inventory(directory, base, *prefixes)
++    candidate = _inventory(directory, commit, *prefixes)
++    require(all(candidate.get(path) == oid for path, oid in inherited.items()),
++            "SCES candidate must preserve exact verified base release and withdrawal advisory blobs")
++    require(all(_archived_report_path(path)[1] in inherited for path in inherited if path.startswith("sces/advisories/")),
++            "SCES verified base withdrawal advisory lacks its archived qualification")
++    new = candidate.keys() - inherited.keys()
++    active = None
++    if selection_tree:
++        active = decode(_blobs(directory, selection_tree, [_SELECTION], limit=_MAX_EVIDENCE)[_SELECTION])["release"]
++        require(isinstance(active, str) and _SLUG.fullmatch(active), "invalid SCES release name")
++        require(f"sces/advisories/{active}.json" not in candidate,
++                "SCES active publication is already withdrawn")
++    allowed = {f"sces/releases/{active}/{name}" for name in ("claims.json", "qualification.json")} if active else set()
++    require(all(path.startswith("sces/advisories/") or path in allowed for path in new),
++            "SCES candidate introduces release files outside the active qualification")
++    return inherited, candidate, sorted(path for path in new if path.startswith("sces/advisories/"))
++
++
++def _archived_report_path(advisory_path):
++    slug = advisory_path.removeprefix("sces/advisories/").removesuffix(".json")
++    require(_SLUG.fullmatch(slug) and advisory_path == f"sces/advisories/{slug}.json",
++            "invalid SCES withdrawal advisory path")
++    return slug, f"sces/releases/{slug}/qualification.json"
++
++
++def _check_withdrawal(advisory, report_path, report_bytes, report):
++    require(advisory["report"] == {"path": report_path, "sha256": _digest(report_bytes)},
 +            "SCES withdrawal advisory does not bind the exact verified base qualification")
-+    _withdrawal_timestamp(advisory["recorded"])
++    require(_withdrawal_timestamp(advisory["recorded"]) <= datetime.now(timezone.utc),
++            "SCES withdrawal advisory timestamp is in the future")
 +    affected = [_key(reference, "claim") for reference in advisory["affected"]]
 +    require(affected and len(set(affected)) == len(affected)
 +            and set(affected) <= {_key(reference, "claim") for reference in report["claims"]}
 +            and isinstance(advisory["reason"], str) and advisory["reason"].strip(),
 +            "SCES withdrawal advisory lacks a reason or lists invalid affected claims")
-+    return dict(sorted({**staged, _BASE_SELECTION_REVIEW_PATH: base_bytes}.items()))
 +
 +
-+def _withdrawn_predecessor(directory, paths, base, selection, target):
-+    """Use the matching dataset's latest UTC withdrawal; tied timestamps need adjudication."""
-+    advisory_paths = _inventory(directory, base, "sces/advisories")
-+    advisories = _blobs(directory, advisory_paths, sorted(advisory_paths), limit=_MAX_EVIDENCE)
-+    withdrawals = []
-+    for advisory, blob in advisories.items():
-+        slug = advisory.removeprefix("sces/advisories/").removesuffix(".json")
-+        require(_SLUG.fullmatch(slug) and advisory == f"sces/advisories/{slug}.json",
-+                "invalid SCES withdrawal advisory path on the verified pull-request base")
-+        row = decode(blob)
-+        descriptor = row["report"]
-+        require(descriptor["path"] == f"sces/releases/{slug}/qualification.json",
-+                "SCES withdrawal advisory does not bind its archived predecessor")
-+        withdrawals.append((_withdrawal_timestamp(row["recorded"]), slug, descriptor, advisory))
-+
-+    report_paths = _inventory(directory, base, "sces/releases") if withdrawals else {}
-+    reports = _blobs(directory, report_paths, sorted(item[2]["path"] for item in withdrawals),
-+                     limit=_MAX_EVIDENCE - sum(map(len, advisories.values())))
-+    matching = []
-+    for recorded, slug, descriptor, advisory in withdrawals:
-+        blob = reports[descriptor["path"]]
-+        require(_digest(blob) == descriptor["sha256"], "SCES withdrawal advisory does not bind the archived predecessor")
-+        report = decode(blob)
++def _new_withdrawals(directory, commit, selection_tree, base_selection_tree, inherited, candidate, new, target):
++    base_bytes, base_selection = None, None
++    if base_selection_tree and (new or not selection_tree):
++        base_bytes = _blobs(directory, base_selection_tree, [_SELECTION], limit=_MAX_EVIDENCE)[_SELECTION]
++        base_selection = decode(base_bytes)
++        slug = base_selection["release"]
++        require(isinstance(slug, str) and _SLUG.fullmatch(slug), "invalid SCES base release name")
++        if not selection_tree:
++            require(f"sces/advisories/{slug}.json" in new,
++                    "SCES active publication removal requires a new withdrawal advisory for the verified base release")
++    if not selection_tree:
++        require(all(f"sces/advisories/{path.split('/')[2]}.json" in candidate
++                    for path in candidate if path.endswith("/qualification.json")),
++                "SCES inactive publication retains a qualification without a withdrawal advisory")
++    if not new:
++        return {}
++    reports = {}
++    for advisory in new:
++        slug, path = _archived_report_path(advisory)
++        require(path in inherited, "SCES new withdrawal advisory must identify an inherited qualified release")
++        reports[advisory] = (slug, path)
++    adoption_paths = _inventory(directory, commit, _ADOPTION)
++    ordered = [_ADOPTION, *new, *(path for _, path in reports.values())]
++    staged = _blobs(directory, {**candidate, **adoption_paths}, ordered,
++                    limit=_MAX_EVIDENCE - len(base_bytes or b""))
++    adoption = decode(staged[_ADOPTION])
++    require(adoption["policy"] == "SCES-1.0" and adoption["policy_sha256"] == POLICY_DIGEST
++            and adoption["repository"] == target.repository and adoption["mode"] == "index",
++            "invalid protected SCES adoption for a withdrawal")
++    for advisory, (slug, report_path) in reports.items():
++        report_bytes = staged[report_path]
++        report = decode(report_bytes)
 +        _qualification_identity(report, slug, target)
-+        if report["dataset"] == selection["dataset"]:
-+            matching.append((recorded, descriptor, advisory))
++        _check_withdrawal(decode(staged[advisory]), report_path, report_bytes, report)
++        if base_selection is not None and slug == base_selection["release"]:
++            _bind_base_qualification(report, base_selection, base_bytes)
++            staged[_BASE_SELECTION_REVIEW_PATH] = base_bytes
++    return staged
 +
++
++def _withdrawn_predecessor(directory, inherited, selection, target):
++    """Follow exact qualification parent links; advisory timestamps do not order releases."""
++    advisory_paths = sorted(path for path in inherited if path.startswith("sces/advisories/"))
++    reports = {}
++    if advisory_paths:
++        report_paths = sorted(path for path in inherited if path.endswith("/qualification.json"))
++        reports = _blobs(directory, inherited, report_paths, limit=_MAX_EVIDENCE)
++    rows = {}
++    for path, blob in reports.items():
++        report = decode(blob)
++        if report["dataset"] == selection["dataset"]:
++            slug, canonical = _archived_report_path(f"sces/advisories/{report['release']}.json")
++            require(path == canonical, "invalid protected SCES qualification report path")
++            _qualification_identity(report, slug, target)
++            rows[path] = report
++    matching = {path: advisory for advisory in advisory_paths
++                if (path := _archived_report_path(advisory)[1]) in rows}
 +    if not matching:
 +        require("previous_report" not in selection,
 +                "SCES archived predecessor requires an unchanged withdrawal advisory for the dataset on the verified pull-request base")
 +        return {}
-+    latest = max(recorded for recorded, _, _ in matching)
-+    eligible = [(descriptor, advisory) for recorded, descriptor, advisory in matching if recorded == latest]
-+    require(len(eligible) == 1, "SCES withdrawn predecessor is ambiguous at the latest withdrawal timestamp")
-+    (expected, advisory), = eligible
++    parents = {}
++    for path, report in rows.items():
++        previous = report.get("previous_report")
++        if "previous_report" not in report:
++            continue
++        parent = previous["path"]
++        require(parent in rows and previous == {"path": parent, "sha256": _digest(reports[parent])},
++                "SCES withdrawn qualification lineage has a broken predecessor")
++        parents[path] = parent
++    tips = rows.keys() - set(parents.values())
++    require(len(tips) == 1, "SCES withdrawn qualification lineage has no unique successor tip")
++    tip, = tips
++    seen = set()
++    cursor = tip
++    while cursor is not None:
++        require(cursor not in seen, "SCES withdrawn qualification lineage contains a cycle")
++        seen.add(cursor)
++        cursor = parents.get(cursor)
++    require(seen == rows.keys(), "SCES withdrawn qualification lineage is disconnected or cyclic")
++    require(tip in matching, "SCES latest protected dataset qualification has no withdrawal advisory")
++    expected = {"path": tip, "sha256": _digest(reports[tip])}
 +    require(selection.get("previous_report") == expected,
 +            "SCES reactivation must identify the verified dataset's latest withdrawn qualification report")
-+    path = expected["path"]
-+    require(path != f"sces/releases/{selection['release']}/qualification.json", "invalid SCES previous report path")
-+    require(paths.get(path) == report_paths[path] and paths.get(advisory) == advisory_paths[advisory],
-+            "SCES archived predecessor requires the unchanged qualification and withdrawal advisory from the verified pull-request base")
-+    return {path: reports[path], advisory: advisories[advisory]}
++    require(tip != f"sces/releases/{selection['release']}/qualification.json", "invalid SCES previous report path")
++    advisory_path = matching[tip]
++    advisory = _blobs(directory, inherited, [advisory_path], limit=_MAX_EVIDENCE)[advisory_path]
++    _check_withdrawal(decode(advisory), tip, reports[tip], rows[tip])
++    return {tip: reports[tip], advisory_path: advisory}
 +
 +
-+def _previous_report(directory, paths, base, base_selection_tree, selection, selection_bytes, target):
++def _previous_report(directory, paths, base, base_selection_tree, inherited, selection, selection_bytes, target):
 +    if not base_selection_tree:
-+        return _withdrawn_predecessor(directory, paths, base, selection, target)
++        return _withdrawn_predecessor(directory, inherited, selection, target)
 +    predecessor = selection.get("previous_report")
 +    base_bytes = _blobs(directory, base_selection_tree, [_SELECTION], limit=_MAX_EVIDENCE)[_SELECTION]
 +    base_selection = decode(base_bytes)
@@ -2667,7 +2762,7 @@ index 0000000000000000000000000000000000000000..e173f283565d1d63fa6b9b44b0d40830
 +    return history
 +
 +
-+def _selected_evidence(directory, paths, target, base, base_selection_tree):
++def _selected_evidence(directory, paths, target, base, base_selection_tree, inherited):
 +    metadata = _blobs(directory, paths, [_ADOPTION, _SELECTION], limit=_MAX_EVIDENCE)
 +    adoption = decode(metadata[_ADOPTION])
 +    selection = decode(metadata[_SELECTION])
@@ -2690,7 +2785,7 @@ index 0000000000000000000000000000000000000000..e173f283565d1d63fa6b9b44b0d40830
 +            "SCES selection and qualification do not bind the exact publication")
 +    require(("previous_report" in report) == ("previous_report" in selection)
 +            and report.get("previous_report") == selection.get("previous_report"), "SCES previous report mismatch")
-+    metadata.update(_previous_report(directory, paths, base, base_selection_tree, selection, metadata[_SELECTION], target))
++    metadata.update(_previous_report(directory, paths, base, base_selection_tree, inherited, selection, metadata[_SELECTION], target))
 +
 +    selected = [_key(ref, "claim") for ref in selection["claims"]]
 +    require(selected and len({identity[:2] for identity in selected}) == len(selected)
@@ -2742,10 +2837,13 @@ index 0000000000000000000000000000000000000000..e173f283565d1d63fa6b9b44b0d40830
 +        require(isinstance(base, str) and re.fullmatch(r"[0-9a-f]{40}", base),
 +                "SCES publication requires the exact verified pull-request base")
 +        base_selection_tree = _selection_tree(directory, base)
-+        if not selection_tree:
-+            return _capture_withdrawal(directory, commit, base, base_selection_tree, target) if base_selection_tree else {}
-+        paths = _inventory(directory, commit, "sces")
-+        return _selected_evidence(directory, paths, target, base, base_selection_tree)
++        inherited, candidate, new = _assert_retained_history(directory, commit, base, selection_tree)
++        staged = _new_withdrawals(directory, commit, selection_tree, base_selection_tree, inherited, candidate, new, target)
++        if selection_tree:
++            paths = _inventory(directory, commit, "sces")
++            staged.update(_selected_evidence(directory, paths, target, base, base_selection_tree, inherited))
++        require(sum(map(len, staged.values())) <= _MAX_EVIDENCE, "SCES selected evidence exceeds the review capture limit")
++        return dict(sorted(staged.items()))
 +    except (KeyError, TypeError, ValueError, UnicodeError, RecursionError) as error:
 +        if isinstance(error, DataError):
 +            raise
