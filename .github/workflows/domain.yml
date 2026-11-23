@@ -38,7 +38,7 @@ jobs:
           SCES_POLICY_ROOT: ${{ github.workspace }}/policy
         run: |
           set -eu
-          python -B -m unittest discover -s tests -v
+          python -I -B -m unittest discover -s tests -v
   registry:
     name: Registry validation
     needs: registry-tests
