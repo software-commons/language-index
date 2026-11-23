@@ -1,0 +1,1 @@
+{"basis":{"id":"microsoft-dxc-project-01b62ad4","kind":"source","revision":1},"citation":{"locator":"Released README Markdown lines 1–7, 21–29, and 45–47.","modality":"descriptive"},"claim":{"id":"hlsl-dxc-2609-documented-compiler-targets","kind":"claim","revision":1},"id":"supports-hlsl-dxc-2609-documented-compiler-targets","kind":"dependency","relation":"support","revision":1}
