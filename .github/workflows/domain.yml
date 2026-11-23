@@ -1,0 +1,46 @@
+name: Domain
+
+on:
+  pull_request:
+  merge_group:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  registry:
+    name: Registry validation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          path: index
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: software-commons/.github
+          ref: ab26f278422772f2d9e5d4dd016407d14372a710
+          path: policy
+          persist-credentials: false
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+      - name: Test registry and validate the proposed revision
+        working-directory: index
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha || github.event.before }}
+          SCES_POLICY_ROOT: ${{ github.workspace }}/policy
+        run: |
+          set -eu
+          python -m pip install --disable-pip-version-check -r "$SCES_POLICY_ROOT/tools/sces/requirements.txt"
+          python -B "$SCES_POLICY_ROOT/tools/sces/validate.py" --policy-only
+          python -B -m unittest discover -s tests -v
+          args=()
+          if [[ -n "$BASE_SHA" && "$BASE_SHA" != 0000000000000000000000000000000000000000 ]]; then
+            args+=(--base "$BASE_SHA")
+          fi
+          python -B tools/index.py --policy "$SCES_POLICY_ROOT" validate "${args[@]}"
