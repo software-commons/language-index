@@ -1,0 +1,1 @@
+{"aliases":[],"id":"d16e5af5dbed40469fd948a0076293b5","identity_claim":{"id":"interlisp-oct1978-language-identity","kind":"claim","revision":1},"kind":"language","name":"Interlisp","relations":[{"claim":{"id":"interlisp-implemented-by-interlisp-d-jul1981","kind":"claim","revision":1},"target":{"id":"05bf21236ea449229e9f8de815d143f9"},"type":"implemented-by"}],"state":"active"}
