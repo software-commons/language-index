@@ -8,3 +8,5 @@ The primary and independent investigations examined eight exact original leads a
 - RPG IV and TSO/E REXX both retain the exact original HTTP 403 capture gap. Supplemental documentation provides useful scope distinctions.
 
 The successor registry links six leads at the documented scopes. RPG IV and TSO/E REXX retain the exact evidence gaps above. The rc.4 registry and associated coverage report remain available at the frozen source revision. [Supplemental decisions](../../sces/artifacts/rocq-ibm-locator-audit/lead-decisions.json) · [Supplemental source inspections](../../sces/artifacts/rocq-ibm-locator-audit/source-inspections.json)
+
+In the supplemental decision record, `original.sha256` identifies the local discovery ledger record before adjudication. Each `source_captures[].sha256` identifies retrieved upstream bytes. The two values bind different artifacts even when the discovery locator and acquisition URL coincide.
