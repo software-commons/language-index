@@ -207,10 +207,10 @@ index 1863d1130f1e65e59a85d98cf28dc0caea911682..1362af915de4c2d8ae94fbd49e8189e9
          for update in ({"integration_id": ACTIONS_APP_ID}, {"integration_id": None}):
 diff --git a/tests/test_review_evidence.py b/tests/test_review_evidence.py
 new file mode 100644
-index 0000000000000000000000000000000000000000..e4ce1a2e7acc151e43704029ab1e5e7930bdb55b
+index 0000000000000000000000000000000000000000..a5c10e2c3f1c7194a45ee633d5d37d95b98a53bd
 --- /dev/null
 +++ b/tests/test_review_evidence.py
-@@ -0,0 +1,351 @@
+@@ -0,0 +1,402 @@
 +"""Synthetic Git-object fixtures for the protected SCES review inputs."""
 +
 +from base64 import b64encode
@@ -335,6 +335,57 @@ index 0000000000000000000000000000000000000000..e4ce1a2e7acc151e43704029ab1e5e79
 +        staged = capture_selected_evidence(self.root, candidate, LANGUAGE)
 +        self.assertEqual(staged, {**inputs, **publication})
 +        self.assertNotIn(UNSELECTED, staged)
++
++    def test_predecessor_must_match_verified_base_even_if_candidate_rehashes_it(self):
++        inputs, publication = fixture()
++        source = self.commit(inputs, "freeze evidence")
++        publication = pin_source(publication, source)
++        path = "sces/releases/archived/qualification.json"
++        original = _canonical({"release": "archived", "fixture": "original"})
++        base = self.commit({path: original}, "retain predecessor in protected history")
++
++        def with_predecessor(blob):
++            report_path = RELEASE + "qualification.json"
++            previous = {"path": path, "sha256": digest(blob)}
++            selection = _canonical({**decode(publication[SELECTION]), "previous_report": previous})
++            report = {**decode(publication[report_path]), "previous_report": previous,
++                      "selection_sha256": digest(selection)}
++            return {**publication, SELECTION: selection, report_path: _canonical(report), path: blob}
++
++        candidate = self.commit(with_predecessor(original), "use the archived predecessor")
++        self.assertEqual(capture_selected_evidence(self.root, candidate, LANGUAGE, base=base)[path], original)
++        with self.assertRaisesRegex(DataError, "requires the exact verified pull-request base"):
++            capture_selected_evidence(self.root, candidate, LANGUAGE)
++        with self.assertRaisesRegex(DataError, "previous report path or blob differs"):
++            capture_selected_evidence(self.root, candidate, LANGUAGE, base=source)
++
++        _git(self.root, "switch", "--quiet", "--detach", base)
++        replacement = _canonical({"release": "archived", "fixture": "replacement"})
++        candidate = self.commit(with_predecessor(replacement), "replace predecessor and recompute the report")
++        with self.assertRaisesRegex(DataError, "previous report path or blob differs"):
++            capture_selected_evidence(self.root, candidate, LANGUAGE, base=base)
++
++    def test_selected_claim_and_inherited_premise_require_independent_execution_pairs(self):
++        for name, execution in (("selected", "selected-research"), ("premise", "premise-research"),
++                                ("premise", ""), ("premise", " ")):
++            with self.subTest(name=name, execution=execution):
++                inputs, publication = fixture()
++                review = f"{name}-review"
++                record_path = f"sces/records/verification/{review}--1.json"
++                row = decode(inputs[record_path])
++                row["run"]["execution"] = execution
++                inputs[record_path] = _canonical(row)
++                source = self.commit(inputs, "freeze evidence with invalid execution pair")
++                publication = pin_source(publication, source)
++                report_path = RELEASE + "qualification.json"
++                report = decode(publication[report_path])
++                report["inputs_sha256"] = digest(_canonical({path: digest(raw) for path, raw in inputs.items()}))
++                for summary in report["verifications"]:
++                    if summary["record"]["id"] == review:
++                        summary.update(execution=execution, record_sha256=digest(inputs[record_path]))
++                candidate = self.commit({**publication, report_path: _canonical(report)}, "qualify matching records")
++                with self.assertRaisesRegex(DataError, "distinct nonempty research and review executions"):
++                    capture_selected_evidence(self.root, candidate, LANGUAGE)
 +
 +    def test_unreferenced_uppercase_file_is_allowed_but_uppercase_descriptor_is_not(self):
 +        inputs, publication = fixture()
@@ -563,7 +614,7 @@ index 0000000000000000000000000000000000000000..e4ce1a2e7acc151e43704029ab1e5e79
 +            with self.assertRaisesRegex(DataError, "retrieval could not complete"):
 +                _fetch_frozen_records(REPOSITORY, commit, expected, len(raw))
 diff --git a/tests/test_review_gate.py b/tests/test_review_gate.py
-index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..af3aa5f6d474ab963291ad85ffb7ca1ec7178a1d 100644
+index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..ea2bd491bdd2e39c665614c3cbff5fc210f6a4e0 100644
 --- a/tests/test_review_gate.py
 +++ b/tests/test_review_gate.py
 @@ -2,7 +2,7 @@
@@ -971,7 +1022,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..af3aa5f6d474ab963291ad85ffb7ca1e
 +                    result = run(args, github)
 +                self.assertEqual(language.call_count, int(target.bind_sces))
 +                self.assertEqual(controls.call_count, 1)
-+                self.capture_selected.assert_called_with(capture.call_args.args[1], pull.merge, target)
++                self.capture_selected.assert_called_with(capture.call_args.args[1], pull.merge, target, base=pull.base)
 +                self.assertEqual(result["status"], "reviewed-locally")
 +                self.assertEqual(result["binding"]["sces_evidence"]["selected_artifacts"],
 +                                 {path: sha256(raw).hexdigest() for path, raw in selected.items()})
@@ -1881,10 +1932,10 @@ index d213d62143ea097a48f01697f606e7c61a21ee10..f4e6d504992e6e3dcee47ebfe9bdb873
 
 diff --git a/tools/review_evidence.py b/tools/review_evidence.py
 new file mode 100644
-index 0000000000000000000000000000000000000000..76a5d1d3767d5a15eddbd8ff3c7a31896782c1c1
+index 0000000000000000000000000000000000000000..0f4dfe91e0f33f55ba46f7f2bf1a3f13da8c32b8
 --- /dev/null
 +++ b/tools/review_evidence.py
-@@ -0,0 +1,390 @@
+@@ -0,0 +1,398 @@
 +"""Capture the active SCES publication inputs as inert bytes from a reviewed Git tree."""
 +
 +from base64 import b64decode, b64encode
@@ -2140,6 +2191,9 @@ index 0000000000000000000000000000000000000000..76a5d1d3767d5a15eddbd8ff3c7a3189
 +                         or records[candidates[-2]]["run"]["completed"] != records[chosen]["run"]["completed"]),
 +                    "selected SCES claim lacks current independent verification")
 +            current.append(chosen)
++        research, review = (records[key]["run"]["execution"] for key in current)
++        require(all(isinstance(value, str) and value and value == value.strip() for value in (research, review))
++                and research != review, "selected SCES claim requires distinct nonempty research and review executions")
 +        active[identity] = current
 +        for dependency in edges[identity]:
 +            row = records[dependency]
@@ -2188,7 +2242,7 @@ index 0000000000000000000000000000000000000000..76a5d1d3767d5a15eddbd8ff3c7a3189
 +    return records, edges, active, used, artifacts
 +
 +
-+def _selected_evidence(directory, paths, target):
++def _selected_evidence(directory, paths, target, base):
 +    metadata = _blobs(directory, paths, [_ADOPTION, _SELECTION], limit=_MAX_EVIDENCE)
 +    adoption = decode(metadata[_ADOPTION])
 +    selection = decode(metadata[_SELECTION])
@@ -2253,6 +2307,11 @@ index 0000000000000000000000000000000000000000..76a5d1d3767d5a15eddbd8ff3c7a3189
 +        path = predecessor["path"]
 +        require(isinstance(path, str) and re.fullmatch(r"sces/releases/[a-z][a-z0-9-]*/qualification\.json", path)
 +                and path != report_path, "invalid SCES previous report path")
++        require(isinstance(base, str) and re.fullmatch(r"[0-9a-f]{40}", base),
++                "SCES previous report requires the exact verified pull-request base")
++        base_paths = _inventory(directory, base, path)
++        require(path in paths and base_paths.get(path) == paths[path],
++                "SCES previous report path or blob differs from the verified pull-request base")
 +        metadata.update(_blobs(directory, paths, [path], limit=_MAX_EVIDENCE))
 +        require(_digest(metadata[path]) == predecessor["sha256"], "SCES previous report digest mismatch")
 +    staged = {**metadata, **evidence}
@@ -2260,7 +2319,7 @@ index 0000000000000000000000000000000000000000..76a5d1d3767d5a15eddbd8ff3c7a3189
 +    return dict(sorted(staged.items()))
 +
 +
-+def capture_selected_evidence(directory, commit, target):
++def capture_selected_evidence(directory, commit, target, *, base=None):
 +    """Return exact selected bytes, or an empty mapping when there is no active publication."""
 +    try:
 +        selection = _git(directory, "ls-tree", "-z", commit, "--", _SELECTION)
@@ -2270,13 +2329,13 @@ index 0000000000000000000000000000000000000000..76a5d1d3767d5a15eddbd8ff3c7a3189
 +                "SCES publication selection is not a regular, non-executable blob")
 +        require(TARGETS.get(target.repository) == target, "SCES review repository is outside the allowlist")
 +        paths = _inventory(directory, commit, "sces")
-+        return _selected_evidence(directory, paths, target)
++        return _selected_evidence(directory, paths, target, base)
 +    except (KeyError, TypeError, ValueError, UnicodeError, RecursionError) as error:
 +        if isinstance(error, DataError):
 +            raise
 +        raise DataError(f"could not capture the active SCES publication evidence: {error}") from error
 diff --git a/tools/review_gate.py b/tools/review_gate.py
-index 46c36046f0bc7015d9fef4bb287659a424941a21..3a4cf8025d35c02f74184283a0bcf79416be76a9 100644
+index 46c36046f0bc7015d9fef4bb287659a424941a21..eb43fcae662d82a280f3dbb4b58b7772aa913de5 100644
 --- a/tools/review_gate.py
 +++ b/tools/review_gate.py
 @@ -5,6 +5,7 @@ from __future__ import annotations
@@ -2518,7 +2577,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..3a4cf8025d35c02f74184283a0bcf794
 +        controls = capture_control_paths(checkout, snapshot)
 +        if snapshot.target.bind_sces:
 +            evidence, staged = capture_sces(checkout, snapshot.merge)
-+        selected = capture_selected_evidence(checkout, snapshot.merge, snapshot.target)
++        selected = capture_selected_evidence(checkout, snapshot.merge, snapshot.target, base=snapshot.base)
 +        if snapshot.target.bind_sces:
 +            require(bool(selected) == ("sces/publication.json" in staged),
 +                    "SCES metadata and selected evidence disagree about active publication")
