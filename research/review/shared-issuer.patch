@@ -207,10 +207,10 @@ index 1863d1130f1e65e59a85d98cf28dc0caea911682..1362af915de4c2d8ae94fbd49e8189e9
          for update in ({"integration_id": ACTIONS_APP_ID}, {"integration_id": None}):
 diff --git a/tests/test_review_evidence.py b/tests/test_review_evidence.py
 new file mode 100644
-index 0000000000000000000000000000000000000000..a5c10e2c3f1c7194a45ee633d5d37d95b98a53bd
+index 0000000000000000000000000000000000000000..c6e831fd3c3815d9100f64a5b7f39aa52967034f
 --- /dev/null
 +++ b/tests/test_review_evidence.py
-@@ -0,0 +1,402 @@
+@@ -0,0 +1,466 @@
 +"""Synthetic Git-object fixtures for the protected SCES review inputs."""
 +
 +from base64 import b64encode
@@ -306,6 +306,20 @@ index 0000000000000000000000000000000000000000..a5c10e2c3f1c7194a45ee633d5d37d95
 +    return {**publication, SELECTION: selection, report_path: _canonical(report)}
 +
 +
++def select_release(publication, slug, predecessor=None):
++    selection = {**decode(publication[SELECTION]), "release": slug}
++    report = {**decode(publication[RELEASE + "qualification.json"]), "release": slug}
++    if predecessor is not None:
++        selection["previous_report"] = report["previous_report"] = predecessor
++    selection_bytes = _canonical(selection)
++    claims = publication[RELEASE + "claims.json"]
++    release_path = f"sces/releases/{slug}/"
++    report["selection_sha256"] = digest(selection_bytes)
++    report["artifacts"] = [{"path": release_path + "claims.json", "sha256": digest(claims)}]
++    return {SELECTION: selection_bytes, release_path + "claims.json": claims,
++            release_path + "qualification.json": _canonical(report)}
++
++
 +class CaptureSelectedEvidenceTests(unittest.TestCase):
 +    def setUp(self):
 +        temp = TemporaryDirectory()
@@ -323,6 +337,10 @@ index 0000000000000000000000000000000000000000..a5c10e2c3f1c7194a45ee633d5d37d95
 +             config=("user.name=Synthetic review fixture", "user.email=fixture@example.invalid", "commit.gpgsign=false"))
 +        return _git(self.root, "rev-parse", "HEAD").decode("ascii").strip()
 +
++    def capture(self, candidate):
++        base = _git(self.root, "rev-parse", candidate + "^1").decode("ascii").strip()
++        return capture_selected_evidence(self.root, candidate, LANGUAGE, base=base)
++
 +    def test_selection_only_commit_stages_unchanged_closure_but_no_unrelated_records(self):
 +        inputs, publication = fixture()
 +        baseline = self.commit({**inputs, UNSELECTED: _canonical(ref("claim", "unselected"))}, "inherited evidence")
@@ -332,43 +350,87 @@ index 0000000000000000000000000000000000000000..a5c10e2c3f1c7194a45ee633d5d37d95
 +        changed = _git(self.root, "diff", "--name-only", baseline, candidate).decode().splitlines()
 +        self.assertNotIn(CLAIM, changed)
 +        self.assertNotIn(REVIEW, changed)
-+        staged = capture_selected_evidence(self.root, candidate, LANGUAGE)
++        staged = self.capture(candidate)
 +        self.assertEqual(staged, {**inputs, **publication})
 +        self.assertNotIn(UNSELECTED, staged)
 +
-+    def test_predecessor_must_match_verified_base_even_if_candidate_rehashes_it(self):
++    def test_successor_requires_the_direct_base_report_at_its_unchanged_bytes(self):
 +        inputs, publication = fixture()
 +        source = self.commit(inputs, "freeze evidence")
 +        publication = pin_source(publication, source)
-+        path = "sces/releases/archived/qualification.json"
-+        original = _canonical({"release": "archived", "fixture": "original"})
-+        base = self.commit({path: original}, "retain predecessor in protected history")
++        older_path = "sces/releases/older/qualification.json"
++        older = select_release(publication, "older")
++        self.commit(older, "publish an older release")
++        older_link = {"path": older_path, "sha256": digest(older[older_path])}
++        current = select_release(publication, "current", older_link)
++        base = self.commit(current, "publish the direct predecessor")
++        path = "sces/releases/current/qualification.json"
++        original = current[path]
++        direct_link = {"path": path, "sha256": digest(original)}
++        successor = select_release(publication, "test-release", direct_link)
++        candidate = self.commit(successor, "use the direct predecessor")
++        self.assertEqual(self.capture(candidate)[path], original)
++        unchanged = self.commit({"sces/artifacts/unrelated.txt": b"unrelated\n"}, "preserve active selection")
++        self.assertEqual(self.capture(unchanged)[path], original)
 +
-+        def with_predecessor(blob):
-+            report_path = RELEASE + "qualification.json"
-+            previous = {"path": path, "sha256": digest(blob)}
-+            selection = _canonical({**decode(publication[SELECTION]), "previous_report": previous})
-+            report = {**decode(publication[report_path]), "previous_report": previous,
-+                      "selection_sha256": digest(selection)}
-+            return {**publication, SELECTION: selection, report_path: _canonical(report), path: blob}
++        _git(self.root, "switch", "--quiet", "--detach", candidate)
++        rewrite = self.commit(select_release(publication, "test-release", older_link), "change active lineage")
++        with self.assertRaisesRegex(DataError, "active publication selection differs"):
++            self.capture(rewrite)
 +
-+        candidate = self.commit(with_predecessor(original), "use the archived predecessor")
-+        self.assertEqual(capture_selected_evidence(self.root, candidate, LANGUAGE, base=base)[path], original)
++        replacement = _canonical({**decode(original), "fixture": "replacement"})
++        replacement_link = {"path": path, "sha256": digest(replacement)}
++        for link, extra, message in (
++            (None, {}, "successor must identify the verified base release"),
++            (older_link, {}, "successor must identify the verified base release"),
++            (replacement_link, {path: replacement}, "previous report path or blob differs"),
++        ):
++            with self.subTest(link=link):
++                _git(self.root, "switch", "--quiet", "--detach", base)
++                candidate = self.commit({**select_release(publication, "test-release", link), **extra},
++                                        "write successor with matching internal hashes")
++                with self.assertRaisesRegex(DataError, message):
++                    self.capture(candidate)
++
++    def test_inactive_base_requires_an_exact_withdrawal_advisory_for_archived_lineage(self):
++        inputs, publication = fixture()
++        source = self.commit(inputs, "freeze evidence")
++        publication = pin_source(publication, source)
++        archived = select_release(publication, "withdrawn")
++        path = "sces/releases/withdrawn/qualification.json"
++        advisory = "sces/advisories/withdrawn.json"
++        link = {"path": path, "sha256": digest(archived[path])}
++        successor = select_release(publication, "test-release", link)
++        del archived[SELECTION]
++        unadvised = self.commit(archived, "archive report without withdrawal advisory")
++        candidate = self.commit(successor, "claim unadvised archived lineage")
++        with self.assertRaisesRegex(DataError, "requires an unchanged withdrawal advisory"):
++            self.capture(candidate)
++
++        advice = {"report": link, "affected": [ref("claim", "selected")], "reason": "Synthetic withdrawal",
++                  "recorded": "2026-10-01T00:00:00Z"}
++        _git(self.root, "switch", "--quiet", "--detach", unadvised)
++        unbound = {**advice, "report": {**link, "sha256": "f" * 64}}
++        self.commit({advisory: _canonical(unbound)}, "archive advisory with a different subject digest")
++        candidate = self.commit(successor, "claim lineage to an unbound archived report")
++        with self.assertRaisesRegex(DataError, "withdrawal advisory does not bind the archived predecessor"):
++            self.capture(candidate)
++
++        _git(self.root, "switch", "--quiet", "--detach", unadvised)
++        self.commit({advisory: _canonical(advice)}, "record withdrawal on the protected base")
++        candidate = self.commit(successor, "link to the advised withdrawn archive")
++        captured = self.capture(candidate)
++        self.assertEqual(captured[path], archived[path])
++        self.assertEqual(captured[advisory], _canonical(advice))
 +        with self.assertRaisesRegex(DataError, "requires the exact verified pull-request base"):
 +            capture_selected_evidence(self.root, candidate, LANGUAGE)
-+        with self.assertRaisesRegex(DataError, "previous report path or blob differs"):
-+            capture_selected_evidence(self.root, candidate, LANGUAGE, base=source)
-+
-+        _git(self.root, "switch", "--quiet", "--detach", base)
-+        replacement = _canonical({"release": "archived", "fixture": "replacement"})
-+        candidate = self.commit(with_predecessor(replacement), "replace predecessor and recompute the report")
-+        with self.assertRaisesRegex(DataError, "previous report path or blob differs"):
-+            capture_selected_evidence(self.root, candidate, LANGUAGE, base=base)
 +
 +    def test_selected_claim_and_inherited_premise_require_independent_execution_pairs(self):
++        baseline = self.commit({"sces/artifacts/fixture.txt": b"fixture\n"}, "prepare independent fixtures")
 +        for name, execution in (("selected", "selected-research"), ("premise", "premise-research"),
 +                                ("premise", ""), ("premise", " ")):
 +            with self.subTest(name=name, execution=execution):
++                _git(self.root, "switch", "--quiet", "--detach", baseline)
 +                inputs, publication = fixture()
 +                review = f"{name}-review"
 +                record_path = f"sces/records/verification/{review}--1.json"
@@ -385,7 +447,7 @@ index 0000000000000000000000000000000000000000..a5c10e2c3f1c7194a45ee633d5d37d95
 +                        summary.update(execution=execution, record_sha256=digest(inputs[record_path]))
 +                candidate = self.commit({**publication, report_path: _canonical(report)}, "qualify matching records")
 +                with self.assertRaisesRegex(DataError, "distinct nonempty research and review executions"):
-+                    capture_selected_evidence(self.root, candidate, LANGUAGE)
++                    self.capture(candidate)
 +
 +    def test_unreferenced_uppercase_file_is_allowed_but_uppercase_descriptor_is_not(self):
 +        inputs, publication = fixture()
@@ -394,14 +456,14 @@ index 0000000000000000000000000000000000000000..a5c10e2c3f1c7194a45ee633d5d37d95
 +        baseline = self.commit({**inputs, readme: document}, "freeze evidence and historical documentation")
 +        publication = pin_source(publication, baseline)
 +        candidate = self.commit(publication, "select existing lowercase artifact paths")
-+        self.assertEqual(capture_selected_evidence(self.root, candidate, LANGUAGE), {**inputs, **publication})
++        self.assertEqual(self.capture(candidate), {**inputs, **publication})
 +
 +        source_path = "sces/records/source/original--1.json"
 +        source = decode(inputs[source_path])
 +        source["artifact"] = {"path": readme, "sha256": digest(document)}
 +        invalid = self.commit({source_path: _canonical(source)}, "try uppercase artifact declaration")
 +        with self.assertRaisesRegex(DataError, "invalid SCES artifact reference"):
-+            capture_selected_evidence(self.root, invalid, LANGUAGE)
++            self.capture(invalid)
 +
 +    def test_tree_inventory_rejects_unsafe_colliding_or_nonregular_paths(self):
 +        def row(path, mode=b"100644"):
@@ -422,11 +484,11 @@ index 0000000000000000000000000000000000000000..a5c10e2c3f1c7194a45ee633d5d37d95
 +        publication = pin_source(publication, self.commit(inputs, "freeze incomplete evidence"))
 +        candidate = self.commit({**inputs, **publication}, "omit inherited verification")
 +        with self.assertRaisesRegex(DataError, "lacks current independent verification"):
-+            capture_selected_evidence(self.root, candidate, LANGUAGE)
++            self.capture(candidate)
 +        correct, _ = fixture()
 +        candidate = self.commit({REVIEW: correct[REVIEW], SOURCE_ARTIFACT: b"wrong citation bytes"}, "alter citation")
 +        with self.assertRaisesRegex(DataError, "selected artifact digest mismatch"):
-+            capture_selected_evidence(self.root, candidate, LANGUAGE)
++            self.capture(candidate)
 +
 +    def test_qualification_cannot_omit_review_or_claim_dependencies(self):
 +        inputs, publication = fixture()
@@ -436,7 +498,7 @@ index 0000000000000000000000000000000000000000..a5c10e2c3f1c7194a45ee633d5d37d95
 +        report["verifications"].pop()
 +        candidate = self.commit({**inputs, **publication, path: _canonical(report)}, "omit verification in report")
 +        with self.assertRaisesRegex(DataError, "omits or changes selected verification records"):
-+            capture_selected_evidence(self.root, candidate, LANGUAGE)
++            self.capture(candidate)
 +        report = decode(publication[path])
 +        claims_path = RELEASE + "claims.json"
 +        incomplete = decode(publication[claims_path])
@@ -445,7 +507,7 @@ index 0000000000000000000000000000000000000000..a5c10e2c3f1c7194a45ee633d5d37d95
 +        report["artifacts"][0]["sha256"] = digest(altered)
 +        candidate = self.commit({path: _canonical(report), claims_path: altered}, "omit dependency in payload")
 +        with self.assertRaisesRegex(DataError, "omits or changes selected evidence"):
-+            capture_selected_evidence(self.root, candidate, LANGUAGE)
++            self.capture(candidate)
 +
 +    def test_qualification_rejects_additional_artifacts_even_when_present_and_digest_matched(self):
 +        inputs, publication = fixture()
@@ -458,7 +520,7 @@ index 0000000000000000000000000000000000000000..a5c10e2c3f1c7194a45ee633d5d37d95
 +        candidate = self.commit({**publication, report_path: _canonical(report), extra_path: extra},
 +                                "add an unsupported release artifact")
 +        with self.assertRaisesRegex(DataError, "do not bind the exact publication"):
-+            capture_selected_evidence(self.root, candidate, LANGUAGE)
++            self.capture(candidate)
 +
 +    def test_self_consistent_candidate_rejects_changed_frozen_input(self):
 +        inputs, publication = fixture()
@@ -477,7 +539,7 @@ index 0000000000000000000000000000000000000000..a5c10e2c3f1c7194a45ee633d5d37d95
 +        candidate = self.commit({**publication, **replacements, report_path: _canonical(report)},
 +                                "rewrite a frozen artifact and recompute its candidate digests")
 +        with self.assertRaisesRegex(DataError, "selected artifact descriptors differ from the frozen source commit"):
-+            capture_selected_evidence(self.root, candidate, LANGUAGE)
++            self.capture(candidate)
 +
 +    def test_self_consistent_candidate_cannot_omit_an_inherited_frozen_dependency(self):
 +        inputs, publication = fixture()
@@ -491,7 +553,7 @@ index 0000000000000000000000000000000000000000..a5c10e2c3f1c7194a45ee633d5d37d95
 +        (self.root / omitted).unlink()
 +        candidate = self.commit(publication, "select the smaller candidate with recomputed report")
 +        with self.assertRaisesRegex(DataError, "selected record membership differs from the frozen source commit"):
-+            capture_selected_evidence(self.root, candidate, LANGUAGE)
++            self.capture(candidate)
 +
 +    def test_same_closure_does_not_allow_a_different_frozen_record_blob(self):
 +        inputs, publication = fixture()
@@ -503,7 +565,7 @@ index 0000000000000000000000000000000000000000..a5c10e2c3f1c7194a45ee633d5d37d95
 +        candidate = self.commit({**publication, CLAIM: changed[CLAIM], report_path: _canonical(report)},
 +                                "change a record's bytes without changing the selected closure")
 +        with self.assertRaisesRegex(DataError, f"differs from its frozen source commit: {CLAIM}"):
-+            capture_selected_evidence(self.root, candidate, LANGUAGE)
++            self.capture(candidate)
 +
 +    def test_shallow_capture_fetches_only_the_missing_frozen_sha_from_the_approved_remote(self):
 +        inputs, publication = fixture()
@@ -511,6 +573,7 @@ index 0000000000000000000000000000000000000000..a5c10e2c3f1c7194a45ee633d5d37d95
 +        baseline = self.commit({**inputs, UNSELECTED: unrelated}, "freeze evidence with an unrelated record")
 +        publication = pin_source(publication, baseline)
 +        (self.root / UNSELECTED).unlink()
++        base = self.commit({}, "retain the exact base separately from frozen evidence")
 +        candidate = self.commit(publication, "publish frozen evidence")
 +        _git(self.root, "config", "uploadpack.allowFilter", "true")
 +        _git(self.root, "config", "uploadpack.allowReachableSHA1InWant", "true")
@@ -518,7 +581,7 @@ index 0000000000000000000000000000000000000000..a5c10e2c3f1c7194a45ee633d5d37d95
 +        self.addCleanup(temp.cleanup)
 +        shallow = Path(temp.name).resolve()
 +        _git(shallow, "init", "--bare", "--quiet", "--template=")
-+        _git(shallow, "fetch", "--quiet", "--depth=1", self.root.resolve().as_uri(), candidate)
++        _git(shallow, "fetch", "--quiet", "--depth=2", self.root.resolve().as_uri(), candidate)
 +        with self.assertRaises(SnapshotError):
 +            _git(shallow, "cat-file", "-t", baseline)
 +        unrelated_oid = _blob_hash(unrelated, "sha1")
@@ -544,7 +607,8 @@ index 0000000000000000000000000000000000000000..a5c10e2c3f1c7194a45ee633d5d37d95
 +        with (patch("tools.review_evidence._git", side_effect=local_git),
 +              patch("tools.review_snapshot._isolated_git_environment", return_value=old_git_environment),
 +              patch("tools.review_evidence._fetch_frozen_records", side_effect=obtain_missing) as fallback):
-+            self.assertEqual(capture_selected_evidence(shallow, candidate, LANGUAGE), {**inputs, **publication})
++            self.assertEqual(capture_selected_evidence(shallow, candidate, LANGUAGE, base=base),
++                             {**inputs, **publication})
 +        fallback.assert_called_once()
 +        (args, config), = fetches
 +        self.assertEqual(args[-2:], (remote_url(LANGUAGE), baseline))
@@ -614,7 +678,7 @@ index 0000000000000000000000000000000000000000..a5c10e2c3f1c7194a45ee633d5d37d95
 +            with self.assertRaisesRegex(DataError, "retrieval could not complete"):
 +                _fetch_frozen_records(REPOSITORY, commit, expected, len(raw))
 diff --git a/tests/test_review_gate.py b/tests/test_review_gate.py
-index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..ea2bd491bdd2e39c665614c3cbff5fc210f6a4e0 100644
+index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..9888a38d0e9edfa3e75e204de99b9b3baa2ee648 100644
 --- a/tests/test_review_gate.py
 +++ b/tests/test_review_gate.py
 @@ -2,7 +2,7 @@
@@ -844,7 +908,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..ea2bd491bdd2e39c665614c3cbff5fc2
      def test_accepts_only_complete_bound_verdicts(self):
          execution, verdict = review_result(make_trace(), BINDING, "abc", PATCH)
          self.assertEqual(execution, EXECUTION)
-@@ -86,40 +242,265 @@ class ReviewGateTests(unittest.TestCase):
+@@ -86,40 +242,275 @@ class ReviewGateTests(unittest.TestCase):
              self.assertIsNone(APP_TOKEN.fullmatch(token))
 
      def test_issuer_refuses_unverified_repository_scope_before_writing(self):
@@ -1042,6 +1106,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..ea2bd491bdd2e39c665614c3cbff5fc2
 +
 +    def test_language_final_check_binds_active_queue_and_sces_objects(self):
 +        pull = replace(SNAPSHOT, repository_id=LANGUAGE.repository_id, target=LANGUAGE)
++        queue = {**QUEUE, "domain_workflow_blob": "8" * 40}
 +        artifact = b'{"repository":"software-commons/language-index"}\n'
 +        captured = ({"tree": "e" * 40}, {"sces/adoption.json": artifact})
 +        with TemporaryDirectory() as directory:
@@ -1057,7 +1122,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..ea2bd491bdd2e39c665614c3cbff5fc2
 +
 +            def inspect(_codex, _model, input_dir, _schema, _audit, *, reviewer):
 +                bound = json.loads((input_dir / "review-input.json").read_bytes())
-+                self.assertEqual(bound["queue_ci"], QUEUE)
++                self.assertEqual(bound["queue_ci"], queue)
 +                self.assertEqual(bound["test_merge"], pull.merge)
 +                self.assertEqual(bound["sces_review_files"], {"sces-00001.data": "sces/adoption.json"})
 +                files = {name: (input_dir / name).read_bytes() for name in bound["sces_review_files"]}
@@ -1077,14 +1142,24 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..ea2bd491bdd2e39c665614c3cbff5fc2
 +
 +            with (patch("tools.review_gate.require_queue_rules", return_value=LANGUAGE_POLICY.approval) as protections,
 +                  patch("tools.review_gate.validate_control_authorization", return_value=AUTHORIZATION) as verify_owner,
-+                  patch("tools.review_gate.capture_queue_observation", return_value=QUEUE) as observation,
++                  patch("tools.review_gate.capture_queue_observation", return_value=queue) as observation,
 +                  patch("tools.review_gate.capture_diff", return_value=("e" * 40, PATCH)),
++                  patch("tools.review_gate.capture_domain_workflow_blob", return_value="9" * 40) as workflow,
 +                  patch("tools.review_gate.capture_sces", return_value=captured) as evidence,
 +                  patch("tools.review_gate.capture_control_paths", return_value=["tools/index.py"]),
 +                  patch("tools.review_gate.protected_staging", return_value=state),
 +                  patch("tools.review_gate.share_reviewer_inputs"),
-+                  patch("tools.review_gate.launch_review", side_effect=inspect),
++                  patch("tools.review_gate.launch_review", side_effect=inspect) as launch,
 +                  patch("tools.review_gate.GitHub", return_value=scope) as client):
++                credential = Mock()
++                with self.assertRaisesRegex(DataError, "Domain workflow blob differs"):
++                    run(args, github, token_input=credential, publisher=publish)
++                workflow.assert_called_once()
++                self.assertEqual(workflow.call_args.args[1], queue["merge"])
++                launch.assert_not_called()
++                credential.assert_not_called()
++                self.assertEqual(issued, [])
++                workflow.return_value = queue["domain_workflow_blob"]
 +                with self.assertRaisesRegex(DataError, "list only the configured review repository"):
 +                    run(args, github, token_input=lambda: STATELESS_TOKEN, publisher=publish)
 +                self.assertEqual(issued, [])
@@ -1098,8 +1173,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..ea2bd491bdd2e39c665614c3cbff5fc2
 +                            run(args, github, token_input=lambda: STATELESS_TOKEN, publisher=publish)
 +                        self.assertEqual(issued, [])
 +                github.get_pull.side_effect = None
-+                observation.side_effect = [QUEUE, {**QUEUE, "merge": "f" * 40}]
-+                credential = Mock()
++                observation.side_effect = [queue, {**queue, "domain_workflow_blob": "f" * 40}]
 +                with self.assertRaisesRegex(DataError, "queue candidate or CI evidence changed"):
 +                    run(args, github, token_input=credential, publisher=publish)
 +                credential.assert_not_called()
@@ -1138,7 +1212,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..ea2bd491bdd2e39c665614c3cbff5fc2
              def respond(_, payload, *, check_id=None):
                  return api_check({"name": CHECK_NAME, "head_sha": QUEUE["merge"],
                                    "external_id": publisher.call_args_list[-2].args[1]["external_id"],
-@@ -142,7 +523,7 @@ class ReviewGateTests(unittest.TestCase):
+@@ -142,7 +533,7 @@ class ReviewGateTests(unittest.TestCase):
                    patch("tools.review_gate.launch_review", side_effect=fake_launch)):
                  result = run(args, github, token_input=lambda: STATELESS_TOKEN, publisher=publisher)
                  self.assertEqual(result["status"], "check-issued")
@@ -1147,7 +1221,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..ea2bd491bdd2e39c665614c3cbff5fc2
                  scope._get_json.assert_called_once_with(SCOPE_PATH)
                  first, last = publisher.call_args_list
                  self.assertEqual(first.args[0], STATELESS_TOKEN)
-@@ -186,49 +567,54 @@ class ReviewGateTests(unittest.TestCase):
+@@ -186,49 +577,54 @@ class ReviewGateTests(unittest.TestCase):
                  publisher.assert_not_called()
 
      def test_queue_admission_targets_only_the_head_and_records_its_purpose(self):
@@ -1229,7 +1303,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..ea2bd491bdd2e39c665614c3cbff5fc2
 
      def test_wrong_source_and_stale_returned_checks_are_rejected(self):
          payload = {"name": CHECK_NAME, "head_sha": SNAPSHOT.merge,
-@@ -257,9 +643,9 @@ class ReviewGateTests(unittest.TestCase):
+@@ -257,9 +653,9 @@ class ReviewGateTests(unittest.TestCase):
              state = Path(directory)
              args = SimpleNamespace(state_dir=state, mode="review", pull=1, model="fixture", codex=Path("fixture"),
                                     app_id=123, reviewer=Reviewer(4001, 4002, state / "reviewer-home"),
@@ -1241,7 +1315,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..ea2bd491bdd2e39c665614c3cbff5fc2
              github.get_pull.return_value = SNAPSHOT
              credential = Mock()
              publisher = Mock()
-@@ -277,9 +663,9 @@ class ReviewGateTests(unittest.TestCase):
+@@ -277,9 +673,9 @@ class ReviewGateTests(unittest.TestCase):
              state = Path(directory)
              args = SimpleNamespace(state_dir=state, mode="review", pull=1, model="fixture", codex=Path("fixture"),
                                     app_id=123, reviewer=Reviewer(4001, 4002, state / "reviewer-home"),
@@ -1253,7 +1327,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..ea2bd491bdd2e39c665614c3cbff5fc2
              github.get_pull.return_value = SNAPSHOT
              credential = Mock()
              publisher = Mock()
-@@ -352,7 +738,8 @@ class ReviewGateTests(unittest.TestCase):
+@@ -352,7 +748,8 @@ class ReviewGateTests(unittest.TestCase):
                  token = json.loads((input_dir / "review-input.json").read_bytes())["inspection_token"]
                  return make_trace(token)
 
@@ -1263,7 +1337,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..ea2bd491bdd2e39c665614c3cbff5fc2
                    patch("tools.review_gate.GitHub", return_value=github),
                    patch("tools.review_gate.capture_diff", return_value=("e" * 40, PATCH)) as capture,
                    patch("tools.review_gate.protected_staging", return_value=root),
-@@ -378,6 +765,46 @@ class ReviewGateTests(unittest.TestCase):
+@@ -378,6 +775,46 @@ class ReviewGateTests(unittest.TestCase):
              self.assertEqual(result["decision_sha256"], sha256(decision).hexdigest())
              self.assertFalse((Path(result["audit"]) / "issued-check.json").exists())
 
@@ -1310,7 +1384,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..ea2bd491bdd2e39c665614c3cbff5fc2
      @unittest.skipUnless(os.name == "posix", "issuer deployment requires POSIX permissions")
      def test_protected_issuer_config_rejects_unpinned_runner_and_shared_permissions(self):
          with TemporaryDirectory() as directory:
-@@ -387,6 +814,7 @@ class ReviewGateTests(unittest.TestCase):
+@@ -387,6 +824,7 @@ class ReviewGateTests(unittest.TestCase):
              config = root / "review.json"
              settings = {
                  "app_id": 123, "audit_dir": str(root), "codex": str(codex), "model": "fixture",
@@ -1318,7 +1392,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..ea2bd491bdd2e39c665614c3cbff5fc2
                  "codex_sha256": sha256(codex.read_bytes()).hexdigest(),
                  "reviewer_uid": 4001, "reviewer_gid": 4002, "reviewer_home": str(root / "reviewer-home"),
              }
-@@ -394,9 +822,47 @@ class ReviewGateTests(unittest.TestCase):
+@@ -394,9 +832,47 @@ class ReviewGateTests(unittest.TestCase):
              config.chmod(0o600)
              reviewer = Reviewer(4001, 4002, root / "reviewer-home")
              with patch("tools.review_gate.load_reviewer", return_value=reviewer):
@@ -1367,7 +1441,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..ea2bd491bdd2e39c665614c3cbff5fc2
                  config.chmod(0o640)
                  with self.assertRaisesRegex(DataError, "must be private"):
                      load_issuer(config)
-@@ -410,8 +876,10 @@ class ReviewGateTests(unittest.TestCase):
+@@ -410,8 +886,10 @@ class ReviewGateTests(unittest.TestCase):
                      load_issuer(config)
                  codex.write_bytes(b"synthetic executable")
                  del settings["app_id"]
@@ -1380,27 +1454,34 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..ea2bd491bdd2e39c665614c3cbff5fc2
                      load_issuer(config)
 
 diff --git a/tests/test_review_queue.py b/tests/test_review_queue.py
-index c9398d9c4d4c41121b70db6ebc4af50e93b9f95e..36252d9025d2b269009c3301bf6e179952836c69 100644
+index c9398d9c4d4c41121b70db6ebc4af50e93b9f95e..376b6538b121779a907d67d21871514bb7bfb453 100644
 --- a/tests/test_review_queue.py
 +++ b/tests/test_review_queue.py
-@@ -6,7 +6,7 @@ import unittest
+@@ -5,8 +5,8 @@ from json import dumps
+ import unittest
  from urllib.parse import quote
 
- from tools.review_queue import capture_queue_observation
+-from tools.review_queue import capture_queue_observation
 -from tools.review_snapshot import REPOSITORY, REPOSITORY_ID, PullSnapshot, SnapshotError
++from tools.review_queue import LEGACY_LANGUAGE_DOMAIN_BLOB, capture_queue_observation
 +from tools.review_snapshot import LANGUAGE, REPOSITORY, REPOSITORY_ID, PullSnapshot, SnapshotError
 
 
  PULL = PullSnapshot(REPOSITORY_ID, 17, "a" * 40, "b" * 40, "c" * 40)
-@@ -100,6 +100,37 @@ class QueueObservationTests(unittest.TestCase):
+@@ -100,6 +100,48 @@ class QueueObservationTests(unittest.TestCase):
          self.assertEqual(github.calls, [SCES_RUN, REF_API, RUN_LIST, CHECKS, DOMAIN_JOBS, SCES_JOBS, RUN_LIST, REF_API])
          self.assertIsInstance(dumps(result), str)
 
 +    def test_language_requires_its_own_repository_and_known_domain_layouts(self):
 +        pull = PullSnapshot(LANGUAGE.repository_id, PULL.number, PULL.base, PULL.head, PULL.merge, LANGUAGE)
 +        language_path = f"/repos/{LANGUAGE.repository}"
-+        for registry_tests in (False, True):
-+            with self.subTest(registry_tests=registry_tests):
++        workflow = f"{language_path}/contents/{DOMAIN_PATH}?ref={QUEUE_SHA}"
++        revised = "f" * 40
++        for blob, registry_tests, accepted in (
++            (LEGACY_LANGUAGE_DOMAIN_BLOB, False, True), (revised, True, True),
++            (revised, False, False), (LEGACY_LANGUAGE_DOMAIN_BLOB, True, False),
++        ):
++            with self.subTest(blob=blob, registry_tests=registry_tests):
 +                values = _responses()
 +                domain_jobs = values[DOMAIN_JOBS]["jobs"][:1]
 +                if registry_tests:
@@ -1409,6 +1490,7 @@ index c9398d9c4d4c41121b70db6ebc4af50e93b9f95e..36252d9025d2b269009c3301bf6e1799
 +                values[CHECKS] = _rows("check_runs", [*(_check(job, 1001) for job in domain_jobs),
 +                                                       *values[CHECKS]["check_runs"][4:5]])
 +                responses = {path.replace(ROOT, language_path): value for path, value in values.items()}
++                responses[workflow] = {"path": DOMAIN_PATH, "type": "file", "sha": blob}
 +                for run in [responses[DOMAIN_RUN.replace(ROOT, language_path)],
 +                            responses[SCES_RUN.replace(ROOT, language_path)],
 +                            *responses[RUN_LIST.replace(ROOT, language_path)]["workflow_runs"]]:
@@ -1419,8 +1501,13 @@ index c9398d9c4d4c41121b70db6ebc4af50e93b9f95e..36252d9025d2b269009c3301bf6e1799
 +                        job["check_run_url"] = job["check_run_url"].replace(ROOT, language_path)
 +
 +                github = FixtureGitHub(responses)
++                if not accepted:
++                    with self.assertRaisesRegex(SnapshotError, "missing, unexpected or duplicate jobs"):
++                        capture_queue_observation(github, pull, 11, actions_app_id=APP)
++                    continue
 +                captured = capture_queue_observation(github, pull, 11, actions_app_id=APP)
 +                self.assertEqual(captured["repository_id"], LANGUAGE.repository_id)
++                self.assertEqual(captured["domain_workflow_blob"], blob)
 +                self.assertEqual(set(captured["workflows"][DOMAIN_PATH]["jobs"]), {job["name"] for job in domain_jobs})
 +                self.assertTrue(all(path.startswith(language_path + "/") for path in github.calls))
 +                responses[DOMAIN_RUN.replace(ROOT, language_path)]["repository"] = REPOSITORY_DATA
@@ -1431,7 +1518,7 @@ index c9398d9c4d4c41121b70db6ebc4af50e93b9f95e..36252d9025d2b269009c3301bf6e1799
          for changes in ({"id": 19}, {"event": "push"}, {"path": ".github/workflows/other.yml"},
                          {"path": DOMAIN_PATH + "@main"}, {"head_branch": BRANCH.replace("pr-17-", "pr-18-")},
 diff --git a/tests/test_review_snapshot.py b/tests/test_review_snapshot.py
-index 90a3be09910e0a7e0ef142602fefe7aeb1379c89..3229f5e97b4d58e9e39432d68b9a7ba42ec4d268 100644
+index 90a3be09910e0a7e0ef142602fefe7aeb1379c89..79f28a35db92dca86b61ca7ef39f85a9d7300629 100644
 --- a/tests/test_review_snapshot.py
 +++ b/tests/test_review_snapshot.py
 @@ -1,5 +1,7 @@
@@ -1449,8 +1536,8 @@ index 90a3be09910e0a7e0ef142602fefe7aeb1379c89..3229f5e97b4d58e9e39432d68b9a7ba4
 +from tools.review_authorization import GRANT_PATH
  from tools.review_snapshot import (
 -    REPOSITORY, REPOSITORY_ID, GitHub, PullSnapshot, SnapshotError, capture_diff,
-+    LANGUAGE, LICENSE, REPOSITORY, REPOSITORY_ID, GitHub, PullSnapshot, SnapshotError, capture_control_paths,
-+    capture_diff, capture_sces,
++    DOMAIN_WORKFLOW_PATH, LANGUAGE, LICENSE, REPOSITORY, REPOSITORY_ID, GitHub, PullSnapshot, SnapshotError,
++    capture_control_paths, capture_diff, capture_domain_workflow_blob, capture_sces,
  )
 
 
@@ -1493,7 +1580,7 @@ index 90a3be09910e0a7e0ef142602fefe7aeb1379c89..3229f5e97b4d58e9e39432d68b9a7ba4
              return capture_diff(snapshot, self.root / "snapshot", **options)
 
      def test_captures_exact_complete_diff_without_checking_out(self):
-@@ -111,6 +131,21 @@ class CaptureTests(unittest.TestCase):
+@@ -111,6 +131,34 @@ class CaptureTests(unittest.TestCase):
          with self.assertRaisesRegex(SnapshotError, "changed during capture"):
              self.capture(merge="c" * 40)
 
@@ -1512,10 +1599,23 @@ index 90a3be09910e0a7e0ef142602fefe7aeb1379c89..3229f5e97b4d58e9e39432d68b9a7ba4
 +                snapshot = PullSnapshot(target.repository_id, 1, self.head, head, merge, target)
 +                self.assertEqual(capture_control_paths(self.source, snapshot), [GRANT_PATH])
 +
++    def test_domain_workflow_blob_comes_from_the_exact_git_object(self):
++        workflow = self.source / DOMAIN_WORKFLOW_PATH
++        workflow.parent.mkdir(parents=True)
++        workflow.write_bytes(b"name: Domain\n")
++        self.git("add", "--", DOMAIN_WORKFLOW_PATH)
++        self.git("commit", "--quiet", "-m", "Record an exact Domain workflow blob")
++        commit = self.git("rev-parse", "HEAD")
++        oid = self.git("rev-parse", f"{commit}:{DOMAIN_WORKFLOW_PATH}")
++        workflow.write_bytes(b"name: Different working copy\n")
++        self.assertEqual(capture_domain_workflow_blob(self.source, commit), oid)
++        with self.assertRaisesRegex(SnapshotError, "exact regular Domain workflow blob"):
++            capture_domain_workflow_blob(self.source, self.base)
++
      def test_rejects_ordered_parent_mismatch(self):
          with self.assertRaisesRegex(SnapshotError, "ordered base and head parents"):
              self.capture(head="d" * 40)
-@@ -138,6 +173,45 @@ class CaptureTests(unittest.TestCase):
+@@ -138,6 +186,45 @@ class CaptureTests(unittest.TestCase):
          with self.assertRaisesRegex(SnapshotError, "single-parent"):
              self.capture(head=self.merge, merge=replay, linear_head=True)
 
@@ -1932,10 +2032,10 @@ index d213d62143ea097a48f01697f606e7c61a21ee10..f4e6d504992e6e3dcee47ebfe9bdb873
 
 diff --git a/tools/review_evidence.py b/tools/review_evidence.py
 new file mode 100644
-index 0000000000000000000000000000000000000000..0f4dfe91e0f33f55ba46f7f2bf1a3f13da8c32b8
+index 0000000000000000000000000000000000000000..86c0163dc74b0aeb5ba83a8378e942cc25fd371d
 --- /dev/null
 +++ b/tools/review_evidence.py
-@@ -0,0 +1,398 @@
+@@ -0,0 +1,432 @@
 +"""Capture the active SCES publication inputs as inert bytes from a reviewed Git tree."""
 +
 +from base64 import b64decode, b64encode
@@ -2242,6 +2342,53 @@ index 0000000000000000000000000000000000000000..0f4dfe91e0f33f55ba46f7f2bf1a3f13
 +    return records, edges, active, used, artifacts
 +
 +
++def _selection_tree(directory, commit):
++    raw = _git(directory, "ls-tree", "-z", commit, "--", _SELECTION)
++    if not raw:
++        return {}
++    match = re.fullmatch(rb"100644 blob ([0-9a-f]{40})\tsces/publication\.json\x00", raw)
++    require(match is not None, "SCES publication selection is not a regular, non-executable blob")
++    return {_SELECTION: match[1].decode("ascii")}
++
++
++def _previous_report(directory, paths, base, selection, selection_bytes):
++    require(isinstance(base, str) and re.fullmatch(r"[0-9a-f]{40}", base),
++            "SCES publication requires the exact verified pull-request base")
++    base_selection_tree = _selection_tree(directory, base)
++    predecessor = selection.get("previous_report")
++    if base_selection_tree:
++        base_bytes = _blobs(directory, base_selection_tree, [_SELECTION], limit=_MAX_EVIDENCE)[_SELECTION]
++        base_slug = decode(base_bytes)["release"]
++        require(isinstance(base_slug, str) and _SLUG.fullmatch(base_slug), "invalid SCES base release name")
++        if selection["release"] == base_slug:
++            require(selection_bytes == base_bytes,
++                    "SCES active publication selection differs from the verified pull-request base")
++        else:
++            expected = f"sces/releases/{base_slug}/qualification.json"
++            require(isinstance(predecessor, dict) and predecessor.get("path") == expected,
++                    "SCES successor must identify the verified base release's qualification report")
++    if "previous_report" not in selection:
++        return {}
++    path = predecessor["path"]
++    match = re.fullmatch(r"sces/releases/([a-z][a-z0-9-]*)/qualification\.json", path)
++    require(match is not None and _SLUG.fullmatch(match[1]) and match[1] != selection["release"],
++            "invalid SCES previous report path")
++    advisory = None if base_selection_tree else f"sces/advisories/{match[1]}.json"
++    linked = (path,) if advisory is None else (path, advisory)
++    base_paths = _inventory(directory, base, *linked)
++    require(path in paths and base_paths.get(path) == paths[path],
++            "SCES previous report path or blob differs from the verified pull-request base")
++    if advisory is not None:
++        require(advisory in paths and base_paths.get(advisory) == paths[advisory],
++                "SCES archived predecessor requires an unchanged withdrawal advisory from the verified pull-request base")
++    history = _blobs(directory, paths, linked, limit=_MAX_EVIDENCE)
++    require(_digest(history[path]) == predecessor["sha256"], "SCES previous report digest mismatch")
++    if advisory is not None:
++        require(decode(history[advisory])["report"] == predecessor,
++                "SCES withdrawal advisory does not bind the archived predecessor")
++    return history
++
++
 +def _selected_evidence(directory, paths, target, base):
 +    metadata = _blobs(directory, paths, [_ADOPTION, _SELECTION], limit=_MAX_EVIDENCE)
 +    adoption = decode(metadata[_ADOPTION])
@@ -2263,6 +2410,9 @@ index 0000000000000000000000000000000000000000..0f4dfe91e0f33f55ba46f7f2bf1a3f13
 +            and report["selection_sha256"] == _digest(metadata[_SELECTION])
 +            and report["artifacts"] == [{"path": claims_path, "sha256": _digest(metadata[claims_path])}],
 +            "SCES selection and qualification do not bind the exact publication")
++    require(("previous_report" in report) == ("previous_report" in selection)
++            and report.get("previous_report") == selection.get("previous_report"), "SCES previous report mismatch")
++    metadata.update(_previous_report(directory, paths, base, selection, metadata[_SELECTION]))
 +
 +    selected = [_key(ref, "claim") for ref in selection["claims"]]
 +    require(selected and len({identity[:2] for identity in selected}) == len(selected)
@@ -2301,19 +2451,6 @@ index 0000000000000000000000000000000000000000..0f4dfe91e0f33f55ba46f7f2bf1a3f13
 +    for path in sorted(inputs):
 +        require(frozen.get(path) == paths[path], f"SCES selected input differs from its frozen source commit: {path}")
 +
-+    predecessor = selection.get("previous_report")
-+    require(report.get("previous_report") == predecessor, "SCES previous report mismatch")
-+    if predecessor is not None:
-+        path = predecessor["path"]
-+        require(isinstance(path, str) and re.fullmatch(r"sces/releases/[a-z][a-z0-9-]*/qualification\.json", path)
-+                and path != report_path, "invalid SCES previous report path")
-+        require(isinstance(base, str) and re.fullmatch(r"[0-9a-f]{40}", base),
-+                "SCES previous report requires the exact verified pull-request base")
-+        base_paths = _inventory(directory, base, path)
-+        require(path in paths and base_paths.get(path) == paths[path],
-+                "SCES previous report path or blob differs from the verified pull-request base")
-+        metadata.update(_blobs(directory, paths, [path], limit=_MAX_EVIDENCE))
-+        require(_digest(metadata[path]) == predecessor["sha256"], "SCES previous report digest mismatch")
 +    staged = {**metadata, **evidence}
 +    require(sum(map(len, staged.values())) <= _MAX_EVIDENCE, "SCES selected evidence exceeds the review capture limit")
 +    return dict(sorted(staged.items()))
@@ -2322,11 +2459,8 @@ index 0000000000000000000000000000000000000000..0f4dfe91e0f33f55ba46f7f2bf1a3f13
 +def capture_selected_evidence(directory, commit, target, *, base=None):
 +    """Return exact selected bytes, or an empty mapping when there is no active publication."""
 +    try:
-+        selection = _git(directory, "ls-tree", "-z", commit, "--", _SELECTION)
-+        if not selection:
++        if not _selection_tree(directory, commit):
 +            return {}
-+        require(re.fullmatch(rb"100644 blob [0-9a-f]{40}\tsces/publication\.json\x00", selection),
-+                "SCES publication selection is not a regular, non-executable blob")
 +        require(TARGETS.get(target.repository) == target, "SCES review repository is outside the allowlist")
 +        paths = _inventory(directory, commit, "sces")
 +        return _selected_evidence(directory, paths, target, base)
@@ -2335,7 +2469,7 @@ index 0000000000000000000000000000000000000000..0f4dfe91e0f33f55ba46f7f2bf1a3f13
 +            raise
 +        raise DataError(f"could not capture the active SCES publication evidence: {error}") from error
 diff --git a/tools/review_gate.py b/tools/review_gate.py
-index 46c36046f0bc7015d9fef4bb287659a424941a21..eb43fcae662d82a280f3dbb4b58b7772aa913de5 100644
+index 46c36046f0bc7015d9fef4bb287659a424941a21..f37d36d63b45bd09d287f297a7a60b3ca526de49 100644
 --- a/tools/review_gate.py
 +++ b/tools/review_gate.py
 @@ -5,6 +5,7 @@ from __future__ import annotations
@@ -2346,7 +2480,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..eb43fcae662d82a280f3dbb4b58b7772
  from hashlib import file_digest, sha256
  import json
  import os
-@@ -20,8 +21,13 @@ from urllib.request import Request, build_opener
+@@ -20,8 +21,14 @@ from urllib.request import Request, build_opener
  from uuid import UUID, uuid4
 
  from .records import DataError, NoRedirects, decode, encode, require
@@ -2356,12 +2490,13 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..eb43fcae662d82a280f3dbb4b58b7772
  from .review_queue import capture_queue_observation
 -from .review_snapshot import BASE_REF, REPOSITORY, GitHub, capture_diff, token_is_target_only
 +from .review_snapshot import (
-+    LICENSE, TARGETS, GitHub, capture_control_paths, capture_diff, capture_sces, token_is_target_only,
++    LICENSE, TARGETS, GitHub, capture_control_paths, capture_diff, capture_domain_workflow_blob, capture_sces,
++    token_is_target_only,
 +)
 
  CHECK_NAME = "Software Commons / Codex technical review"
  ACTIONS_APP_ID = 15368
-@@ -46,6 +52,7 @@ REVIEWER_ENV = {
+@@ -46,6 +53,7 @@ REVIEWER_ENV = {
      "SYSTEMROOT", "TEMP", "TMP", "TMPDIR", "USERPROFILE", "WINDIR",
  }
  MAX_TRACE_BYTES = 32 * 1024 * 1024
@@ -2369,7 +2504,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..eb43fcae662d82a280f3dbb4b58b7772
  APP_TOKEN = re.compile(r"ghs_[A-Za-z0-9._-]{36,}")
  RUNTIME_KEYS = {"audit_dir", "codex", "codex_sha256", "model", "reviewer_uid", "reviewer_gid", "reviewer_home"}
 
-@@ -57,6 +64,12 @@ class Reviewer:
+@@ -57,6 +65,12 @@ class Reviewer:
      home: Path
 
 
@@ -2382,7 +2517,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..eb43fcae662d82a280f3dbb4b58b7772
  def save(path, data):
      with path.open("xb") as file:
          file.write(data)
-@@ -69,7 +82,17 @@ def valid_execution(value):
+@@ -69,7 +83,17 @@ def valid_execution(value):
          return False
 
 
@@ -2401,7 +2536,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..eb43fcae662d82a280f3dbb4b58b7772
      """Accept a verdict only from one complete captured Codex execution."""
      require(len(trace) <= MAX_TRACE_BYTES, "review trace exceeds the configured limit")
      events = [decode(line) for line in trace.splitlines() if line.strip()]
-@@ -85,10 +108,13 @@ def review_result(trace, binding, inspection_token, diff):
+@@ -85,10 +109,13 @@ def review_result(trace, binding, inspection_token, diff):
      require(messages, "Codex review did not return a verdict")
      final_position = messages[-1]
      verdict = decode(items[final_position]["text"].encode("utf-8"))
@@ -2417,7 +2552,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..eb43fcae662d82a280f3dbb4b58b7772
              "review verdict does not bind the exact inspected inputs")
      require(verdict["decision"] in {"approve", "changes-required", "inconclusive"}
              and isinstance(verdict["findings"], list)
-@@ -96,10 +122,9 @@ def review_result(trace, binding, inspection_token, diff):
+@@ -96,10 +123,9 @@ def review_result(trace, binding, inspection_token, diff):
              and isinstance(verdict["rationale"], str) and verdict["rationale"].strip(), "invalid review verdict")
      if verdict["decision"] == "inconclusive":
          return execution, verdict
@@ -2431,7 +2566,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..eb43fcae662d82a280f3dbb4b58b7772
      witness = sha256(inspection_token.encode("ascii") + diff).hexdigest()
      patch_lines = {line for line in diff.decode("utf-8", errors="replace").splitlines()
                     if line.startswith(("+", "-", "GIT binary patch", "old mode ", "new mode ",
-@@ -108,6 +133,11 @@ def review_result(trace, binding, inspection_token, diff):
+@@ -108,6 +134,11 @@ def review_result(trace, binding, inspection_token, diff):
      require(any(witness in output.casefold() for output in inspections)
              and any(any(line in patch_lines for line in output.splitlines()) for output in inspections),
              "review trace lacks a successful exact-byte proof and patch body inspection")
@@ -2443,7 +2578,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..eb43fcae662d82a280f3dbb4b58b7772
      require(verdict["decision"] != "approve" or not verdict["findings"], "approval contains material findings")
      return execution, verdict
 
-@@ -145,7 +175,16 @@ def launch_review(codex, model, input_dir, schema, audit_dir, *, reviewer=None):
+@@ -145,7 +176,16 @@ def launch_review(codex, model, input_dir, schema, audit_dir, *, reviewer=None):
          "Account for all portions of the change, including generated records and their validation. "
          "If tooling or context prevents sufficient review, return inconclusive. "
          "Report only material findings. Use approve only if you have sufficient evidence and no material findings. "
@@ -2461,7 +2596,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..eb43fcae662d82a280f3dbb4b58b7772
          "in the rationale. This is technical review only. You have no authority to verify scientific claims or "
          "authorize a release."
      )
-@@ -165,10 +204,11 @@ def verify_issued_check(check, merge, app_id, external_id, status, conclusion=No
+@@ -165,10 +205,11 @@ def verify_issued_check(check, merge, app_id, external_id, status, conclusion=No
              "GitHub returned a stale, failed, or wrong-source review check")
 
 
@@ -2475,7 +2610,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..eb43fcae662d82a280f3dbb4b58b7772
                        headers={"Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json",
                                 "Content-Type": "application/json", "User-Agent": "Software-Commons-Review-Gate",
                                 "X-GitHub-Api-Version": "2022-11-28"})
-@@ -179,8 +219,9 @@ def write_check(token, payload, *, check_id=None):
+@@ -179,8 +220,9 @@ def write_check(token, payload, *, check_id=None):
          raise DataError(f"GitHub check API failed: {error.reason}") from None
 
 
@@ -2487,7 +2622,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..eb43fcae662d82a280f3dbb4b58b7772
      require(isinstance(rules, list) and len(rules) < 100 and all(isinstance(item, dict) for item in rules),
              "GitHub did not return a complete active branch rules view")
      by_type = {}
-@@ -188,6 +229,9 @@ def require_queue_rules(github, app_id):
+@@ -188,6 +230,9 @@ def require_queue_rules(github, app_id):
          by_type.setdefault(item.get("type"), []).append(item)
      require({"pull_request", "deletion", "non_fast_forward"} <= by_type.keys(),
              "mandatory pull requests, branch deletion protection and force-push protection are required")
@@ -2497,7 +2632,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..eb43fcae662d82a280f3dbb4b58b7772
      queue = by_type.get("merge_queue", [])
      require(len(queue) == 1, "App issuance requires a mandatory merge queue")
      parameters = queue[0].get("parameters")
-@@ -212,17 +256,29 @@ def require_queue_rules(github, app_id):
+@@ -212,17 +257,29 @@ def require_queue_rules(github, app_id):
                  bindings[name].append(integration if strict and type(integration) is int else None)
      require(all(bindings[name] == [source] for name, source in expected.items()),
              "required review and CI contexts must each bind their exact integration and enforce strict checks")
@@ -2528,7 +2663,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..eb43fcae662d82a280f3dbb4b58b7772
      pending = publisher(token, {"name": CHECK_NAME, "head_sha": target,
                                  "status": "in_progress", "external_id": decision_digest})
      verify_issued_check(pending, target, app_id, decision_digest, "in_progress")
-@@ -236,7 +292,7 @@ def create_check(snapshot, app_id, token, decision, publisher, verify_fresh, *,
+@@ -236,7 +293,7 @@ def create_check(snapshot, app_id, token, decision, publisher, verify_fresh, *,
              "summary": (
                  f"PR #{snapshot.number}\n\nHead: `{snapshot.head}`\n\nBase: `{snapshot.base}`\n\n"
                  f"Reviewed merge: `{snapshot.merge}`\n\nExecution: `{decision['execution']}`\n\n"
@@ -2537,7 +2672,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..eb43fcae662d82a280f3dbb4b58b7772
              ),
          },
      }, check_id=check_id)
-@@ -245,7 +301,7 @@ def create_check(snapshot, app_id, token, decision, publisher, verify_fresh, *,
+@@ -245,7 +302,7 @@ def create_check(snapshot, app_id, token, decision, publisher, verify_fresh, *,
      return result
 
 
@@ -2546,7 +2681,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..eb43fcae662d82a280f3dbb4b58b7772
      state = args.state_dir.resolve()
      require(state.is_dir(), "configure an existing issuer-owned state directory")
      reviewer = getattr(args, "reviewer", None)
-@@ -254,13 +310,17 @@ def run(args, github, *, token_input=None, publisher=write_check):
+@@ -254,13 +311,17 @@ def run(args, github, *, token_input=None, publisher=write_check):
      admission = getattr(args, "queue_admission", False)
      run_id = getattr(args, "queue_run", None)
      require(not (admission and run_id is not None), "select one review phase")
@@ -2566,7 +2701,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..eb43fcae662d82a280f3dbb4b58b7772
      snapshot = pull
      capture_options = {"linear_head": True} if admission else {}
      if run_id is not None:
-@@ -268,31 +328,85 @@ def run(args, github, *, token_input=None, publisher=write_check):
+@@ -268,31 +329,88 @@ def run(args, github, *, token_input=None, publisher=write_check):
          snapshot = replace(pull, merge=observation["merge"])
          capture_options["queue_ref"] = observation["queue_ref"]
      with TemporaryDirectory(prefix="git-", dir=state) as directory:
@@ -2574,6 +2709,9 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..eb43fcae662d82a280f3dbb4b58b7772
 -    binding = {**asdict(snapshot), "repository": REPOSITORY, "base_ref": BASE_REF,
 +        checkout = Path(directory)
 +        tree, diff = capture_diff(snapshot, checkout, **capture_options)
++        if observation is not None and snapshot.target.bind_sces:
++            require(observation.get("domain_workflow_blob") == capture_domain_workflow_blob(checkout, snapshot.merge),
++                    "Observed Domain workflow blob differs from the exact captured merge group")
 +        controls = capture_control_paths(checkout, snapshot)
 +        if snapshot.target.bind_sces:
 +            evidence, staged = capture_sces(checkout, snapshot.merge)
@@ -2658,7 +2796,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..eb43fcae662d82a280f3dbb4b58b7772
      decision = {"binding": binding, "execution": execution, "model": args.model,
                  "started_at": started_at, "completed_at": completed_at,
                  "trace_sha256": sha256(trace).hexdigest(), "decision": verdict["decision"],
-@@ -308,9 +422,15 @@ def run(args, github, *, token_input=None, publisher=write_check):
+@@ -308,9 +426,15 @@ def run(args, github, *, token_input=None, publisher=write_check):
      if verdict["decision"] != "approve":
          return {**result, "status": verdict["decision"], "findings": verdict["findings"], "rationale": verdict["rationale"]}
      def verify_fresh():
@@ -2675,7 +2813,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..eb43fcae662d82a280f3dbb4b58b7772
          if observation is not None:
              current = capture_queue_observation(github, pull, run_id, actions_app_id=ACTIONS_APP_ID)
              require(current == observation, "merge queue candidate or CI evidence changed after review")
-@@ -320,6 +440,8 @@ def run(args, github, *, token_input=None, publisher=write_check):
+@@ -320,6 +444,8 @@ def run(args, github, *, token_input=None, publisher=write_check):
      if args.app_id is not None:
          # A protected caller, not the reviewer, provides a short-lived installation token.
          installation_token = token_input().strip()
@@ -2684,7 +2822,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..eb43fcae662d82a280f3dbb4b58b7772
          check = create_check(snapshot, args.app_id, installation_token, decision, publisher, verify_fresh,
                               admission=admission)
          save(audit / "issued-check.json", encode(check))
-@@ -378,13 +500,38 @@ def load_issuer(path, *, rehearsal=False):
+@@ -378,13 +504,38 @@ def load_issuer(path, *, rehearsal=False):
      protected_path(path.parent, directory=True)
      protected_path(path, directory=False)
      settings = decode(path.read_bytes())
@@ -2725,7 +2863,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..eb43fcae662d82a280f3dbb4b58b7772
      audit = Path(settings["audit_dir"])
      protected_path(audit, directory=True)
      reviewer = load_reviewer(settings)
-@@ -393,7 +540,7 @@ def load_issuer(path, *, rehearsal=False):
+@@ -393,7 +544,7 @@ def load_issuer(path, *, rehearsal=False):
      with codex.open("rb") as executable:
          require(file_digest(executable, "sha256").hexdigest() == settings["codex_sha256"],
                  "Codex executable differs from the protected issuer pin")
@@ -2734,7 +2872,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..eb43fcae662d82a280f3dbb4b58b7772
 
 
  def load_reviewer(settings):
-@@ -426,24 +573,36 @@ def main(argv=None):
+@@ -426,24 +577,36 @@ def main(argv=None):
      config = parser.add_mutually_exclusive_group()
      config.add_argument("--issuer-config", type=Path, help="protected issuer configuration, installation token read from stdin")
      config.add_argument("--rehearsal-config", type=Path, help="protected reviewer configuration without App access")
@@ -2845,35 +2983,34 @@ index 0000000000000000000000000000000000000000..719b019820855a29252735672e6be563
 +        return None
 +    return ApprovalRule(source, owners, count)
 diff --git a/tools/review_queue.py b/tools/review_queue.py
-index 8b8292098eeac021263bb31bb106a71b3e036188..e9dfd58305f3099846027ede73a4819db02be1eb 100644
+index 8b8292098eeac021263bb31bb106a71b3e036188..e1df25113fed6f1405c3f06c81361f41ab6c8940 100644
 --- a/tools/review_queue.py
 +++ b/tools/review_queue.py
-@@ -5,18 +5,18 @@ from __future__ import annotations
+@@ -5,18 +5,16 @@ from __future__ import annotations
  import re
  from urllib.parse import urlencode
 
 -from .review_snapshot import BASE_REF, REPOSITORY, PullSnapshot, SnapshotError
-+from .review_snapshot import PullSnapshot, SnapshotError
++from .review_snapshot import DOMAIN_WORKFLOW_PATH, PullSnapshot, SnapshotError
 
 
 -_REPO_PATH = f"/repos/{REPOSITORY}"
 -_QUEUE_BRANCH = re.compile(rf"gh-readonly-queue/{re.escape(BASE_REF)}/pr-([1-9][0-9]*)-[0-9a-f]{{40}}")
 -_CHECK_RUN_URL = re.compile(rf"https://api\.github\.com{re.escape(_REPO_PATH)}/check-runs/([1-9][0-9]*)")
  _WORKFLOWS = {
-     ".github/workflows/domain.yml": (
+-    ".github/workflows/domain.yml": (
 -        "Domain", ("Registry validation", "Tests on macos-15", "Tests on ubuntu-24.04", "Tests on windows-2025"),
++    DOMAIN_WORKFLOW_PATH: (
 +        "Domain", (("Registry validation", "Tests on macos-15", "Tests on ubuntu-24.04", "Tests on windows-2025"),),
      ),
 -    ".github/workflows/sces-ci.yml": ("SCES", ("Evidence / SCES validation",)),
 +    ".github/workflows/sces-ci.yml": ("SCES", (("Evidence / SCES validation",),)),
  }
-+_LANGUAGE_WORKFLOWS = {**_WORKFLOWS, ".github/workflows/domain.yml": (
-+    "Domain", (("Registry validation",), ("Registry validation", "Registry tests")),
-+)}
++LEGACY_LANGUAGE_DOMAIN_BLOB = "5a6223d804012372494bcf1e8891ad881b3163a5"
 
 
  def _require(ok, message):
-@@ -50,8 +50,8 @@ def _required_workflow(row):
+@@ -50,8 +48,8 @@ def _required_workflow(row):
      return path.split("@", 1)[0]
 
 
@@ -2884,7 +3021,7 @@ index 8b8292098eeac021263bb31bb106a71b3e036188..e9dfd58305f3099846027ede73a4819d
      _require(row.get("path") in (path, f"{path}@{branch}", f"{path}@refs/heads/{branch}")
               and row.get("name") == name and row.get("event") == "merge_group"
               and row.get("head_branch") == branch and row.get("head_sha") == merge,
-@@ -59,19 +59,19 @@ def _verify_run(row, path, snapshot, branch, merge):
+@@ -59,19 +57,19 @@ def _verify_run(row, path, snapshot, branch, merge):
      for key in ("repository", "head_repository"):
          repository = row.get(key)
          _require(isinstance(repository, dict) and repository.get("id") == snapshot.repository_id
@@ -2908,7 +3045,7 @@ index 8b8292098eeac021263bb31bb106a71b3e036188..e9dfd58305f3099846027ede73a4819d
              number = binding["run_number"]
              _require(number not in candidates[path], f"GitHub returned ambiguous {path} runs")
              candidates[path][number] = (binding, _successful(row))
-@@ -89,8 +89,8 @@ def _selected_runs(github, listing_path, snapshot, branch, merge):
+@@ -89,8 +87,8 @@ def _selected_runs(github, listing_path, snapshot, branch, merge):
      return selected
 
 
@@ -2919,12 +3056,21 @@ index 8b8292098eeac021263bb31bb106a71b3e036188..e9dfd58305f3099846027ede73a4819d
      _require(isinstance(item, dict) and item.get("ref") == f"refs/heads/{branch}",
               "GitHub did not return the exact live merge-queue ref")
      target = item.get("object")
-@@ -98,23 +98,24 @@ def _verify_ref(github, branch, merge):
+@@ -98,23 +96,33 @@ def _verify_ref(github, branch, merge):
               "GitHub merge-queue ref no longer names the observed commit")
 
 
 -def _jobs(github, path, run, branch, merge, checks, actions_app_id):
 -    name, expected = _WORKFLOWS[path]
++def _language_domain_blob(github, repo_path, merge):
++    item = github._get_json(f"{repo_path}/contents/{DOMAIN_WORKFLOW_PATH}?ref={merge}")
++    oid = item.get("sha") if isinstance(item, dict) else None
++    _require(isinstance(oid, str) and re.fullmatch(r"[0-9a-f]{40}", oid)
++             and item.get("type") == "file" and item.get("path") == DOMAIN_WORKFLOW_PATH,
++             "GitHub did not identify the Domain workflow blob on the exact merge group")
++    return oid
++
++
 +def _jobs(github, repo_path, path, run, branch, merge, checks, actions_app_id, workflows):
 +    name, expected = workflows[path]
      run_id, attempt = run["id"], run["run_attempt"]
@@ -2950,14 +3096,14 @@ index 8b8292098eeac021263bb31bb106a71b3e036188..e9dfd58305f3099846027ede73a4819d
          _require(link is not None, f"GitHub {path} job has no exact repository check-run link")
          check_id = int(link[1])
          check = checks.get(check_id, {})
-@@ -131,33 +132,38 @@ def capture_queue_observation(github, pull_snapshot, run_id, *, actions_app_id):
+@@ -131,33 +139,48 @@ def capture_queue_observation(github, pull_snapshot, run_id, *, actions_app_id):
      """Observe current CI provenance. The caller must still verify the commit's Git parents."""
      _require(isinstance(pull_snapshot, PullSnapshot), "Expected a validated pull-request snapshot")
      _require(_positive_id(run_id) and _positive_id(actions_app_id), "Expected positive Actions run and App IDs")
 -    anchor = github._get_json(f"{_REPO_PATH}/actions/runs/{run_id}")
 +    target = pull_snapshot.target
 +    repo_path = f"/repos/{target.repository}"
-+    workflows = _LANGUAGE_WORKFLOWS if target.bind_sces else _WORKFLOWS
++    workflows = _WORKFLOWS
 +    anchor = github._get_json(f"{repo_path}/actions/runs/{run_id}")
      _require(isinstance(anchor, dict) and anchor.get("id") == run_id, "GitHub returned the wrong workflow run")
      path = _required_workflow(anchor)
@@ -2978,6 +3124,13 @@ index 8b8292098eeac021263bb31bb106a71b3e036188..e9dfd58305f3099846027ede73a4819d
      _require(_successful(anchor), "The selected GitHub merge-group run did not complete successfully")
 -    _verify_ref(github, branch, merge)
 +    _verify_ref(github, repo_path, branch, merge)
++    domain_blob = None
++    if target.bind_sces:
++        domain_blob = _language_domain_blob(github, repo_path, merge)
++        registry_jobs = ("Registry validation",)
++        if domain_blob != LEGACY_LANGUAGE_DOMAIN_BLOB:
++            registry_jobs += ("Registry tests",)
++        workflows = {**_WORKFLOWS, DOMAIN_WORKFLOW_PATH: ("Domain", (registry_jobs,))}
 
      query = urlencode({"event": "merge_group", "branch": branch, "head_sha": merge, "per_page": 100})
 -    listing = f"{_REPO_PATH}/actions/runs?{query}"
@@ -2998,15 +3151,19 @@ index 8b8292098eeac021263bb31bb106a71b3e036188..e9dfd58305f3099846027ede73a4819d
 +    _require(_selected_runs(github, listing, pull_snapshot, branch, merge, workflows) == runs,
               "GitHub merge-group workflow runs changed during evidence collection")
 -    _verify_ref(github, branch, merge)
-+    _verify_ref(github, repo_path, branch, merge)
-     return {"repository_id": pull_snapshot.repository_id, "pull_number": pull_snapshot.number, "merge": merge,
+-    return {"repository_id": pull_snapshot.repository_id, "pull_number": pull_snapshot.number, "merge": merge,
 -            "queue_ref": f"refs/heads/{branch}", "observed_run_id": run_id, "workflows": workflows}
-+            "queue_ref": f"refs/heads/{branch}", "observed_run_id": run_id, "workflows": observed}
++    _verify_ref(github, repo_path, branch, merge)
++    result = {"repository_id": pull_snapshot.repository_id, "pull_number": pull_snapshot.number, "merge": merge,
++              "queue_ref": f"refs/heads/{branch}", "observed_run_id": run_id, "workflows": observed}
++    if domain_blob is not None:
++        result["domain_workflow_blob"] = domain_blob
++    return result
 diff --git a/tools/review_snapshot.py b/tools/review_snapshot.py
-index 67163aa9af81a323b712a724aa87672258dd9090..963eaaae756362f04fc7aa879c202a2524a3edbf 100644
+index 67163aa9af81a323b712a724aa87672258dd9090..2132e253c1da98f9d583e26139774d2b71bd32cc 100644
 --- a/tools/review_snapshot.py
 +++ b/tools/review_snapshot.py
-@@ -1,22 +1,27 @@
+@@ -1,22 +1,28 @@
  """Capture an exact GitHub pull-request merge candidate without checking it out."""
 
 +from contextlib import nullcontext
@@ -3029,13 +3186,14 @@ index 67163aa9af81a323b712a724aa87672258dd9090..963eaaae756362f04fc7aa879c202a25
  REPOSITORY = "software-commons/license-index"
  REPOSITORY_ID = 1468281504
  BASE_REF = "main"
++DOMAIN_WORKFLOW_PATH = ".github/workflows/domain.yml"
  MAX_DIFF_BYTES = 8 * 1024 * 1024
  _MAX_API_BYTES = 2 * 1024 * 1024
 -_REMOTE_URL = f"https://github.com/{REPOSITORY}.git"
  _API_URL = "https://api.github.com"
  _SHA = re.compile(r"[0-9a-f]{40}")
  _API_TIMEOUT = 20
-@@ -47,6 +52,33 @@ def token_is_target_only(github, repository_id, repository):
+@@ -47,6 +53,33 @@ def token_is_target_only(github, repository_id, repository):
      return type(row.get("id")) is int and row["id"] == repository_id and row.get("full_name") == repository
 
 
@@ -3069,7 +3227,7 @@ index 67163aa9af81a323b712a724aa87672258dd9090..963eaaae756362f04fc7aa879c202a25
  def _is_sha(value):
      return isinstance(value, str) and _SHA.fullmatch(value) is not None
 
-@@ -58,9 +90,11 @@ class PullSnapshot:
+@@ -58,9 +91,11 @@ class PullSnapshot:
      base: str
      head: str
      merge: str
@@ -3082,7 +3240,7 @@ index 67163aa9af81a323b712a724aa87672258dd9090..963eaaae756362f04fc7aa879c202a25
              raise SnapshotError("GitHub returned an unexpected repository identifier")
          if type(self.number) is not int or self.number < 1:
              raise SnapshotError("Expected a positive pull-request number")
-@@ -77,7 +111,10 @@ class _NoRedirects(HTTPRedirectHandler):
+@@ -77,7 +112,10 @@ class _NoRedirects(HTTPRedirectHandler):
  class GitHub:
      """Read the fixed repository from GitHub without following redirects."""
 
@@ -3094,7 +3252,7 @@ index 67163aa9af81a323b712a724aa87672258dd9090..963eaaae756362f04fc7aa879c202a25
          self._headers = {
              "Accept": "application/vnd.github+json",
              "Cache-Control": "no-cache",
-@@ -107,21 +144,21 @@ class GitHub:
+@@ -107,21 +145,21 @@ class GitHub:
      def get_pull(self, number):
          if type(number) is not int or number < 1:
              raise SnapshotError("Expected a positive pull-request number")
@@ -3120,7 +3278,7 @@ index 67163aa9af81a323b712a724aa87672258dd9090..963eaaae756362f04fc7aa879c202a25
          )
 
 
-@@ -132,21 +169,26 @@ def _isolated_git_environment():
+@@ -132,21 +170,26 @@ def _isolated_git_environment():
          "GIT_CONFIG_GLOBAL": os.devnull,
          "GIT_TERMINAL_PROMPT": "0",
          "GIT_OPTIONAL_LOCKS": "0",
@@ -3152,7 +3310,7 @@ index 67163aa9af81a323b712a724aa87672258dd9090..963eaaae756362f04fc7aa879c202a25
      except OSError as error:
          raise SnapshotError("Cannot start Git for isolated review capture") from error
 
-@@ -202,7 +244,7 @@ def capture_diff(snapshot, directory: Path, *, queue_ref=None, linear_head=False
+@@ -202,7 +245,7 @@ def capture_diff(snapshot, directory: Path, *, queue_ref=None, linear_head=False
          raise SnapshotError("Expected a validated pull-request snapshot")
      ref = f"refs/pull/{snapshot.number}/merge"
      if queue_ref is not None:
@@ -3161,7 +3319,7 @@ index 67163aa9af81a323b712a724aa87672258dd9090..963eaaae756362f04fc7aa879c202a25
          if not isinstance(queue_ref, str) or not queue_ref.startswith(prefix) or not _is_sha(queue_ref[len(prefix):]):
              raise SnapshotError("Expected the exact GitHub merge-queue branch for this pull request")
          ref = queue_ref
-@@ -215,7 +257,7 @@ def capture_diff(snapshot, directory: Path, *, queue_ref=None, linear_head=False
+@@ -215,7 +258,7 @@ def capture_diff(snapshot, directory: Path, *, queue_ref=None, linear_head=False
      _git(directory, "init", "--bare", "--quiet", "--template=", "--object-format=sha1")
      _git(
          directory, "fetch", "--quiet", "--depth=2", "--no-tags", "--no-recurse-submodules",
@@ -3170,7 +3328,7 @@ index 67163aa9af81a323b712a724aa87672258dd9090..963eaaae756362f04fc7aa879c202a25
          config=("http.followRedirects=false", "fetch.fsckObjects=true"),
      )
      fetched = _git(directory, "rev-parse", "--verify", "FETCH_HEAD^{commit}").strip()
-@@ -236,3 +278,63 @@ def capture_diff(snapshot, directory: Path, *, queue_ref=None, linear_head=False
+@@ -236,3 +279,72 @@ def capture_diff(snapshot, directory: Path, *, queue_ref=None, linear_head=False
      if not diff:
          raise SnapshotError("The GitHub test merge makes no changes relative to its base")
      return tree, diff
@@ -3182,6 +3340,15 @@ index 67163aa9af81a323b712a724aa87672258dd9090..963eaaae756362f04fc7aa879c202a25
 +                   snapshot.base, snapshot.merge, "--", *paths, limit=65536)
 +    return [path.decode("utf-8", errors="backslashreplace") for path in changes.rstrip(b"\x00").split(b"\x00")
 +            if path]
++
++
++def capture_domain_workflow_blob(directory, commit):
++    """Read the regular Domain workflow blob from the exact captured Git tree."""
++    raw = _git(directory, "ls-tree", "-z", commit, "--", DOMAIN_WORKFLOW_PATH)
++    match = re.fullmatch(rb"100644 blob ([0-9a-f]{40})\t" + re.escape(DOMAIN_WORKFLOW_PATH.encode("ascii")) + rb"\x00", raw)
++    if match is None:
++        raise SnapshotError("Reviewed merge has no exact regular Domain workflow blob")
++    return match[1].decode("ascii")
 +
 +
 +def capture_sces(directory: Path, merge: str):
