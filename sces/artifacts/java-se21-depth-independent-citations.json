@@ -1,0 +1,146 @@
+[
+  {
+    "source": "java-se21-jls-exceptions",
+    "dependency": "supports-java-se21-checked-exception-undeclared",
+    "anchor": "jls-11.2-100",
+    "start": 25937,
+    "end": 27003,
+    "sha256": "5755babefb81f9dff7ba0857c0d0931d1a4fce3fd3f06fc25dd275daf336c341"
+  },
+  {
+    "source": "java-se21-jls-exceptions",
+    "dependency": "supports-java-se21-checked-exception-undeclared",
+    "anchor": "jls-11.2.3-100",
+    "start": 48698,
+    "end": 49218,
+    "sha256": "9262739895ec5b0e4ab4969336404689f284749d16f57cc9b3fb10aac11c16a0"
+  },
+  {
+    "source": "java-se21-jls-execution",
+    "dependency": "supports-java-se21-nonconstant-static-field-initialization",
+    "anchor": "jls-12.4.1-100",
+    "start": 48875,
+    "end": 49122,
+    "sha256": "4ebbb134ae1a43ed2316d74aa1ca1846a2f0939e916cbaf5b5812d8dccf0dafd"
+  },
+  {
+    "source": "java-se21-jls-execution",
+    "dependency": "supports-java-se21-nonconstant-static-field-initialization",
+    "anchor": "jls-12.4.1-100-D",
+    "start": 50252,
+    "end": 50637,
+    "sha256": "165d9988bdd8105dad7bc1f508f0ea6c98992f0700146f43c568e915a01dc108"
+  },
+  {
+    "source": "java-se21-jls-execution",
+    "dependency": "supports-java-se21-nonconstant-static-field-initialization",
+    "anchor": "jls-12.4.1-120",
+    "start": 51463,
+    "end": 51984,
+    "sha256": "53c86ce1ed4815196692418f70d4c10fa8f068c266dfcf49b33b01dfe3885130"
+  },
+  {
+    "source": "java-se21-jls-execution",
+    "dependency": "supports-java-se21-erroneous-type-initialization",
+    "anchor": "jls-12.4.2-200-D",
+    "start": 62630,
+    "end": 62910,
+    "sha256": "4a2901898d5e3d9cf2350b3d37b4132428971bcaa9b1f39f73bfe48e3df0c6c2"
+  },
+  {
+    "source": "java-se21-jls-execution",
+    "dependency": "supports-java-se21-erroneous-type-initialization",
+    "anchor": "jls-12.4.2-300-E",
+    "start": 65978,
+    "end": 66408,
+    "sha256": "a79637961e3647fcaf8be2926caac2058a72e59e9d0bdb43376dab3adefa9fbe"
+  },
+  {
+    "source": "java-se21-jls-statements",
+    "dependency": "supports-java-se21-try-catch-first-compatible",
+    "anchor": "jls-14.20.1-100-B",
+    "start": 353427,
+    "end": 353804,
+    "sha256": "a69fee4a019e524283160948ce7f280ff7d8517f8c58ba31264da78018b21525"
+  },
+  {
+    "source": "java-se21-jls-statements",
+    "dependency": "supports-java-se21-try-catch-first-compatible",
+    "anchor": "jls-14.20.1-100-B-A",
+    "start": 354012,
+    "end": 355088,
+    "sha256": "ecde562c285d796019d85b5c3194fef98f2d1f1b6d69fcadf9f03722a9fe8510"
+  },
+  {
+    "source": "java-se21-jls-statements",
+    "dependency": "supports-java-se21-resource-close-reverse-order",
+    "anchor": "jls-14.20.3-300",
+    "start": 391522,
+    "end": 392175,
+    "sha256": "c2bb5772063c48cad1c988455aab2add2b818ab1417581b8ce71bb3b834b26dc"
+  },
+  {
+    "source": "java-se21-jls-statements",
+    "dependency": "supports-java-se21-resource-close-reverse-order",
+    "anchor": "jls-14.20.3-310",
+    "start": 392191,
+    "end": 392837,
+    "sha256": "87d664395b6f5fcff78b9ec67c73c0982b83a909c0d50d260e3a283769bbd3c5"
+  },
+  {
+    "source": "java-se21-jls-statements",
+    "dependency": "supports-java-se21-resource-close-suppression-call",
+    "anchor": "jls-14.20.3.1-100",
+    "start": 394394,
+    "end": 394809,
+    "sha256": "e76b0c6e51471d0cc3311b2d1e65ee4e22aaa0e5076015d5b8142efc9e08ce5b"
+  },
+  {
+    "source": "java-se21-jls-statements",
+    "dependency": "supports-java-se21-resource-close-suppression-call",
+    "anchor": "jls-14.20.3.1-220",
+    "start": 398845,
+    "end": 399341,
+    "sha256": "19d2840631e827dfad47c92cb01ffdaae350d78ff3a62ab535900b1a9c6f12cb"
+  },
+  {
+    "source": "java-se21-jls-statements",
+    "dependency": "supports-java-se21-resource-close-suppression-call",
+    "anchor": "jls-14.20.3.1-140",
+    "start": 397009,
+    "end": 397935,
+    "sha256": "12d29f73c584af7d627de55c55a5822d1df7d5c78a2ab1f57bfc12cb720d5678"
+  },
+  {
+    "source": "java-se21-jls-threads-locks",
+    "dependency": "supports-java-se21-monitor-unlock-happens-before",
+    "anchor": "jls-17.4.4-110-A",
+    "start": 75074,
+    "end": 75512,
+    "sha256": "0976124cbd7874ae1b2d9374197c1d7d5e2a19d1b3d61d16b2b80a8c21577d45"
+  },
+  {
+    "source": "java-se21-jls-threads-locks",
+    "dependency": "supports-java-se21-monitor-unlock-happens-before",
+    "anchor": "jls-17.4.5-320-A",
+    "start": 85783,
+    "end": 86036,
+    "sha256": "9c371d9a0b70504e614747a56d5512b09e1f2345e400aedc63edf758fa8c52aa"
+  },
+  {
+    "source": "java-se21-jls-threads-locks",
+    "dependency": "supports-java-se21-volatile-write-happens-before",
+    "anchor": "jls-17.4.4-110-B",
+    "start": 75607,
+    "end": 76190,
+    "sha256": "ac9ef6b72ab8960861dafa772936658ae9d0037ebe8a398a103296c96fc63a89"
+  },
+  {
+    "source": "java-se21-jls-threads-locks",
+    "dependency": "supports-java-se21-volatile-write-happens-before",
+    "anchor": "jls-17.4.5-320-B",
+    "start": 86131,
+    "end": 86551,
+    "sha256": "fcb9726dd10d820bdf06f02d16da3b06ef37ee5d9529743a492cef626f6c694c"
+  }
+]

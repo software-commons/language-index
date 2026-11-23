@@ -1,0 +1,1 @@
+{"basis":{"id":"java-se21-jls-threads-locks","kind":"source","revision":1},"citation":{"locator":"JLS §§17.4.4–17.4.5, #jls-17.4.4-110-A and #jls-17.4.5-320-A","modality":"required"},"claim":{"id":"java-se21-monitor-unlock-happens-before","kind":"claim","revision":1},"id":"supports-java-se21-monitor-unlock-happens-before","kind":"dependency","relation":"support","revision":1}
