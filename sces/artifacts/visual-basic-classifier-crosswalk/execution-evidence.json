@@ -1,0 +1,202 @@
+{
+  "account_principal_recorded": true,
+  "account_scoped": true,
+  "calls": {
+    "archive_page_views_and_counterevidence_inspection": [
+      {
+        "call_id": "call_aec8b5606c714dd8b251b031b82eac35",
+        "rollout_event_sha256": "fa7993d52b862cbb79e49de6f35e599be92fc5245927031613fa06c05bb023db",
+        "time": "2026-11-23T09:57:09.292Z",
+        "tool": "exec",
+        "type": "custom_tool_call"
+      },
+      {
+        "call_id": "call_aec8b5606c714dd8b251b031b82eac35",
+        "rollout_event_sha256": "32c7bf072b2c9a3ade581e6fe308bf70c40553cfac4bd7b384d76a6d34f7f7d0",
+        "time": "2026-11-23T09:57:11.632Z",
+        "tool": null,
+        "type": "custom_tool_call_output"
+      }
+    ],
+    "archive_render_outputs": [
+      {
+        "call_id": "call_1b1ee91e91234016998eab033eb84ab9",
+        "rollout_event_sha256": "5afd4331a54c0ced299204d01485d33239536d384246418f5de4ac5b36434320",
+        "time": "2026-11-23T09:56:08.930Z",
+        "tool": "exec",
+        "type": "custom_tool_call"
+      },
+      {
+        "call_id": "call_1b1ee91e91234016998eab033eb84ab9",
+        "rollout_event_sha256": "fd89dfdccaa82244cd84e1a682a4887070ed08b02abdcd42184ed06a02217c09",
+        "time": "2026-11-23T09:56:12.792Z",
+        "tool": null,
+        "type": "custom_tool_call_output"
+      }
+    ],
+    "catalog_sample_and_archive_inspection": [
+      {
+        "call_id": "call_72d79843ba3f43b4ad0e5b2e730e4e26",
+        "rollout_event_sha256": "290d0b9a6ac3877ee4b1488b2e01f24c6702c0b0df4a7e1c6afe5087f04c2a6b",
+        "time": "2026-11-23T09:56:53.041Z",
+        "tool": "exec",
+        "type": "custom_tool_call"
+      },
+      {
+        "call_id": "call_72d79843ba3f43b4ad0e5b2e730e4e26",
+        "rollout_event_sha256": "50b8d927c52f3878ae4f1f320ae068c806cd52fd002c2b243983b84ebb200b3e",
+        "time": "2026-11-23T09:56:55.124Z",
+        "tool": null,
+        "type": "custom_tool_call_output"
+      }
+    ],
+    "github_connected_exact_line_crosscheck": [
+      {
+        "call_id": "call_26f6c84fb53b4e6dba5fe7fe717cb41d",
+        "rollout_event_sha256": "cf875ba870a82632e83ad6dde62f8ab9c0bc7399f649df917ae144bd1ca297a2",
+        "time": "2026-11-23T09:58:06.326Z",
+        "tool": "exec",
+        "type": "custom_tool_call"
+      },
+      {
+        "call_id": "call_26f6c84fb53b4e6dba5fe7fe717cb41d",
+        "rollout_event_sha256": "a2630b130ba9aaba3f95964f7d9dadd4c5ce02e10ab973acb9d69dbb2300f6b1",
+        "time": "2026-11-23T09:58:07.043Z",
+        "tool": null,
+        "type": "custom_tool_call_output"
+      }
+    ],
+    "github_connected_vb6_directory_listing": [
+      {
+        "call_id": "call_b73d5c42c144496c8bffd824bb4c6686",
+        "rollout_event_sha256": "950ddaf91d03cae8992fbb35489d8002f83f4bcc2e5126ace5843da853a09a5b",
+        "time": "2026-11-23T09:57:32.848Z",
+        "tool": "exec",
+        "type": "custom_tool_call"
+      },
+      {
+        "call_id": "call_b73d5c42c144496c8bffd824bb4c6686",
+        "rollout_event_sha256": "31648975541822538fbac69c5852b3ef6f90ba67b9f5af811c8a88c8360fec62",
+        "time": "2026-11-23T09:57:35.172Z",
+        "tool": null,
+        "type": "custom_tool_call_output"
+      }
+    ],
+    "github_connected_vb6_sample_challenge": [
+      {
+        "call_id": "call_5f1b638f6e3a4aa8939c702604ba915c",
+        "rollout_event_sha256": "999c23414abae691e63584497564b444cf76bfc79b451f726b11e4f1a4ad4712",
+        "time": "2026-11-23T09:57:52.277Z",
+        "tool": "exec",
+        "type": "custom_tool_call"
+      },
+      {
+        "call_id": "call_5f1b638f6e3a4aa8939c702604ba915c",
+        "rollout_event_sha256": "ec4f968026e005ec9bfdd2be74fc147ea73a29709adc5d855eba603d4af1d8ba",
+        "time": "2026-11-23T09:57:53.046Z",
+        "tool": null,
+        "type": "custom_tool_call_output"
+      }
+    ],
+    "initial_workspace_dns_failure": [
+      {
+        "call_id": "call_2786ca31102d43bab45ee7bf726b6d84",
+        "rollout_event_sha256": "c42a3e7f6c34b0c52df3e8f3263a055865d889bcf74171519b9989dcfd56bf6e",
+        "time": "2026-11-23T09:54:07.621Z",
+        "tool": "exec",
+        "type": "custom_tool_call"
+      },
+      {
+        "call_id": "call_2786ca31102d43bab45ee7bf726b6d84",
+        "rollout_event_sha256": "8be85a70b74122f64695d275aed9c6ad4ed4df57b8845eddd51a2815135e2c9d",
+        "time": "2026-11-23T09:54:10.005Z",
+        "tool": null,
+        "type": "custom_tool_call_output"
+      }
+    ],
+    "other_publisher_witness_inspection": [
+      {
+        "call_id": "call_4c94d1269e3d4662a95bf137fb5b493f",
+        "rollout_event_sha256": "5c1a188570acd61a65defeb2eab4146cb38ed5c3b8bb758602239d095975efc4",
+        "time": "2026-11-23T09:58:53.726Z",
+        "tool": "exec",
+        "type": "custom_tool_call"
+      },
+      {
+        "call_id": "call_4c94d1269e3d4662a95bf137fb5b493f",
+        "rollout_event_sha256": "82aeb8528cf3c6ccdaf0e021a847f161efde1888908a7e2fa7932b83e3f97c3f",
+        "time": "2026-11-23T09:58:55.806Z",
+        "tool": null,
+        "type": "custom_tool_call_output"
+      }
+    ],
+    "policy_and_verification": [
+      {
+        "call_id": "call_884ff42f71904327906265537363b968",
+        "rollout_event_sha256": "c399bc41ff96f80862a683355f1ce7d2b075d2771e3c9742f5cdbacca2ff48a2",
+        "time": "2026-11-23T09:56:33.418Z",
+        "tool": "exec",
+        "type": "custom_tool_call"
+      },
+      {
+        "call_id": "call_884ff42f71904327906265537363b968",
+        "rollout_event_sha256": "408e96e095999b7690e98c14787ff13722159da0b71007e2b27e9cc4c6e2c493",
+        "time": "2026-11-23T09:56:38.293Z",
+        "tool": null,
+        "type": "custom_tool_call_output"
+      }
+    ],
+    "publisher_and_raw_github_reacquisition_invocation": [
+      {
+        "call_id": "call_f014c88b6c73496a909bff7285cf17e9",
+        "rollout_event_sha256": "2db252651c894598cbdc1e6cef80468997627efa220c150bcdfc5d6e7f50817d",
+        "time": "2026-11-23T09:54:51.134Z",
+        "tool": "exec",
+        "type": "custom_tool_call"
+      },
+      {
+        "call_id": "call_f014c88b6c73496a909bff7285cf17e9",
+        "rollout_event_sha256": "6ad5c8f0592a510668b4298c3c7e1d6e64cb6a0fcb41f260d1b32a7587b070e6",
+        "time": "2026-11-23T09:54:52.421Z",
+        "tool": null,
+        "type": "custom_tool_call_output"
+      }
+    ],
+    "publisher_and_raw_github_reacquisition_result": [
+      {
+        "call_id": "call_c7557a4f41f14b739e2f6aa9a7bc1fcf",
+        "rollout_event_sha256": "798230a5d4e3a77cdce7249bcbe555dbe7bedd9cb4b02fc0381c4ae25db2c354",
+        "time": "2026-11-23T09:54:59.612Z",
+        "tool": "wait",
+        "type": "function_call"
+      },
+      {
+        "call_id": "call_c7557a4f41f14b739e2f6aa9a7bc1fcf",
+        "rollout_event_sha256": "3bf758f90242c11efcbd2414ffcea4e5a3f526e60eedcba539796956224e4c76",
+        "time": "2026-11-23T09:54:59.655Z",
+        "tool": null,
+        "type": "function_call_output"
+      }
+    ]
+  },
+  "completed": "2026-11-23T10:01:31Z",
+  "effort": "ultra",
+  "execution": "01a207d2-bd21-7a41-9b62-6f8832d7c190",
+  "harness": "Codex Desktop 0.171.0-alpha.13",
+  "model": "gpt-6.2-sol",
+  "native_transport_tool": "exec-6caf0308-c39e-46e2-8466-ddde86171575",
+  "native_verification_tool": "exec-1c566ea1-6d8f-4fa8-922b-6dd6dfb4694b",
+  "provider": "openai",
+  "safe_receipts_sha256": "af24169bab3b8ca0d785fa1ce952ebf1aa66ac0f6c1a6452c8e943eac4fdb806",
+  "safe_trace_extraction_native_tool": "exec-60433894-ff96-44c9-9f20-60936323bdcd",
+  "session": "01a20663-ce3c-79b3-a9fd-137b04c310e2",
+  "started": "2026-11-23T09:53:02Z",
+  "trace_description": "Safe selected fields from the active account-scoped Codex Desktop execution rollout. The export has content hashes and recoverable execution/call IDs. It contains no credential, user/account principal, raw transcript, or cryptographic signature.",
+  "transport_sha256": {
+    "catalog": "d7eef05c5c7f5d49a4a0a657d39a863fc41c8c1d250391302958ee04f1843f5c",
+    "publisher": "09bc44ef6c6af130649a5c90a5cde6192d295948c2f246f683d2768520f4ee4f",
+    "supplementary": "71d3088eb73c610be5ec01061b64be748006f5543ce6dd83c4f49e016c6f9856"
+  },
+  "turn": "01a207d2-bd63-73e3-9074-e52567420a1e",
+  "user_principal_recorded": true
+}

@@ -13,3 +13,13 @@ Four existing Visual Basic leads were examined against their exact discovery loc
 The Linguist programming classifier, file suffixes, and highlighting scopes help locate candidates. The publisher references govern the language and edition boundary in the selected claims.
 
 The primary and independent follow-up both matched the Microsoft Office VBA reference capture at SHA-256 `bc23c462f8e6dd841a687c2370a6cd9dcd982bdcdd8c27bcb1e4a6032cc80fcc`. Its language-reference metadata and Office VBA documentation hierarchy support the publisher lead's link to the exact VBA identity. The three independently checked Linguist lead rows retain their original locators and explicit classifier limits. [VBA language reference](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/visual-basic-language-reference)
+
+## Native classifier follow-up
+
+Both executions matched the pinned Linguist rows and named specimens. They also inspected the Microsoft scope references, including the archived migration guide and Data Report designer documentation. Two leads now link to existing qualified identities. [Primary decisions](../../sces/artifacts/visual-basic-classifier-crosswalk/primary-decision-bundle.json) · [Independent review](../../sces/artifacts/visual-basic-classifier-crosswalk/independent-review.json)
+
+- Visual Basic .NET links to Visual Basic for .NET at language level. The sample’s namespace and XML import forms match the documented language grammar.
+- VBScript links to the existing VBScript dialect. The WScript host and ArrayList service remain separate. The cited script has 140 physical lines and no terminal LF.
+- The two `.Dsr` files support a Visual Basic 6.0 designer-tooling association. The broader classifier groups aliases and shared suffixes. The population-wide edition identity remains unresolved.
+
+The follow-up supplies scoped discovery links. It leaves general compiler compatibility and classification of files beyond the inspected samples open. [Primary receipts](../../sces/artifacts/visual-basic-classifier-crosswalk/primary-receipts.jsonl) · [Independent receipts](../../sces/artifacts/visual-basic-classifier-crosswalk/review-receipts.jsonl)

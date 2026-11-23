@@ -41,3 +41,7 @@ Follow-on [ALGOL archive research](../research/campaigns/algol-archive.md) verif
 Follow-on research supports seven [Oberon-2 report claims](../research/campaigns/oberon2-profile.md) and its scoped dialect link. The mixed Oberon classifier remains open. The [SQL host crosswalk](../research/campaigns/sql-host-origin-crosswalk.md) links three original STRling leads to qualified dialect identities and retains the release, engine, and configuration boundaries.
 
 The [structured-notation investigation](../research/campaigns/structured-notation-boundaries.md) supports GraphQL, the Protocol Buffers schema language, and TOML at their documented scope. It resolves three base-format exclusions for CSV, JSON, and JSON5. The preserved first revisions record citation and source acquisition limits.
+
+The [ISETL, SETL, and PARLOG follow-up](../research/campaigns/setl-parlog-profile-depth.md) adds eleven independently reviewed technical claims and preserves a SETL variadic writeback question.
+
+The separate [Visual Basic classifier follow-up](../research/campaigns/visual-basic-lineage.md#native-classifier-follow-up) links Visual Basic for .NET and VBScript and documents the remaining Visual Basic 6.0 classifier boundary.
