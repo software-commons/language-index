@@ -1,0 +1,1 @@
+{"basis":{"id":"pg-170-sql-syntax","kind":"source","revision":1},"citation":{"locator":"Lexical Structure and Identifiers and Key Words, lines 145–178 and 193–202","modality":"descriptive"},"claim":{"id":"postgresql-identifier-case","kind":"claim","revision":1},"id":"supports-postgresql-identifier-case","kind":"dependency","relation":"support","revision":1}

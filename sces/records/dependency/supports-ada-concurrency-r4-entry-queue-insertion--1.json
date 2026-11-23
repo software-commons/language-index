@@ -1,0 +1,1 @@
+{"basis":{"id":"ada2022-rm-entry-calls","kind":"source","revision":1},"citation":{"locator":"§9.5.3 Entry Calls, ¶¶1, 7/3, 8, 12 and 21 (#p1, #p7, #p8, #p12, #p21)","modality":"descriptive"},"claim":{"id":"ada-concurrency","kind":"claim","revision":4},"id":"supports-ada-concurrency-r4-entry-queue-insertion","kind":"dependency","relation":"support","revision":1}

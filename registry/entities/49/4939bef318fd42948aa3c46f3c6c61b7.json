@@ -1,0 +1,1 @@
+{"aliases":[],"id":"4939bef318fd42948aa3c46f3c6c61b7","identity_claim":{"id":"sqlite-language-identity","kind":"claim","revision":1},"kind":"dialect","name":"SQLite SQL dialect","relations":[{"claim":{"id":"sqlite-sql-parent","kind":"claim","revision":1},"target":{"id":"b97a2dbaf9d644488c87e934193b55ff"},"type":"dialect-of"}],"state":"active"}
