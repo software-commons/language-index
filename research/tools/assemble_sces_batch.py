@@ -50,7 +50,7 @@ def phase_input(run_file, trace_file):
     return run, (path, trace), receipts
 
 
-def assemble(batch, review, primary, independent, label):
+def assemble(batch, review, primary, independent, label, held):
     research_run, research_trace, research_receipts = primary
     review_run, review_trace, review_receipts = independent
     require(research_run["execution"] != review_run["execution"] and
@@ -137,7 +137,7 @@ def assemble(batch, review, primary, independent, label):
                 require(phase_conclusion == "supported" or conclusion != "supported", "Review cannot override primary findings")
             record(verification)
 
-        if conclusion in {"supported", "inconclusive"}:
+        if conclusion in {"supported", "inconclusive"} and claim["id"] not in held:
             identifier = f"{label}-{claim['id']}-r{claim['revision']}"
             accepted = conclusion == "supported"
             record(dict(make_ref("disposition", identifier), target=reference(claim),
@@ -146,6 +146,7 @@ def assemble(batch, review, primary, independent, label):
                         reason=("The two executions recorded support for each exact scoped binding." if accepted else
                                 "Independent verification was inconclusive. See the exact assessment and challenge."),
                         research=refs["research"], review=refs["independent-review"]))
+    require(held <= {row["id"] for row in claims.values()}, "A withheld claim was not present in the batch")
     return planned
 
 
@@ -158,11 +159,12 @@ def main():
     parser.add_argument("--research-trace", type=Path, required=True)
     parser.add_argument("--review-run", type=Path, required=True)
     parser.add_argument("--review-trace", type=Path, required=True)
+    parser.add_argument("--hold", action="append", default=[], help="retain review data without a disposition for this claim ID")
     parser.add_argument("--output", type=Path, required=True, help="new directory outside the registry")
     args = parser.parse_args()
     try:
         planned = assemble(read(args.batch), read(args.review), phase_input(args.research_run, args.research_trace),
-                           phase_input(args.review_run, args.review_trace), args.label)
+                           phase_input(args.review_run, args.review_trace), args.label, set(args.hold))
         args.output.mkdir(parents=True, exist_ok=False)
         for name, blob in sorted(planned.items()):
             path = args.output / name

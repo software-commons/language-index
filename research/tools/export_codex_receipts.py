@@ -16,6 +16,7 @@ IDENTIFIER = r"[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}"
 CALL_ID = r"call_[A-Za-z0-9_-]{1,120}"
 LABEL = r"[A-Za-z0-9][A-Za-z0-9._/+:-]{0,127}"
 TRACE_PATH = r"sces/artifacts/[a-z0-9][a-z0-9._-]*(?:/[a-z0-9][a-z0-9._-]*)*\.jsonl"
+RUNNING_CELL = re.compile(r"Script running with cell ID ([A-Za-z0-9:_-]+)")
 
 
 class ReceiptError(ValueError):
@@ -109,6 +110,12 @@ def markers_in(output):
                 yield source_marker(line)
 
 
+def output_heading(output):
+    if isinstance(output, list):
+        output = output[0].get("text", "") if output and isinstance(output[0], dict) else ""
+    return output.split("\n", 1)[0].rstrip("\r") if isinstance(output, str) else ""
+
+
 def selected_rollout(path, turn_id):
     match = re.fullmatch(rf"rollout-.*({IDENTIFIER})\.jsonl", path.name)
     require(match is not None, "select an explicit Codex rollout JSONL file")
@@ -156,30 +163,60 @@ def export(path, turn_id, trace_path, selected_calls):
     for index, row in enumerate(rows):
         payload = row["payload"]
         if row.get("type") == "response_item" and payload.get("type") in {
-            "custom_tool_call", "custom_tool_call_output"
+            "custom_tool_call", "custom_tool_call_output", "function_call", "function_call_output"
         } and matches(CALL_ID, payload.get("call_id")):
             pairs[payload["call_id"]].append(index)
+
+    active_cells = {}
+
+    def request_for(index):
+        call = rows[index]["payload"]["call_id"]
+        require(matches(CALL_ID, call) and len(pairs[call]) == 2, "marked output lacks a unique input/output pair")
+        request_index, response_index = pairs[call]
+        require(begin < request_index < response_index == index, "tool call is not paired within the selected turn")
+        return request_index, rows[request_index]["payload"]
+
     trace = []
     used = set()
     for index in range(begin + 1, end):
         row = rows[index]
         payload = row["payload"]
-        if row.get("type") != "response_item" or payload.get("type") != "custom_tool_call_output":
+        if row.get("type") != "response_item" or payload.get("type") not in {
+            "custom_tool_call_output", "function_call_output"
+        }:
             continue
-        call = payload.get("call_id")
+        call, output = payload.get("call_id"), payload.get("output")
+        heading = output_heading(output)
+        running = RUNNING_CELL.fullmatch(heading)
+        if running and payload["type"] == "custom_tool_call_output":
+            _, request = request_for(index)
+            require(request.get("type") == "custom_tool_call" and request.get("name") == "exec" and
+                    request.get("status") == "completed", "yielded output lacks its original functions.exec call")
+            cell = running[1]
+            require(cell not in active_cells, "ambiguous yielded functions.exec cell")
+            active_cells[cell] = index
+            continue
         if selected_calls and call not in selected_calls:
             continue
-        markers = list(markers_in(payload.get("output")))
+        markers = list(markers_in(output))
         if not markers:
             continue
-        require(matches(CALL_ID, call) and len(pairs[call]) == 2, "marked output lacks a unique input/output pair")
-        request_index, response_index = pairs[call]
-        request = rows[request_index]
-        require(begin < request_index < response_index == index and request["payload"].get("type") == "custom_tool_call"
-                and request["payload"].get("name") == "exec" and request["payload"].get("status") == "completed",
-                "marked output is not paired to a completed functions.exec call in the selected turn")
+        request_index, request = request_for(index)
+        if payload["type"] == "function_call_output":
+            require(request.get("type") == "function_call" and request.get("name") == "wait" and
+                    heading == "Script completed", "marked continuation lacks a successful functions.wait result")
+            wait = json.loads(request["arguments"])
+            require(isinstance(wait, dict), "marked continuation has invalid wait arguments")
+            cell = wait.get("cell_id")
+            require(not wait.get("terminate") and cell in active_cells and active_cells[cell] < request_index,
+                    "marked continuation lacks an earlier functions.exec cell in the same turn")
+            del active_cells[cell]
+        else:
+            require(request.get("type") == "custom_tool_call" and request.get("name") == "exec" and
+                    request.get("status") == "completed", "marked output lacks a completed functions.exec call")
         result_time = event_time(row)
-        require(started <= event_time(request) <= result_time <= completed, "acquisition timestamp is outside its turn")
+        require(started <= event_time(rows[request_index]) <= result_time <= completed,
+                "acquisition timestamp is outside its turn")
         used.add(call)
         for ordinal, marker in enumerate(markers, 1):
             trace.append({

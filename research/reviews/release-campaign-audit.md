@@ -7,7 +7,7 @@ The campaign started from the 26 provisional profiles on `fb221d9141f529a8ef99f2
 | Profile | Original scope | Gate or remaining question |
 | --- | --- | --- |
 | Python | 3.13.0 identity and name binding | Keep the pilot's corrected identity binding. The extended review excluded `nonlocal` revision 2 and the import-finder claim. |
-| ECMAScript | 15th-edition declaration grammar and evaluation | Both original subject IDs were malformed. The new research uses immutable successors and examines ordinary declarations separately from loop-head productions. |
+| ECMAScript | 15th-edition declaration grammar and evaluation | Both original subject IDs were malformed. The new research uses immutable successors and examines ordinary declarations separately from loop-head productions. The original `OrdinaryGet` condition was withheld because the descriptor lookup belongs to the `[[GetOwnProperty]]` suboperation. |
 | Go | Go 1.23 source-file structure and slice storage | Reverify both exact original claims. Larger edition and implementation history remains outside the original profile. |
 | Lua | 5.4 types, metatables and memory | Reverify applicability within the documented 5.4 language and distinguish behavior governed by the manual from a particular execution. |
 | Haskell | 2010 typing, evaluation and modules | Reverify against the language report. Compiler-specific extensions require separate records. |
@@ -20,7 +20,7 @@ The campaign started from the 26 provisional profiles on `fb221d9141f529a8ef99f2
 | Clojure | JVM 1.12 core macros and atom APIs | Distinguish Clojure identity from the JVM host and pin implementation/API claims to the documented distribution. |
 | PostgreSQL SQL | 17.0 table inheritance and partition declarations | The command reference supports specific vendor behavior. Governed SQL parent and dialect identity need separate authority. |
 | SQLite SQL | 3.46.0 parser grammar and table options | Parser evidence establishes recognized grammar fields. Engine behavior and SQL dialect identity need distinct support. |
-| Visual Basic for .NET | Source compilation, Option Strict, and imports | Microsoft separately documents VB6 and VBA. A shared display name does not establish an alias or edition relation. [VB6 support statement](https://learn.microsoft.com/en-us/previous-versions/visualstudio/visual-basic-6/visual-basic-6-support-policy?view=vs-2019) · [VBA language specification](https://learn.microsoft.com/en-us/openspecs/microsoft_general_purpose_programming_languages/ms-vbal/d5418146-0bd2-45eb-9c7a-fd9502722c74) |
+| Visual Basic for .NET | Source compilation, Option Strict, and imports | Microsoft separately documents VB6 and VBA. A shared display name does not establish an alias or edition relation. The independent review also observed that the tested Roslyn compiler accepted a mixed-width keyword that the pinned grammar excludes. The scope of the selected claim is the grammar. [VB6 support statement](https://learn.microsoft.com/en-us/previous-versions/visualstudio/visual-basic-6/visual-basic-6-support-policy?view=vs-2019) · [VBA language specification](https://learn.microsoft.com/en-us/openspecs/microsoft_general_purpose_programming_languages/ms-vbal/d5418146-0bd2-45eb-9c7a-fd9502722c74) |
 
 ## Historical and enterprise profile audit
 
@@ -43,5 +43,7 @@ The [historical profiles](../profiles/profiles-history.md) identify eleven langu
 ## Reproduced exclusions
 
 Two Python challenge sets ran on CPython 3.13.5. The reviewer checked the 3.13.0 reference and compiler source separately. A method nested in a class can obtain the implicit `__class__` binding through `nonlocal`, even without a textually enclosing function binding. Attempting to import a missing submodule can fail while resolving its parent, before a finder examines the requested submodule. These observations challenge the frozen applicability conditions. They do not extend the stated interpreter observations to other implementations. [Probe sources and recorded results](python-313-probes/)
+
+The first `OrdinaryGet` revision says its operation returns no own property descriptor. One review applied that phrase to the nested `[[GetOwnProperty]]` step and supported the intended scope. A separate reading identified the misleading literal attribution. The scoped requirement needs a new frozen condition naming `[[GetOwnProperty]]` and allowing for an abrupt completion from prototype retrieval. [ECMA-262, §10.1.8.1](https://262.ecma-international.org/15.0/index.html#sec-ordinaryget)
 
 The release cohort uses exact selected claims and directly inspected sources. Unreviewed profiles, unresolved lead matches, and candidate-era draft claims remain research records. The cohort establishes neither a closed population nor complete technical or historical coverage of an included language.
