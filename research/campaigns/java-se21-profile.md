@@ -4,4 +4,4 @@ The Java identity and three technical claims use edition 21 of the Java Language
 
 The selected claims apply to the Java language at this specification edition. Java Virtual Machine semantics, boxed `Boolean`, compatibility across editions, and mapping the original regex facility lead to the language identity remain separate research questions.
 
-[Technical research acquisition](../../sces/artifacts/java-se21-research.jsonl) · [Independent technical acquisition](../../sces/artifacts/java-se21-review.jsonl) · [Identity research acquisition](../../sces/artifacts/java-identity-r2-proof-research.jsonl) · [Independent identity acquisition](../../sces/artifacts/java-identity-r2-proof-review.jsonl)
+[Technical research acquisition](../../sces/artifacts/java-se21-research.jsonl) · [Independent technical acquisition](../../sces/artifacts/java-se21-review.jsonl) · [Identity research acquisition](../../sces/artifacts/java-identity-r3-proof-research.jsonl) · [Independent identity acquisition](../../sces/artifacts/java-identity-r3-proof-review.jsonl) · [Earlier review history](../reviews/java-se21-role-mismatch/README.md)
