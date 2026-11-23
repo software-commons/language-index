@@ -1,0 +1,1 @@
+{"basis":{"id":"scheme-r7rs-small-2013-original-report","kind":"source","revision":1},"citation":{"locator":"§3.5 Proper tail recursion, physical PDF 11","modality":"descriptive"},"claim":{"id":"scheme-r7rs-small-active-tail-calls","kind":"claim","revision":1},"id":"supports-scheme-r7rs-small-active-tail-calls","kind":"dependency","relation":"support","revision":1}
