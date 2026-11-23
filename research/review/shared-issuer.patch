@@ -45,10 +45,10 @@ index 1863d1130f1e65e59a85d98cf28dc0caea911682..1362af915de4c2d8ae94fbd49e8189e9
          for update in ({"integration_id": ACTIONS_APP_ID}, {"integration_id": None}):
 diff --git a/tests/test_review_evidence.py b/tests/test_review_evidence.py
 new file mode 100644
-index 0000000000000000000000000000000000000000..e23e8f5a7cf7ba5d6d85e3726d7b7979d81fc4e1
+index 0000000000000000000000000000000000000000..cc0bd603a32580d48d44a0dd7aea87b7107a28bd
 --- /dev/null
 +++ b/tests/test_review_evidence.py
-@@ -0,0 +1,249 @@
+@@ -0,0 +1,275 @@
 +"""Synthetic Git-object fixtures for the protected SCES review inputs."""
 +
 +from hashlib import sha256
@@ -259,7 +259,33 @@ index 0000000000000000000000000000000000000000..e23e8f5a7cf7ba5d6d85e3726d7b7979
 +        }))
 +        candidate = self.commit({**publication, **replacements, report_path: _canonical(report)},
 +                                "rewrite a frozen artifact and recompute its candidate digests")
-+        with self.assertRaisesRegex(DataError, "differs from its frozen source commit: sces/artifacts/citation.txt"):
++        with self.assertRaisesRegex(DataError, "selected artifact descriptors differ from the frozen source commit"):
++            capture_selected_evidence(self.root, candidate, LANGUAGE)
++
++    def test_self_consistent_candidate_cannot_omit_an_inherited_frozen_dependency(self):
++        inputs, publication = fixture()
++        # The fixture report already describes the smaller candidate. The frozen tree
++        # contains an additional dependency alongside the one retained in the candidate.
++        omitted = "sces/records/dependency/selected-extra--1.json"
++        dependency = _canonical({**ref("dependency", "selected-extra"), "claim": ref("claim", "selected"),
++                                 "basis": ref("source", "original"), "relation": "support"})
++        baseline = self.commit({**inputs, omitted: dependency}, "freeze both selected dependencies")
++        publication = pin_source(publication, baseline)
++        (self.root / omitted).unlink()
++        candidate = self.commit(publication, "select the smaller candidate with recomputed report")
++        with self.assertRaisesRegex(DataError, "selected record membership differs from the frozen source commit"):
++            capture_selected_evidence(self.root, candidate, LANGUAGE)
++
++    def test_same_closure_does_not_allow_a_different_frozen_record_blob(self):
++        inputs, publication = fixture()
++        publication = pin_source(publication, self.commit(inputs, "freeze selected records"))
++        changed = {**inputs, CLAIM: b"\n" + inputs[CLAIM]}
++        report_path = RELEASE + "qualification.json"
++        report = decode(publication[report_path])
++        report["inputs_sha256"] = digest(_canonical({path: digest(raw) for path, raw in changed.items()}))
++        candidate = self.commit({**publication, CLAIM: changed[CLAIM], report_path: _canonical(report)},
++                                "change a record's bytes without changing the selected closure")
++        with self.assertRaisesRegex(DataError, f"differs from its frozen source commit: {CLAIM}"):
 +            capture_selected_evidence(self.root, candidate, LANGUAGE)
 +
 +    def test_shallow_capture_fetches_only_the_missing_frozen_sha_from_the_approved_remote(self):
@@ -1399,10 +1425,10 @@ index d213d62143ea097a48f01697f606e7c61a21ee10..f4e6d504992e6e3dcee47ebfe9bdb873
 
 diff --git a/tools/review_evidence.py b/tools/review_evidence.py
 new file mode 100644
-index 0000000000000000000000000000000000000000..461802d9e18eeb905ddab188ce84289e3122f844
+index 0000000000000000000000000000000000000000..b77d1bca3b871e8d8c1fe425ab89485752dd4481
 --- /dev/null
 +++ b/tools/review_evidence.py
-@@ -0,0 +1,270 @@
+@@ -0,0 +1,289 @@
 +"""Capture the active SCES publication inputs as inert bytes from a reviewed Git tree."""
 +
 +from collections import defaultdict
@@ -1499,6 +1525,16 @@ index 0000000000000000000000000000000000000000..461802d9e18eeb905ddab188ce84289e
 +    return result
 +
 +
++def _record_blobs(directory, paths, cache):
++    records = {path: oid for path, oid in paths.items() if path.startswith("sces/records/")}
++    uncached = {oid: path for path, oid in records.items() if oid not in cache}
++    for path, payload in _blobs(directory, paths, sorted(uncached.values()), limit=_MAX_RECORDS).items():
++        cache[records[path]] = payload
++    blobs = {path: cache[oid] for path, oid in records.items()}
++    require(sum(map(len, blobs.values())) <= _MAX_RECORDS, "SCES registry exceeds the review capture limit")
++    return blobs
++
++
 +def _registry(blobs):
 +    records = {}
 +    edges = defaultdict(list)
@@ -1590,6 +1626,13 @@ index 0000000000000000000000000000000000000000..461802d9e18eeb905ddab188ce84289e
 +    return used, artifacts
 +
 +
++def _selected_registry(selected, blobs):
++    records, edges, reviews, dispositions, conflicts = _registry(blobs)
++    active = _active_reviews(selected, records, edges, reviews, dispositions)
++    used, artifacts = _closure(selected, records, edges, active, dispositions, conflicts)
++    return records, edges, active, used, artifacts
++
++
 +def _selected_evidence(directory, paths, target):
 +    metadata = _blobs(directory, paths, [_ADOPTION, _SELECTION], limit=_MAX_EVIDENCE)
 +    adoption = decode(metadata[_ADOPTION])
@@ -1616,11 +1659,9 @@ index 0000000000000000000000000000000000000000..461802d9e18eeb905ddab188ce84289e
 +    require(selected and len({identity[:2] for identity in selected}) == len(selected)
 +            and [_key(ref, "claim") for ref in report["claims"]] == sorted(selected),
 +            "SCES publication claim selection does not match the report")
-+    record_blobs = _blobs(directory, paths, sorted(path for path in paths if path.startswith("sces/records/")),
-+                          limit=_MAX_RECORDS)
-+    records, edges, reviews, dispositions, conflicts = _registry(record_blobs)
-+    active = _active_reviews(selected, records, edges, reviews, dispositions)
-+    used, artifacts = _closure(selected, records, edges, active, dispositions, conflicts)
++    blob_cache = {}
++    record_blobs = _record_blobs(directory, paths, blob_cache)
++    records, edges, active, used, artifacts = _selected_registry(selected, record_blobs)
 +    expected_claims = [{"claim": records[identity],
 +                        "dependencies": [records[edge] for edge in sorted(edges[identity])]}
 +                       for identity in sorted(selected)]
@@ -1642,6 +1683,10 @@ index 0000000000000000000000000000000000000000..461802d9e18eeb905ddab188ce84289e
 +    inputs[_ADOPTION] = _digest(metadata[_ADOPTION])
 +    require(report["inputs_sha256"] == _digest(_canonical(inputs)), "SCES selected input digest mismatch")
 +    frozen = _frozen_inputs(directory, selection["source_commit"], target)
++    # The same selected roots must reach the same records when reverse links come from the frozen tree.
++    *_, frozen_used, frozen_artifacts = _selected_registry(selected, _record_blobs(directory, frozen, blob_cache))
++    require(used == frozen_used, "SCES selected record membership differs from the frozen source commit")
++    require(artifacts == frozen_artifacts, "SCES selected artifact descriptors differ from the frozen source commit")
 +    for path in sorted(inputs):
 +        require(frozen.get(path) == paths[path], f"SCES selected input differs from its frozen source commit: {path}")
 +
