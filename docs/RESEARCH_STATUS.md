@@ -109,3 +109,5 @@ The next evidence cut adds 44 independently reviewed claims and three scoped lea
 This evidence cut adds 28 independently reviewed claims and three scoped identity links. The 1,126-lead ledger has 132 resolved and 994 unresolved leads, including 897 awaiting initial investigation. [SPARQL and SHACL](../research/campaigns/sparql-shacl.md) · [GLSL](../research/campaigns/glsl-4608-evidence.md) · [Smalltalk-80](../research/campaigns/smalltalk80-profile-depth.md)
 
 The WGSL and HLSL profiles add 17 independently reviewed claims and two scoped identity links. The 1,126-lead ledger has 134 resolved and 992 unresolved leads, including 893 awaiting initial investigation. [WGSL](../research/campaigns/wgsl-dated-profile.md) · [HLSL](../research/campaigns/hlsl-dated-draft.md)
+
+The Dart, Elixir, Julia and Perl 5 profiles add 12 independently reviewed claims and resolve four scoped host-language leads. The 1,126-lead ledger has 138 resolved and 988 unresolved leads, including 893 awaiting initial investigation. [Host-language evidence](../research/campaigns/predecessor-host-ambiguities.md)
