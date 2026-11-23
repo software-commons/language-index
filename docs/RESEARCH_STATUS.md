@@ -125,3 +125,5 @@ The preview adds scoped claims for eight language profiles and separately adjudi
 The preview adds exact historical Z notation claims and an identity decision from the IEC catalogue. The 1,126-lead ledger has 170 resolved and 956 unresolved leads, including 848 awaiting initial investigation. [Z formal notation](../research/campaigns/iso-z-formal-notation.md)
 
 The preview adds scope-specific claims for Z notation, Event-B, Maude, Bluespec and Verilog-AMS. The 1,126-lead ledger has 174 resolved and 952 unresolved leads, including 844 awaiting initial investigation. [Z formal notation](../research/campaigns/iso-z-formal-notation.md) · [Event-B and Maude](../research/campaigns/event-b-maude.md) · [Bluespec and Verilog-AMS](../research/campaigns/hardware-dialects.md)
+
+Five recovered IBM origin documents support existing language identities and new edition-scoped profile claims. The 1,126-lead ledger has 179 resolved and 947 unresolved leads, including 844 awaiting initial investigation. [Recovered IBM origins](../research/campaigns/ibm-recovered-origins.md)
