@@ -1,0 +1,5 @@
+# Wolfram Language 14.3 evaluation and classifier boundaries
+
+Six new claims use Wolfram’s exact archived 14.3 reference pages for `HoldAllComplete`, `Orderless`, `Part`, `SetDelayed`, `Block`, and `Module`. They preserve the individual evaluation, expression access, assignment, and scoping conditions stated by those pages. [Research receipts](../../sces/artifacts/wolfram-classifier-proof-research.jsonl) · [Independent review receipts](../../sces/artifacts/wolfram-classifier-proof-review.jsonl) · [Source witnesses](../../sces/artifacts/wolfram-143-profile-source-witnesses.json)
+
+The pinned classifier contains 14 specimen paths with 13 distinct blobs. The `.m` and `.wl` copies of `Predicates` share one blob. Two notebook specimens contain input and stored output and record a Mathematica 9.0 front end. The classifier also lists CDF, which the publisher describes separately as a deployment document format. The exact source and test specimens support a Wolfram Language association. The broader classifier stays unresolved. [Discovery review](../../sces/artifacts/wolfram-classifier-origin-review.json)
