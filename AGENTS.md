@@ -7,3 +7,5 @@ This index adopts **SCES-1.0** at `ab26f278422772f2d9e5d4dd016407d14372a710` wit
 - Use separate Codex research and independent-review executions. Verify exact applicability, conflicts, and negative knowledge. Apply targeted challenges and independent recomputation where required.
 - Keep unsupported or unresolved findings provisional. Run the pinned validator for all publication candidates. Apply all gates and retain exact verification and artifact records for each release.
 - Use repository-specific predicate, scope, and authority guidance in addition to SCES.
+
+The registry also adopts SCIRS-1.0 at organization commit f23ffb93c5ad8d6b96d8652186ba20befee3bca8. Read the [Index Repository Standard](https://github.com/software-commons/.github/blob/f23ffb93c5ad8d6b96d8652186ba20befee3bca8/docs/standards/INDEX_REPOSITORY_STANDARD.md) before making changes to shared architecture.
