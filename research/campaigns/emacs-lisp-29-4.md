@@ -1,0 +1,7 @@
+# GNU Emacs Lisp 29.4
+
+The profile draws on the Emacs Lisp reference manual packaged with GNU Emacs 29.4. The supported claims cover the reader and evaluator, ordinary function argument evaluation, lexical closures and dynamic special bindings, and the selection and explicit access of buffer-local and default values. Compiler behavior and other Emacs releases require separate evidence.
+
+Both executions recovered the release archive named in GNU’s release announcement and matched its published SHA-256. The independent execution also verified agreement with the detached signature using the published primary fingerprint. GnuPG flagged the signing key as expired. [GNU Emacs 29.4 release announcement](https://lists.gnu.org/archive/html/info-gnu-emacs/2024-06/msg00000.html) · [Independent source witnesses](../../sces/artifacts/emacs-lisp-source-witnesses.json)
+
+The original Linguist row has a supported Emacs Lisp language referent. The primary execution held the aggregate unresolved, and the independent execution classified the referent while limiting whole-row equivalence. Complete specimens include ordinary source, host configurations, package descriptions, and a reader data fixture. The aggregate remains unresolved pending finer scope separation. [Pinned classifier](https://github.com/github-linguist/linguist/blob/cfd7a0113aa1efab99faeff38756f0ed4d48add8/lib/linguist/languages.yml#L2139) · [Lead decisions](../../sces/artifacts/emacs-lisp-origin-review.json)
