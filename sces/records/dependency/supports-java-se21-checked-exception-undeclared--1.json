@@ -1,0 +1,1 @@
+{"basis":{"id":"java-se21-jls-exceptions","kind":"source","revision":1},"citation":{"locator":"JLS §§11.2 and 11.2.3, #jls-11.2-100 and #jls-11.2.3-100","modality":"conditional"},"claim":{"id":"java-se21-checked-exception-undeclared","kind":"claim","revision":1},"id":"supports-java-se21-checked-exception-undeclared","kind":"dependency","relation":"support","revision":1}

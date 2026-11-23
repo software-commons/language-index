@@ -1,0 +1,1 @@
+{"basis":{"id":"ruby-3410-pattern-commit","kind":"source","revision":1},"citation":{"locator":"Pattern matching, opening section, case/in form and unmatched case","modality":"descriptive"},"claim":{"id":"ruby-3410-case-in-unmatched-error","kind":"claim","revision":1},"id":"supports-ruby-3410-case-in-unmatched-error","kind":"dependency","relation":"support","revision":1}

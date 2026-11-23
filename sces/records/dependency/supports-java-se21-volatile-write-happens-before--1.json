@@ -1,0 +1,1 @@
+{"basis":{"id":"java-se21-jls-threads-locks","kind":"source","revision":1},"citation":{"locator":"JLS §§17.4.4–17.4.5, #jls-17.4.4-110-B and #jls-17.4.5-320-B","modality":"required"},"claim":{"id":"java-se21-volatile-write-happens-before","kind":"claim","revision":1},"id":"supports-java-se21-volatile-write-happens-before","kind":"dependency","relation":"support","revision":1}

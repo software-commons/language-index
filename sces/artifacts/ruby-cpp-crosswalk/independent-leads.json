@@ -1,0 +1,167 @@
+{
+  "context_witnesses": {
+    "cpp-hello-sample": {
+      "byte_end_exclusive": 93,
+      "byte_start": 0,
+      "first_line": 1,
+      "last_line": 9,
+      "sha256": "4936c6b8abd79d4b41807452f2b6070b70a3d27ff7dceed7df51981da6028546",
+      "source_body_sha256": "4936c6b8abd79d4b41807452f2b6070b70a3d27ff7dceed7df51981da6028546"
+    },
+    "cpp-ino-sample": {
+      "byte_end_exclusive": 81,
+      "byte_start": 0,
+      "first_line": 1,
+      "last_line": 7,
+      "sha256": "b8766ba61225d7848594781ae6d6922fb5f01dcae87345fc5553858f6ae25a88",
+      "source_body_sha256": "b8766ba61225d7848594781ae6d6922fb5f01dcae87345fc5553858f6ae25a88"
+    },
+    "cpp-module-sample": {
+      "byte_end_exclusive": 92,
+      "byte_start": 0,
+      "first_line": 1,
+      "last_line": 8,
+      "sha256": "c37f988e3cc3ffdc1a61ec3102777e318acb4b14dbd456c36a58ec45212d2f6b",
+      "source_body_sha256": "fb03452a8908ca2d5ff4c78043518e5825b1a1518a78fd9b962266dc6c12ebb0"
+    },
+    "re2-immutable-header": {
+      "byte_end_exclusive": 720,
+      "byte_start": 206,
+      "first_line": 8,
+      "last_line": 18,
+      "sha256": "ad542e763eab3dfdcf45d35a1fe1973a5a91bd48c3858c9b3b13b5af6b237856",
+      "source_body_sha256": "59f4d4b5318fcb6acf0c90f17d17e71903a87ec25d75fcf5d13e738beb29490f"
+    },
+    "ruby-foo-sample": {
+      "byte_end_exclusive": 15,
+      "byte_start": 0,
+      "first_line": 1,
+      "last_line": 2,
+      "sha256": "00378ff84be52dd81d36028e8147528069deec225edbe3bdc0f5425b38b84c75",
+      "source_body_sha256": "00378ff84be52dd81d36028e8147528069deec225edbe3bdc0f5425b38b84c75"
+    },
+    "ruby-formula-sample": {
+      "byte_end_exclusive": 652,
+      "byte_start": 248,
+      "first_line": 11,
+      "last_line": 23,
+      "sha256": "f65dc16546d17b46db0692e7922a1ba0f3f3fb9d656053c9af43b9390804d62b",
+      "source_body_sha256": "dda73e1c0fdbfb997a45a772496b31f1fe8b2e0cdf4f1eccc83f57a229ab462c"
+    },
+    "ruby-rbi-sample": {
+      "byte_end_exclusive": 298,
+      "byte_start": 0,
+      "first_line": 1,
+      "last_line": 10,
+      "sha256": "b5c8398d7bf337061250b70a61e3ded83435fbde8df93376bb6d80daf9fda69a",
+      "source_body_sha256": "b5c8398d7bf337061250b70a61e3ded83435fbde8df93376bb6d80daf9fda69a"
+    },
+    "ruby-release-regexp-source": {
+      "byte_end_exclusive": 129874,
+      "byte_start": 129121,
+      "first_line": 4798,
+      "last_line": 4809,
+      "sha256": "7f7816a7ef7f06f7e7059acb9d5864283f121b4e27199bc2a64c29691b1c8e36",
+      "source_body_sha256": "3842f4b60fce8e669acd607e8964f0c4e59cf694e22be97ccfe13ee1c86a9bae"
+    }
+  },
+  "input_sha256": "9b4f97ca8ca201db2791443cea699dad44dc376cffdf8b93e350998761d5722f",
+  "lead_assessments": [
+    {
+      "analytical_target": {
+        "id": "cpp-n4950-language-identity",
+        "kind": "claim",
+        "revision": 1
+      },
+      "candidate_id": "24c858bd5e8149d7a05497972a79fc8d",
+      "candidate_sha256": "26725e1f1bdf7fdbb3c0d12ae98c71e77a8eb8bc90c1354c8c5e382c5036b655",
+      "equivalence": "exact-equivalence-insufficient",
+      "origin": "https://github.com/strling-lang/regex-conformance/blob/62084ca0ef9b05a28711dd28bf10885c6ed0cb5d/registries/universe/full-known-universe-2026-08-15.v1.json#L62",
+      "origin_witness": {
+        "byte_end_exclusive": 4076,
+        "byte_start": 3726,
+        "commit": "62084ca0ef9b05a28711dd28bf10885c6ed0cb5d",
+        "first_line": 62,
+        "git_blob_sha1": "f19747d9c5172196183a79fa8ddd23b5c621fbc3",
+        "last_line": 62,
+        "sha256": "b27d42b1ff95f2e9717b75d6724979477fa03c4a001caec621c4071c6808d9ee",
+        "source": "strling-universe",
+        "source_body_sha256": "0601c2c948b19c7f5265bd53260c7c8a47478d12d3dc79e863a2f2f8e411f9f8"
+      },
+      "outcome": "host-language-context-supported",
+      "reasoning": "STRling's exact row identifies a standalone RE2 engine API. Its recorded release tag resolves to a concrete Google RE2 commit, whose own header identifies a C++ interface and implements an API in C++. The exact WG21 draft independently establishes the host language. The predecessor key identifies RE2's API surface, so retain its host-language context without equating that surface with the C++ entity or draft."
+    },
+    {
+      "analytical_target": {
+        "id": "ruby-3410-language-identity",
+        "kind": "claim",
+        "revision": 1
+      },
+      "candidate_id": "121f797a4e4046cfa1d8dc0e490d9d0c",
+      "candidate_sha256": "a51b51876e299098da837293d88f706f241365c8d6baa68f83743fda14fa9a76",
+      "equivalence": "exact-equivalence-insufficient",
+      "origin": "https://github.com/strling-lang/regex-conformance/blob/62084ca0ef9b05a28711dd28bf10885c6ed0cb5d/registries/universe/full-known-universe-2026-08-15.v1.json#L81",
+      "origin_witness": {
+        "byte_end_exclusive": 11409,
+        "byte_start": 11017,
+        "commit": "62084ca0ef9b05a28711dd28bf10885c6ed0cb5d",
+        "first_line": 81,
+        "git_blob_sha1": "f19747d9c5172196183a79fa8ddd23b5c621fbc3",
+        "last_line": 81,
+        "sha256": "80944dfd89e92e6c4bca458c0aabb7afa740d0e169e8f011782c4d2a6b846804",
+        "source": "strling-universe",
+        "source_body_sha256": "0601c2c948b19c7f5265bd53260c7c8a47478d12d3dc79e863a2f2f8e411f9f8"
+      },
+      "outcome": "host-language-context-supported",
+      "reasoning": "STRling's exact row identifies a language-runtime Regexp surface across Ruby release lines. The pinned Ruby 3.4.10 source registers Regexp as a class and binds its API methods. Ruby's exact README independently establishes the language identity. The predecessor key specifically denotes Regexp, so retain its host-language context without treating the facility or historical coverage model as the Ruby entity."
+    },
+    {
+      "analytical_target": {
+        "id": "cpp-n4950-language-identity",
+        "kind": "claim",
+        "revision": 1
+      },
+      "candidate_id": "bb1c232cb6054a36ad4f7b35bba67aa5",
+      "candidate_sha256": "2431de17ff0113415d12c10327e33c8e6459b0f7e90ba8a43cfd92dce93f2fb9",
+      "equivalence": "edition-or-classifier-equivalence-insufficient",
+      "origin": "https://github.com/github-linguist/linguist/blob/cfd7a0113aa1efab99faeff38756f0ed4d48add8/lib/linguist/languages.yml#L935",
+      "origin_witness": {
+        "byte_end_exclusive": 18441,
+        "byte_start": 18027,
+        "commit": "cfd7a0113aa1efab99faeff38756f0ed4d48add8",
+        "first_line": 935,
+        "git_blob_sha1": "b9eec00082ce5bc4bbc8ccfafc0d23563a2cf954",
+        "last_line": 965,
+        "sha256": "88c4b0f9ffa0c1eb31045dee6494a3fcdafcf98a7ae472a72b320c78525c4ab6",
+        "source": "linguist-catalog",
+        "source_body_sha256": "05e20bd736808a9e468ae1546e1a3b518b95fa215ee6f746903f7e164a9fd37b"
+      },
+      "outcome": "language-level-discovery-link-supported",
+      "reasoning": "The pinned classifier's C++ row and exact hello.cpp and module fixtures supply a substantive language-level discovery link to C++ as identified by WG21. The Arduino-style .ino specimen and the shared .h heuristic for Objective-C, C++ and C illustrate the classifier's broader practical scope. The classifier does not assert N4950, a single edition, exclusive file ownership or compiler conformance."
+    },
+    {
+      "analytical_target": {
+        "id": "ruby-3410-language-identity",
+        "kind": "claim",
+        "revision": 1
+      },
+      "candidate_id": "790c5af378b042439d33bddc3aca99ea",
+      "candidate_sha256": "fe6782f2c81073b89fbc09444ee8870cf4b32d6b92f16bcfa85f7e0772325cee",
+      "equivalence": "edition-or-classifier-equivalence-insufficient",
+      "origin": "https://github.com/github-linguist/linguist/blob/cfd7a0113aa1efab99faeff38756f0ed4d48add8/lib/linguist/languages.yml#L7162",
+      "origin_witness": {
+        "byte_end_exclusive": 124773,
+        "byte_start": 123863,
+        "commit": "cfd7a0113aa1efab99faeff38756f0ed4d48add8",
+        "first_line": 7162,
+        "git_blob_sha1": "b9eec00082ce5bc4bbc8ccfafc0d23563a2cf954",
+        "last_line": 7228,
+        "sha256": "9a019305e10213a59f0732f2b6ec490a4c9f9f8dc9a9b9e724972897edfd8fa2",
+        "source": "linguist-catalog",
+        "source_body_sha256": "05e20bd736808a9e468ae1546e1a3b518b95fa215ee6f746903f7e164a9fd37b"
+      },
+      "outcome": "language-level-discovery-link-supported",
+      "reasoning": "The pinned classifier's Ruby row and exact Ruby module and class specimens support the Ruby language-level discovery link under the exact project README. Runtime-selection aliases, filenames and the RBI sample show classifier coverage beyond an edition identifier. The .rbi sample records type signatures in a tooling profile. The row cannot establish Ruby 3.4.10, implementation identity, or canonical alias claims."
+    }
+  ]
+}

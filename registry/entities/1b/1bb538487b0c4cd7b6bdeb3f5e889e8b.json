@@ -1,0 +1,1 @@
+{"aliases":[],"id":"1bb538487b0c4cd7b6bdeb3f5e889e8b","identity_claim":{"id":"algol-n-japanese-language-identity","kind":"claim","revision":1},"kind":"language","name":"ALGOL-N","relations":[{"claim":{"id":"algol-n-derived-from-algol68-draft","kind":"claim","revision":1},"target":{"id":"075fb038b7e84e29ab8b0f6e4ea5f35c"},"type":"derived-from"}],"state":"active"}

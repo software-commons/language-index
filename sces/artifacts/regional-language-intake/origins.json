@@ -1,0 +1,24 @@
+{
+  "registry_baseline": "218456e77d6eedff90b4819c7146da4aab1b1485",
+  "baseline_census": 1123,
+  "baseline_entities": 76,
+  "scope": "Origin and edition investigation. These records preserve discovery leads and capture outcomes.",
+  "existing": [
+    {"id": "38a0d39635904f34a106286ae8ae116c", "label": "なでしこ (Nadeshiko v1)"},
+    {"id": "b9a8f5214c4a4549b200e59c79b83f7c", "label": "なでしこ3 (Nadeshiko v3)"}
+  ],
+  "new": [
+    {"id": "6a6c453784334802979ee8c0942466fb", "origin": "https://www.onionsoft.net/hsp/v37/doclib/hsp3.htm#LANG_SPEC", "status": "unresolved"},
+    {"id": "74a1df682e11458cbcdf42d7f303b631", "origin": "https://kanemune.eplang.jp/lib/exe/fetch.php?media=kanemunelab%3Adata%3Apro4211.pdf#page=1", "status": "unresolved"}
+  ],
+  "primary_input_sha256": "f209284d5fc36f75ad29b0e82e6e8d542b2093c5e340bf19b58dbc40bbab563f",
+  "intake_sha256": "906dfe564d2e6f1e8d55491d8caf267cc5d893227fd15830e1c325204ce5e59b",
+  "independent_review_sha256": "e34c0dd027f3866f2eb92b6f6be2cc09d805e1989c2b0350a555ab3af9897e98",
+  "independent_execution": "01a207cc-9c92-7ed1-9575-5f8d1b8bacc3",
+  "independent_turn": "01a207e6-080c-7c32-80c1-40e3a9531b63",
+  "independent_acquisition": "call_1c6e7f8710f2493ab6cd2312b2d61feb",
+  "independent_acquisition_at": "2026-11-23T10:15:30.411Z",
+  "exact_source_spans": 38,
+  "exact_whole_responses": 9,
+  "varying_whole_responses": 5
+}

@@ -1,0 +1,1224 @@
+{
+  "adopter_ci_caller_sha256": "4511a0b56cb82ced370bc86e303e04699db9d502ac5e6517df0e4201d51301b2",
+  "adopter_manifest_sha256": "87a1bca34529d1d398e5b7c1e9414ba946585003f06e424431bbad6bbc355e72",
+  "capture_events": {
+    "10e6e4": {
+      "completed_at": "2026-11-23T09:38:04.049Z",
+      "tool_call_id": "call_2019082c1ac7468d97e4988a6295079a"
+    },
+    "236ec0": {
+      "completed_at": "2026-11-23T09:41:13.105Z",
+      "tool_call_id": "call_3ef9256fa0634f53aa9626ff606378a9"
+    },
+    "51b4da": {
+      "completed_at": "2026-11-23T09:36:45.194Z",
+      "tool_call_id": "call_32dd479d1cc948baa4602e40d8ec72f0"
+    },
+    "6a9962": {
+      "completed_at": "2026-11-23T09:40:28.922Z",
+      "tool_call_id": "call_ab3e521129484a0c85bf2b9fe4d61dd6"
+    },
+    "turn402view1": {
+      "completed_at": "2026-11-23T09:35:51.808Z",
+      "tool_call_id": "call_d5d2a5e0239b48d8a31ec2274dba064e"
+    },
+    "turn408search0": {
+      "completed_at": "2026-11-23T09:37:07.549Z",
+      "tool_call_id": "call_d2b39d43b4e3407390a54a65a4c35d93"
+    }
+  },
+  "check_time": "2026-11-23T09:43:29.358331+00:00",
+  "different_native_representation": [
+    "mysql-8410-tag",
+    "mysql-8411-tag",
+    "mysql-8046-tag",
+    "mysql-26070-tag",
+    "tsql-original-facility",
+    "tsql-builds",
+    "tsql-cu8-canonical",
+    "duckdb-original-facility",
+    "duckdb-15-facility",
+    "duckdb-15-dialect",
+    "duckdb-20-facility",
+    "duckdb-releases",
+    "duckdb-155-tag",
+    "duckdb-155-release",
+    "duckdb-155-re2-tree"
+  ],
+  "execution": {
+    "cli_version": "0.171.0-alpha.13",
+    "effort": "ultra",
+    "id": "01a207c2-9f18-72e1-9870-b5472b985b07",
+    "model": "gpt-6.2-sol",
+    "model_provider": "openai",
+    "originator": "Codex Desktop",
+    "session_started_at": "2026-11-23T09:35:24.961Z",
+    "turn_id": "01a207c2-9fb8-7fa0-ad49-04f2bf22749e",
+    "turn_started_at": "2026-11-23T09:35:26.479Z"
+  },
+  "inspection_receipts_sha256": "b733630fbee7d4cdc2ca1b1c731515ec1fb8b63d1b732b22c210ca09539586f2",
+  "native_events_sha256": "eadc29e4e8c4598e64df38cb309a9386eb169001462b260936dbe8da696adac9",
+  "planning_cutoff": "2026-08-15",
+  "policy": {
+    "bundle_sha256": "14da3f31f697ab828d4a4560f060dbe511861020db54bea7bc531e20ea0855ce",
+    "commit": "ab26f278422772f2d9e5d4dd016407d14372a710",
+    "standard": "SCES-1.0"
+  },
+  "policy_file_count_verified": 15,
+  "registry_head": "be39341993de56d708a66dd295e4b3f95493f417",
+  "review_input_sha256": "cfb0faa78bbba2b2b3edecad10b0a99ae9f2f74ce4bd0105fc33c0e6b95c5ff0",
+  "rows": [
+    {
+      "candidate_id": "4e46e81f10234c9baeb0acf48959ffe7",
+      "candidate_sha256": "481ec0dad0a8b37a87d112527ff8c9163e65e867c81157478d7a675cf6bd6955",
+      "end_byte_exclusive": 22356,
+      "file": "sources/strling-planning.body",
+      "first_line": 108,
+      "judgment": "supports the origin as context for a regex facility hosted by this existing dialect",
+      "last_line": 108,
+      "record": {
+        "archetype": "database-service-surface",
+        "category": "database",
+        "current_profiles": 3,
+        "current_representatives": [
+          "8.0=latest-update",
+          "8.4=8.4.10",
+          "innovation=latest-stable"
+        ],
+        "historical_profiles": {
+          "expected": 14,
+          "lower": 12,
+          "upper": 16
+        },
+        "key": "mysql-regex",
+        "name": "MySQL regex SQL surface",
+        "release_line_model": "MySQL maintenance/LTS/innovation line with Spencer-to-ICU graph boundary",
+        "source": "https://dev.mysql.com/doc/refman/8.4/en/regexp.html"
+      },
+      "representation_sha256": "0601c2c948b19c7f5265bd53260c7c8a47478d12d3dc79e863a2f2f8e411f9f8",
+      "selected_identity_claim": {
+        "id": "mysql-84-sql-dialect-identity",
+        "kind": "claim",
+        "revision": 1
+      },
+      "selected_identity_claim_path": "sces/records/claim/mysql-84-sql-dialect-identity--1.json",
+      "selected_identity_claim_sha256": "36c8e4ec775fb4b0101fd1b1513d1970f7b9f17c8150946ccb7d59fe2833ca56",
+      "selected_identity_source": {
+        "access": "public",
+        "captured_sha256": "a8c12fa28fa9ddb6837a12dad3bd6b758a28421ebd905ae4be4a504a644a32d2",
+        "id": "goal-mysql84-oracle-manual-pdf",
+        "kind": "source",
+        "locator": "https://docs.oracle.com/cd/E17952_01/mysql-8.4-en/mysql-8.4-en.pdf",
+        "origin": "oracle-mysql",
+        "preservation_limit": "Research scratch retains the exact captured bytes and inspection witnesses.",
+        "published": "2026-04-21",
+        "publisher": "Oracle Corporation",
+        "release": "oracle-mysql-8.4-manual-r84592",
+        "reuse": "Publisher terms govern the original. The index records paraphrased findings and references.",
+        "revalidation": {
+          "due": "2027-04-01T00:00:00Z",
+          "triggers": [
+            "Publisher correction, source digest change, or edition boundary change."
+          ]
+        },
+        "revision": 1,
+        "role": "official-documentation",
+        "scope": {
+          "authority": "oracle-mysql",
+          "revision": "oracle-mysql-8.4-manual-r84592"
+        },
+        "title": "MySQL 8.4 Reference Manual Including MySQL NDB Cluster 8.4",
+        "upstream": []
+      },
+      "sha256": "f56ddb45bfd608dbaa0b53ab48e112d63712b27a9ae31ab2b9e98dc1f44bb4c1",
+      "start_byte": 21907,
+      "target_id": "90f7ae0a40074883afa1ed80d4e7d017",
+      "target_sha256": "88383dd23847e34b35dc9278e860f52bf155bf170ddcb744e3a9563ab5f7d07d"
+    },
+    {
+      "candidate_id": "9d4c42cdbfba42868c52314c2a0ca9c3",
+      "candidate_sha256": "d51172f7dd635c8f1a94a8418ec1d5c6d913e379c5c36f818be21a593b971988",
+      "end_byte_exclusive": 24662,
+      "file": "sources/strling-planning.body",
+      "first_line": 113,
+      "judgment": "supports the origin as context for a regex facility hosted by this existing dialect",
+      "last_line": 113,
+      "record": {
+        "archetype": "database-service-surface",
+        "category": "database",
+        "current_profiles": 1,
+        "current_representatives": [
+          "2025=latest-CU"
+        ],
+        "historical_profiles": {
+          "expected": 1,
+          "lower": 1,
+          "upper": 2
+        },
+        "key": "sqlserver-regex",
+        "name": "SQL Server regular expression functions",
+        "release_line_model": "SQL Server product line beginning with the public regex facility",
+        "source": "https://learn.microsoft.com/en-us/sql/relational-databases/regular-expressions/overview"
+      },
+      "representation_sha256": "0601c2c948b19c7f5265bd53260c7c8a47478d12d3dc79e863a2f2f8e411f9f8",
+      "selected_identity_claim": {
+        "id": "microsoft-tsql-dialect-identity",
+        "kind": "claim",
+        "revision": 1
+      },
+      "selected_identity_claim_path": "sces/records/claim/microsoft-tsql-dialect-identity--1.json",
+      "selected_identity_claim_sha256": "c02c6a004dd42b8b43d233316ec6bdb62e5ffd6d7958e03e3ffa5c9d66f0ba63",
+      "selected_identity_source": {
+        "access": "public",
+        "captured_sha256": "788db980778b2fa3521fbfaefe9d689e446283a40a39d594fe38ff6adc20d964",
+        "id": "goal-tsql-ms-reference",
+        "kind": "source",
+        "locator": "https://raw.githubusercontent.com/MicrosoftDocs/sql-docs/5f220f578385645cd005eed84f5b6881817b1c81/docs/t-sql/language-reference.md",
+        "origin": "microsoft-sql-server",
+        "preservation_limit": "Research scratch retains the exact captured bytes and inspection witnesses.",
+        "published": "2026-01-26",
+        "publisher": "Microsoft Corporation",
+        "release": "5f220f578385645cd005eed84f5b6881817b1c81",
+        "reuse": "Publisher terms govern the original. The index records paraphrased findings and references.",
+        "revalidation": {
+          "due": "2027-04-01T00:00:00Z",
+          "triggers": [
+            "Publisher correction, source digest change, or edition boundary change."
+          ]
+        },
+        "revision": 1,
+        "role": "official-documentation",
+        "scope": {
+          "authority": "microsoft-sql-server",
+          "revision": "5f220f578385645cd005eed84f5b6881817b1c81"
+        },
+        "title": "Transact-SQL Reference (Database Engine)",
+        "upstream": []
+      },
+      "sha256": "bb0ac6d86523f137e7590e7717fd27466157429f59240636831104911563e832",
+      "start_byte": 24211,
+      "target_id": "c46eb05a99444d81a272b6b131064aec",
+      "target_sha256": "2050a15d45c3630f57973df797949567f4ef8c5c3b3a47a8eb92ab2955934d47"
+    },
+    {
+      "candidate_id": "d6f46e1bbb4d4530ab41d96d87e34aea",
+      "candidate_sha256": "9a8e292a91dd2aeb69844c8bf082982138f7698d6f9c149aba6353c2fdbf7617",
+      "end_byte_exclusive": 26360,
+      "file": "sources/strling-planning.body",
+      "first_line": 117,
+      "judgment": "supports the origin as context for a regex facility hosted by this existing dialect",
+      "last_line": 117,
+      "record": {
+        "archetype": "database-service-surface",
+        "category": "database",
+        "current_profiles": 1,
+        "current_representatives": [
+          "1=official-latest"
+        ],
+        "historical_profiles": {
+          "expected": 1,
+          "lower": 1,
+          "upper": 2
+        },
+        "key": "duckdb-regex",
+        "name": "DuckDB regex SQL surface",
+        "release_line_model": "SemVer major line with exact RE2 binding",
+        "source": "https://duckdb.org/docs/current/sql/functions/regular_expressions"
+      },
+      "representation_sha256": "0601c2c948b19c7f5265bd53260c7c8a47478d12d3dc79e863a2f2f8e411f9f8",
+      "selected_identity_claim": {
+        "id": "duckdb-100-sql-dialect-identity",
+        "kind": "claim",
+        "revision": 1
+      },
+      "selected_identity_claim_path": "sces/records/claim/duckdb-100-sql-dialect-identity--1.json",
+      "selected_identity_claim_sha256": "93ad8ba9546e49f1746da2cc7b7149ae4cbf66a67718fb2ed0b01efa3f48062e",
+      "selected_identity_source": {
+        "access": "public",
+        "captured_sha256": "8c588aebf7a55e221f8e1e00fb2ba292e4c462a69d1f9b01069d60443ff52ab4",
+        "id": "goal-duckdb100-manual",
+        "kind": "source",
+        "locator": "https://blobs.duckdb.org/docs/duckdb-docs-1.0.0.pdf",
+        "origin": "duckdb-project",
+        "preservation_limit": "Research scratch retains the exact captured bytes and inspection witnesses.",
+        "published": "2024-09-12",
+        "publisher": "DuckDB project",
+        "release": "duckdb-1.0.0-docs-2024-09-12",
+        "reuse": "Publisher terms govern the original. The index records paraphrased findings and references.",
+        "revalidation": {
+          "due": "2027-04-01T00:00:00Z",
+          "triggers": [
+            "Publisher correction, source digest change, or edition boundary change."
+          ]
+        },
+        "revision": 1,
+        "role": "official-documentation",
+        "scope": {
+          "authority": "duckdb-project",
+          "revision": "duckdb-1.0.0-docs-2024-09-12"
+        },
+        "title": "DuckDB Documentation, DuckDB version 1.0.0",
+        "upstream": []
+      },
+      "sha256": "e0591228740ee06c8c9dde11a7ce155af2af5f76ea21061a32de415bbbd1ad4c",
+      "start_byte": 25970,
+      "target_id": "2a9d5e1dacef4abf95e6bef1feca168c",
+      "target_sha256": "0de729b80f6c0edec4967374be73d293a149ffede6a91608458ffe5830c76561"
+    }
+  ],
+  "source_spans": {
+    "duckdb-100-reference": [
+      {
+        "end_byte_exclusive": 75,
+        "file": "sources/duckdb-100-reference-p1.extract.txt",
+        "first_line": 1,
+        "last_line": 3,
+        "note": "UTF-8 text derived by pypdf; ranges refer to the derived page text.",
+        "pdf_page_one_based": 1,
+        "representation_sha256": "c9b817165c01640b6ff7bc0987c216714bc15028a8f08d543cb4a9441cb68a46",
+        "sha256": "c9b817165c01640b6ff7bc0987c216714bc15028a8f08d543cb4a9441cb68a46",
+        "start_byte": 0
+      },
+      {
+        "end_byte_exclusive": 1516,
+        "file": "sources/duckdb-100-reference-p688.extract.txt",
+        "first_line": 1,
+        "last_line": 38,
+        "note": "UTF-8 text derived by pypdf; ranges refer to the derived page text.",
+        "pdf_page_one_based": 688,
+        "representation_sha256": "d8775f5fa8bd5130aa8bcae2ceece28153eb21a194b74c89c0482bab16a00fae",
+        "sha256": "d8775f5fa8bd5130aa8bcae2ceece28153eb21a194b74c89c0482bab16a00fae",
+        "start_byte": 0
+      },
+      {
+        "end_byte_exclusive": 1654,
+        "file": "sources/duckdb-100-reference-p689.extract.txt",
+        "first_line": 1,
+        "last_line": 40,
+        "note": "UTF-8 text derived by pypdf; ranges refer to the derived page text.",
+        "pdf_page_one_based": 689,
+        "representation_sha256": "eded05f404d81b370ab145b2470792cd30dd52c6aaac427f7f0eaff88ebeff72",
+        "sha256": "eded05f404d81b370ab145b2470792cd30dd52c6aaac427f7f0eaff88ebeff72",
+        "start_byte": 0
+      },
+      {
+        "end_byte_exclusive": 1971,
+        "file": "sources/duckdb-100-reference-p776.extract.txt",
+        "first_line": 1,
+        "last_line": 31,
+        "note": "UTF-8 text derived by pypdf; ranges refer to the derived page text.",
+        "pdf_page_one_based": 776,
+        "representation_sha256": "298fabd8ce102e5b2bfc3e762bbf0d10c324aeeadfbafee2c927925313882897",
+        "sha256": "298fabd8ce102e5b2bfc3e762bbf0d10c324aeeadfbafee2c927925313882897",
+        "start_byte": 0
+      },
+      {
+        "end_byte_exclusive": 1312,
+        "file": "sources/duckdb-100-reference-p777.extract.txt",
+        "first_line": 1,
+        "last_line": 37,
+        "note": "UTF-8 text derived by pypdf; ranges refer to the derived page text.",
+        "pdf_page_one_based": 777,
+        "representation_sha256": "43e5cb984581f3bd7e84a6a0b7bdfc7567259ad95fc0bffac3ee18c8fdcb453a",
+        "sha256": "43e5cb984581f3bd7e84a6a0b7bdfc7567259ad95fc0bffac3ee18c8fdcb453a",
+        "start_byte": 0
+      }
+    ],
+    "duckdb-15-dialect": [
+      {
+        "end_byte_exclusive": 68710,
+        "file": "sources/duckdb-15-dialect.body",
+        "first_line": 288,
+        "last_line": 298,
+        "representation_sha256": "bc62cdcd6eb4599dc116d51135c71770a4ec074f8c6fab7bb7dd1a050914e102",
+        "sha256": "e0d5dfcb06f5ef3925c150a9b67d931f4434dc3cc92879fadc1e17a572ea1b88",
+        "start_byte": 68234
+      }
+    ],
+    "duckdb-15-facility": [
+      {
+        "end_byte_exclusive": 70571,
+        "file": "sources/duckdb-15-facility.body",
+        "first_line": 304,
+        "last_line": 313,
+        "representation_sha256": "040fded803c61911dfe4d0a110038ee42627fbba5c9e88c48add59e7ee611a4f",
+        "sha256": "7d305adba0ab45471d71fd0fdbff94cf9be8ed8a9832815e78307a053219f306",
+        "start_byte": 70000
+      },
+      {
+        "end_byte_exclusive": 74799,
+        "file": "sources/duckdb-15-facility.body",
+        "first_line": 345,
+        "last_line": 354,
+        "representation_sha256": "040fded803c61911dfe4d0a110038ee42627fbba5c9e88c48add59e7ee611a4f",
+        "sha256": "323091a7afe893c9b326d20664ea29acb8cd31b1b0f10a33b764dda462d5095d",
+        "start_byte": 73746
+      },
+      {
+        "end_byte_exclusive": 82653,
+        "file": "sources/duckdb-15-facility.body",
+        "first_line": 468,
+        "last_line": 478,
+        "representation_sha256": "040fded803c61911dfe4d0a110038ee42627fbba5c9e88c48add59e7ee611a4f",
+        "sha256": "8e1d6470f679935743dc6f39d63d4e9c8542684ca922e0aed580a079e5350406",
+        "start_byte": 82238
+      }
+    ],
+    "duckdb-155-code": [
+      {
+        "end_byte_exclusive": 4386,
+        "file": "sources/duckdb-155-code.body",
+        "first_line": 90,
+        "last_line": 106,
+        "representation_sha256": "a7c34c07957a01e6e4455b598e1ed0111d3200cbb71cb4a88f6f7aef8f253ab3",
+        "sha256": "3b84cfb6884e43050333f11ab429cd935ec5a3f9fd26e762615d4bc7875821ec",
+        "start_byte": 3830
+      },
+      {
+        "end_byte_exclusive": 17780,
+        "file": "sources/duckdb-155-code.body",
+        "first_line": 374,
+        "last_line": 399,
+        "representation_sha256": "a7c34c07957a01e6e4455b598e1ed0111d3200cbb71cb4a88f6f7aef8f253ab3",
+        "sha256": "92b2aa3b0b14fe11600fb8df0ef9eb7afc5363d8e99d8842d5ad88e0593148ba",
+        "start_byte": 16049
+      }
+    ],
+    "duckdb-155-re2-build": [
+      {
+        "end_byte_exclusive": 2650,
+        "file": "sources/duckdb-155-re2-build.body",
+        "first_line": 72,
+        "last_line": 97,
+        "representation_sha256": "22830da96217103d3973be68a433df763a1e049677665553d7db74aca8285706",
+        "sha256": "11dc0b9f271a923cd266dede9b08f7d25e07c2cf8061f9468bfe2895c83c9fce",
+        "start_byte": 2116
+      }
+    ],
+    "duckdb-155-re2-git-tree": [
+      {
+        "end_byte_exclusive": 250,
+        "file": "sources/duckdb-155-re2-git-tree.body",
+        "first_line": 1,
+        "last_line": 8,
+        "representation_sha256": "a3d79a0eb22595938503efff8809734a29d645f6b54835bf501dc3d24e994508",
+        "sha256": "ee4e05fa8e08526f86b084bb0bf8eeddedadc1687f4224d7d899c45890d158cb",
+        "start_byte": 0
+      },
+      {
+        "end_byte_exclusive": 1287,
+        "file": "sources/duckdb-155-re2-git-tree.body",
+        "first_line": 15,
+        "last_line": 38,
+        "representation_sha256": "a3d79a0eb22595938503efff8809734a29d645f6b54835bf501dc3d24e994508",
+        "sha256": "4476e27362144a4dbc2a4685e610623306dde67024e9e9821ef3ed939ed392b9",
+        "start_byte": 480
+      }
+    ],
+    "duckdb-155-re2-tree": [
+      {
+        "end_byte_exclusive": 18097,
+        "file": "sources/duckdb-155-re2-tree.body",
+        "first_line": 307,
+        "last_line": 314,
+        "representation_sha256": "a5ea4206ecc4d48c9167b73a52b065d4fc324c106b56690e45c9bf0af5c3a13d",
+        "sha256": "e7776acf2efc476738ff064b2b1500d7b88447db447eee97e3d2eea8227bf8b8",
+        "start_byte": 17598
+      }
+    ],
+    "duckdb-155-release": [
+      {
+        "end_byte_exclusive": 1775,
+        "file": "sources/duckdb-155-release.body",
+        "first_line": 29,
+        "last_line": 37,
+        "representation_sha256": "3ec78bbfbb640959f69b5e56dd010739f3b08e27afb07e5661bf7711bb5653f9",
+        "sha256": "c33e70855d82224e397c829adb8375c2f534c347ea14462e06c66c006149271e",
+        "start_byte": 1458
+      }
+    ],
+    "duckdb-155-tag": [
+      {
+        "end_byte_exclusive": 372,
+        "file": "sources/duckdb-155-tag.body",
+        "first_line": 2,
+        "last_line": 9,
+        "representation_sha256": "925e48fb899463ce31fda83acea73b2aef3aa32a9d66b1526e80dd623c65d0d3",
+        "sha256": "b9a86206229d4c743ea540c29fc6acc986e64b6fdf289301edc41714193452dc",
+        "start_byte": 2
+      }
+    ],
+    "duckdb-156-release": [
+      {
+        "end_byte_exclusive": 1749,
+        "file": "sources/duckdb-156-release.body",
+        "first_line": 29,
+        "last_line": 37,
+        "representation_sha256": "9e29831267bc501dc5cb619608441cf9d838701c159f05806e10411c0e238078",
+        "sha256": "88e9581787faae49a23f76bd0b787c0384ff634142e83b90b1db885e15000ff5",
+        "start_byte": 1432
+      }
+    ],
+    "duckdb-20-facility": [
+      {
+        "end_byte_exclusive": 67928,
+        "file": "sources/duckdb-20-facility.body",
+        "first_line": 292,
+        "last_line": 302,
+        "representation_sha256": "0461109e8d25c5ed70cb3c7f910a49055bea3441a66dfeb9f637d6a9bb91a7d6",
+        "sha256": "8fd842a9b135226934383a4d20b8d7b4014bea841936d47c27dc6d50b7f28400",
+        "start_byte": 67348
+      }
+    ],
+    "duckdb-current-dialect": [
+      {
+        "end_byte_exclusive": 549,
+        "file": "sources/duckdb-current-dialect.body",
+        "first_line": 1,
+        "last_line": 10,
+        "representation_sha256": "3c7e6a946e62c90453a3dd38340984f809054faa04fe56ec14f6e754e1fbad20",
+        "sha256": "b0473142704bb0f250fffad9fed68086f8957ecc602a407b7f5ee0bfeee4b6d9",
+        "start_byte": 0
+      }
+    ],
+    "duckdb-original-facility": [
+      {
+        "end_byte_exclusive": 601,
+        "file": "sources/duckdb-original-facility.body",
+        "first_line": 1,
+        "last_line": 10,
+        "representation_sha256": "883603d59f2a7421917ff1665b0fc9d32ed1d287b4292e513136441573922360",
+        "sha256": "d082c3f085fe5256a49199c9e4657e5f1ac4d3a4dce3473cb130840c7eb539fc",
+        "start_byte": 0
+      }
+    ],
+    "duckdb-releases": [
+      {
+        "end_byte_exclusive": 11832,
+        "file": "sources/duckdb-releases.body",
+        "first_line": 363,
+        "last_line": 386,
+        "representation_sha256": "d311a9318bb03b2fe4afd2a3d6de21ec4869463d6922af0bacb7f6586c9b087f",
+        "sha256": "a5c211e1288b2d36b1a6467d30799975cd08d11c3c7aba5be603bf69f708a2f4",
+        "start_byte": 10902
+      }
+    ],
+    "mysql-26070-cmake": [
+      {
+        "end_byte_exclusive": 1589,
+        "file": "sources/mysql-26070-cmake.body",
+        "first_line": 24,
+        "last_line": 32,
+        "representation_sha256": "f5d63aec18b36b4769a0d8c51857a88422ad4b4aba176755998f7df628191de9",
+        "sha256": "7299c0a25fff7b85a81d84276753be15e2f8ce0b62dc1da1a317a20d80a5440d",
+        "start_byte": 1182
+      },
+      {
+        "end_byte_exclusive": 4821,
+        "file": "sources/mysql-26070-cmake.body",
+        "first_line": 124,
+        "last_line": 126,
+        "representation_sha256": "f5d63aec18b36b4769a0d8c51857a88422ad4b4aba176755998f7df628191de9",
+        "sha256": "f8d08aaa7ca56f7fddd5aafe1b0e3d3a6d8ddb1608bf4b0bfd7abb626bf05f4c",
+        "start_byte": 4683
+      },
+      {
+        "end_byte_exclusive": 6402,
+        "file": "sources/mysql-26070-cmake.body",
+        "first_line": 168,
+        "last_line": 186,
+        "representation_sha256": "f5d63aec18b36b4769a0d8c51857a88422ad4b4aba176755998f7df628191de9",
+        "sha256": "517860961b18babd2213c9efd00f044bd4f3064e6eaf40c55f8c6c449f5b0d36",
+        "start_byte": 5943
+      }
+    ],
+    "mysql-26070-developer-release": [
+      {
+        "end_byte_exclusive": 22116,
+        "file": "sources/mysql-26070-developer-release.body",
+        "first_line": 269,
+        "last_line": 280,
+        "representation_sha256": "52a6ce932986ebaca25aecbd7fe6cf9605dc19959e44ecf14edf85636f482b82",
+        "sha256": "d9fbc1e26b90509d9738454a4062f88fd4b5488a557ee8f71ac7ed2a34f96de2",
+        "start_byte": 19580
+      }
+    ],
+    "mysql-26070-icu-header": [
+      {
+        "end_byte_exclusive": 2391,
+        "file": "sources/mysql-26070-icu-header.body",
+        "first_line": 55,
+        "last_line": 68,
+        "representation_sha256": "ede6d900f95bee0f775ff2c7bc4bc3d0e29126870f48dfef4cf3a71256d52184",
+        "sha256": "9bc850d943360769fe1d05da9260d8e492bcf325c2643808be6b082ee0290105",
+        "start_byte": 2004
+      },
+      {
+        "end_byte_exclusive": 4657,
+        "file": "sources/mysql-26070-icu-header.body",
+        "first_line": 132,
+        "last_line": 137,
+        "representation_sha256": "ede6d900f95bee0f775ff2c7bc4bc3d0e29126870f48dfef4cf3a71256d52184",
+        "sha256": "a8318d233debdde7bac56a5815ffac9843cf0766066e5d3c7c8906d0ce6f0ea8",
+        "start_byte": 4538
+      }
+    ],
+    "mysql-26070-registry": [
+      {
+        "end_byte_exclusive": 52519,
+        "file": "sources/mysql-26070-registry.body",
+        "first_line": 1522,
+        "last_line": 1525,
+        "representation_sha256": "6e4018d4daafa6223d11a177bd16ac9f7840e2b6b08926789aa98b3ff6625757",
+        "sha256": "14796351ef42a6db7c03284a955ade4ab4e1590d50ecee94301a26230f632860",
+        "start_byte": 52247
+      }
+    ],
+    "mysql-26070-tag": [
+      {
+        "end_byte_exclusive": 402,
+        "file": "sources/mysql-26070-tag.body",
+        "first_line": 2,
+        "last_line": 9,
+        "representation_sha256": "c56fd74b97151d0d9dc7d6b5771137ae3d3b65bf7dc6974c2d29c6fb126ecd2c",
+        "sha256": "bb2821da753d1e5c572eda4cf8139e889163d11bc65485ff2733e60212a4495f",
+        "start_byte": 2
+      }
+    ],
+    "mysql-26070-version": [
+      {
+        "end_byte_exclusive": 124,
+        "file": "sources/mysql-26070-version.body",
+        "first_line": 1,
+        "last_line": 5,
+        "representation_sha256": "5e50579dedad36143f1ac2791c3501872aef9a744fd69134bff5f8d07fb2b3b4",
+        "sha256": "18666c406a7915d09d4f70ef4275e4a28307316f9aedb6014b8b1f4c56ce1b3b",
+        "start_byte": 0
+      }
+    ],
+    "mysql-26100-release": [
+      {
+        "end_byte_exclusive": 20677,
+        "file": "sources/mysql-26100-release.body",
+        "first_line": 269,
+        "last_line": 278,
+        "representation_sha256": "95e32403e047fbc26302fc361d6594195b5167b0f761739992f883a94a3668e5",
+        "sha256": "dbb76abb76c513e90cc93ba41c13b1c4bda71393fe110948184299608d0c76d6",
+        "start_byte": 19991
+      }
+    ],
+    "mysql-80-facility": [
+      {
+        "end_byte_exclusive": 67080,
+        "file": "sources/mysql-80-facility.body",
+        "first_line": 756,
+        "last_line": 778,
+        "representation_sha256": "5a66df711d240675dc25846feb9797f099dac54315dde7b33f2718a5d9656e40",
+        "sha256": "c88de7ab349a4c4a4d3c8323812c7f01fd8ddae8f035160ffadf906e49afdb96",
+        "start_byte": 65395
+      },
+      {
+        "end_byte_exclusive": 109487,
+        "file": "sources/mysql-80-facility.body",
+        "first_line": 1464,
+        "last_line": 1478,
+        "representation_sha256": "5a66df711d240675dc25846feb9797f099dac54315dde7b33f2718a5d9656e40",
+        "sha256": "72685881601d169e33f2bc6339720e03bf34c67d5d3fb12eb47a34064b7bd558",
+        "start_byte": 108756
+      }
+    ],
+    "mysql-80-release-index": [
+      {
+        "end_byte_exclusive": 30026,
+        "file": "sources/mysql-80-release-index.body",
+        "first_line": 353,
+        "last_line": 370,
+        "representation_sha256": "597066dec5ec28b48724ecb791b5ba64df95cd2919bb0d433def497562c3c890",
+        "sha256": "bcd28e7e57b9f90ba16848261860fca71ce82eab02507c2d45ea0cf3b43fbd0e",
+        "start_byte": 29390
+      },
+      {
+        "end_byte_exclusive": 33075,
+        "file": "sources/mysql-80-release-index.body",
+        "first_line": 422,
+        "last_line": 425,
+        "representation_sha256": "597066dec5ec28b48724ecb791b5ba64df95cd2919bb0d433def497562c3c890",
+        "sha256": "4c81b98c6a54343d67cbc3c41df9c581e27170e2959fba3ac5b68b8aae7e5dfe",
+        "start_byte": 32755
+      }
+    ],
+    "mysql-8046": [
+      {
+        "end_byte_exclusive": 26583,
+        "file": "sources/mysql-8046.body",
+        "first_line": 269,
+        "last_line": 282,
+        "representation_sha256": "2e22fed7579867c153ed426ea23961c275f6539a52f2dadaa4428d23c15edfec",
+        "sha256": "c293e756be94a80fcfbeb20914982746942719f9cb85a507ff5dd8b8a960c320",
+        "start_byte": 24781
+      }
+    ],
+    "mysql-8046-cmake": [
+      {
+        "end_byte_exclusive": 1589,
+        "file": "sources/mysql-8046-cmake.body",
+        "first_line": 24,
+        "last_line": 32,
+        "representation_sha256": "65e25ca07f476ff2080594cab874e95ec8ace05d8761422aeafb480ae9baa6f3",
+        "sha256": "7299c0a25fff7b85a81d84276753be15e2f8ce0b62dc1da1a317a20d80a5440d",
+        "start_byte": 1182
+      },
+      {
+        "end_byte_exclusive": 4794,
+        "file": "sources/mysql-8046-cmake.body",
+        "first_line": 124,
+        "last_line": 125,
+        "representation_sha256": "65e25ca07f476ff2080594cab874e95ec8ace05d8761422aeafb480ae9baa6f3",
+        "sha256": "1700040acad32eaee29a92f82639aaa66982f9a34f47d782e3099505e5a47550",
+        "start_byte": 4683
+      },
+      {
+        "end_byte_exclusive": 6375,
+        "file": "sources/mysql-8046-cmake.body",
+        "first_line": 167,
+        "last_line": 185,
+        "representation_sha256": "65e25ca07f476ff2080594cab874e95ec8ace05d8761422aeafb480ae9baa6f3",
+        "sha256": "517860961b18babd2213c9efd00f044bd4f3064e6eaf40c55f8c6c449f5b0d36",
+        "start_byte": 5916
+      }
+    ],
+    "mysql-8046-icu-header": [
+      {
+        "end_byte_exclusive": 2391,
+        "file": "sources/mysql-8046-icu-header.body",
+        "first_line": 55,
+        "last_line": 68,
+        "representation_sha256": "ede6d900f95bee0f775ff2c7bc4bc3d0e29126870f48dfef4cf3a71256d52184",
+        "sha256": "9bc850d943360769fe1d05da9260d8e492bcf325c2643808be6b082ee0290105",
+        "start_byte": 2004
+      },
+      {
+        "end_byte_exclusive": 4657,
+        "file": "sources/mysql-8046-icu-header.body",
+        "first_line": 132,
+        "last_line": 137,
+        "representation_sha256": "ede6d900f95bee0f775ff2c7bc4bc3d0e29126870f48dfef4cf3a71256d52184",
+        "sha256": "a8318d233debdde7bac56a5815ffac9843cf0766066e5d3c7c8906d0ce6f0ea8",
+        "start_byte": 4538
+      }
+    ],
+    "mysql-8046-registry": [
+      {
+        "end_byte_exclusive": 51854,
+        "file": "sources/mysql-8046-registry.body",
+        "first_line": 1528,
+        "last_line": 1531,
+        "representation_sha256": "21aab9a24309565338982c6cac47f905ddfbeaa2ce5cc8d02a6c1d40a44a89b4",
+        "sha256": "14796351ef42a6db7c03284a955ade4ab4e1590d50ecee94301a26230f632860",
+        "start_byte": 51582
+      }
+    ],
+    "mysql-8046-tag": [
+      {
+        "end_byte_exclusive": 402,
+        "file": "sources/mysql-8046-tag.body",
+        "first_line": 2,
+        "last_line": 9,
+        "representation_sha256": "ef72c65c259e13a85cea941aa4d25ac7b5215bbac43e7d7aff94cc3700668340",
+        "sha256": "78b63a8f5a4c8542e74451b0d1bf62c6b2bd41cf119b356b09bd5af1acfffd53",
+        "start_byte": 2
+      }
+    ],
+    "mysql-84-release-index": [
+      {
+        "end_byte_exclusive": 26036,
+        "file": "sources/mysql-84-release-index.body",
+        "first_line": 358,
+        "last_line": 361,
+        "representation_sha256": "99d6b76d92b12a164a9cabef336428810b1caf13f8925b8f8cab06e068322b90",
+        "sha256": "cf7923321ca47a642112dbc3f14a80016c35bc2f241cd8381273442031a26772",
+        "start_byte": 25612
+      }
+    ],
+    "mysql-8410-cmake": [
+      {
+        "end_byte_exclusive": 1589,
+        "file": "sources/mysql-8410-cmake.body",
+        "first_line": 24,
+        "last_line": 32,
+        "representation_sha256": "65e25ca07f476ff2080594cab874e95ec8ace05d8761422aeafb480ae9baa6f3",
+        "sha256": "7299c0a25fff7b85a81d84276753be15e2f8ce0b62dc1da1a317a20d80a5440d",
+        "start_byte": 1182
+      },
+      {
+        "end_byte_exclusive": 4794,
+        "file": "sources/mysql-8410-cmake.body",
+        "first_line": 124,
+        "last_line": 125,
+        "representation_sha256": "65e25ca07f476ff2080594cab874e95ec8ace05d8761422aeafb480ae9baa6f3",
+        "sha256": "1700040acad32eaee29a92f82639aaa66982f9a34f47d782e3099505e5a47550",
+        "start_byte": 4683
+      },
+      {
+        "end_byte_exclusive": 6375,
+        "file": "sources/mysql-8410-cmake.body",
+        "first_line": 167,
+        "last_line": 185,
+        "representation_sha256": "65e25ca07f476ff2080594cab874e95ec8ace05d8761422aeafb480ae9baa6f3",
+        "sha256": "517860961b18babd2213c9efd00f044bd4f3064e6eaf40c55f8c6c449f5b0d36",
+        "start_byte": 5916
+      }
+    ],
+    "mysql-8410-engine": [
+      {
+        "end_byte_exclusive": 3760,
+        "file": "sources/mysql-8410-engine.body",
+        "first_line": 90,
+        "last_line": 100,
+        "representation_sha256": "833194cf1de93e2f96c097faa1924ad0483c057333ae6e0bb899a7341a26e70e",
+        "sha256": "a693040546a1b0fb7e21f46d0508fa1ec56ce3624f4d7b9f534654cf790b6d7e",
+        "start_byte": 3304
+      }
+    ],
+    "mysql-8410-facade-impl": [
+      {
+        "end_byte_exclusive": 5357,
+        "file": "sources/mysql-8410-facade-impl.body",
+        "first_line": 130,
+        "last_line": 146,
+        "representation_sha256": "0cc636f7c185ee4577f2caad10b458f463f3665473dda2ecf14cad07e23d603d",
+        "sha256": "9af256d93843ab503aa14591d1d669d2ac14f66809a22b2ec01101274c900fd9",
+        "start_byte": 4890
+      },
+      {
+        "end_byte_exclusive": 6691,
+        "file": "sources/mysql-8410-facade-impl.body",
+        "first_line": 174,
+        "last_line": 185,
+        "representation_sha256": "0cc636f7c185ee4577f2caad10b458f463f3665473dda2ecf14cad07e23d603d",
+        "sha256": "9f1f89d33d6b442a8bee57c4bd1b79ddddaf521c957ecc0febe80b68241af87d",
+        "start_byte": 6299
+      }
+    ],
+    "mysql-8410-icu-header": [
+      {
+        "end_byte_exclusive": 2391,
+        "file": "sources/mysql-8410-icu-header.body",
+        "first_line": 55,
+        "last_line": 68,
+        "representation_sha256": "ede6d900f95bee0f775ff2c7bc4bc3d0e29126870f48dfef4cf3a71256d52184",
+        "sha256": "9bc850d943360769fe1d05da9260d8e492bcf325c2643808be6b082ee0290105",
+        "start_byte": 2004
+      },
+      {
+        "end_byte_exclusive": 4657,
+        "file": "sources/mysql-8410-icu-header.body",
+        "first_line": 132,
+        "last_line": 137,
+        "representation_sha256": "ede6d900f95bee0f775ff2c7bc4bc3d0e29126870f48dfef4cf3a71256d52184",
+        "sha256": "a8318d233debdde7bac56a5815ffac9843cf0766066e5d3c7c8906d0ce6f0ea8",
+        "start_byte": 4538
+      }
+    ],
+    "mysql-8410-item": [
+      {
+        "end_byte_exclusive": 5655,
+        "file": "sources/mysql-8410-item.body",
+        "first_line": 126,
+        "last_line": 158,
+        "representation_sha256": "215edea4e6c2e2807ef6601e3281668a2453b7e5bbcad1efdfb4cf9f470acd2e",
+        "sha256": "b0aef62c37e5c85c138e7eaf5756095147415f50378c1f844d7491d9e3476103",
+        "start_byte": 4720
+      }
+    ],
+    "mysql-8410-sql-grammar": [
+      {
+        "end_byte_exclusive": 331633,
+        "file": "sources/mysql-8410-sql-grammar.body",
+        "first_line": 10229,
+        "last_line": 10245,
+        "representation_sha256": "91c79ba42c614439e2b134d454ce9da45da930dbfd81c0873476b09360dc2541",
+        "sha256": "e009314f73b401c0396aa89a997bfa6ce4f11ada45c3330d41fa9136bb99f6e5",
+        "start_byte": 331050
+      }
+    ],
+    "mysql-8410-sql-registration": [
+      {
+        "end_byte_exclusive": 51890,
+        "file": "sources/mysql-8410-sql-registration.body",
+        "first_line": 1529,
+        "last_line": 1532,
+        "representation_sha256": "8f82c4c9c354afa8276e762b19243397ea405f0780ce6f9e099280af8e5f5532",
+        "sha256": "14796351ef42a6db7c03284a955ade4ab4e1590d50ecee94301a26230f632860",
+        "start_byte": 51618
+      }
+    ],
+    "mysql-8410-tag": [
+      {
+        "end_byte_exclusive": 402,
+        "file": "sources/mysql-8410-tag.body",
+        "first_line": 2,
+        "last_line": 9,
+        "representation_sha256": "0ceb4526ef524db56107efdcfaffb91859bc4e8a2b577538b911f1e0414b7929",
+        "sha256": "dc0a9615f24bf9ba755003d27dff0661fb704215982c9bbb47ae02240d838f03",
+        "start_byte": 2
+      }
+    ],
+    "mysql-8411-tag": [
+      {
+        "end_byte_exclusive": 402,
+        "file": "sources/mysql-8411-tag.body",
+        "first_line": 2,
+        "last_line": 9,
+        "representation_sha256": "d24ae4194bcb6f2446ca85472e7de565de17fc21db6cd71d682f74a925e75ea3",
+        "sha256": "0377c8d5ed1dfd3311786de85cd8c7ea441cbf39c2d1b6f61b102eed85126737",
+        "start_byte": 2
+      }
+    ],
+    "mysql-developer-8410": [
+      {
+        "end_byte_exclusive": 22310,
+        "file": "sources/mysql-developer-8410.body",
+        "first_line": 270,
+        "last_line": 278,
+        "representation_sha256": "a3cb9740af7fdc523b1e757a5b26aa3af3d8f3d3b622c72cb9dafc4a7c7e03e6",
+        "sha256": "1b3d5252ef5a3741809aecca9b1505c5f47272e5c83ce869de086f708ccef7b2",
+        "start_byte": 21644
+      }
+    ],
+    "mysql-developer-8411": [
+      {
+        "end_byte_exclusive": 22314,
+        "file": "sources/mysql-developer-8411.body",
+        "first_line": 270,
+        "last_line": 278,
+        "representation_sha256": "09a0e03e7b37d1d9d60655977492cbc0dc8ccaef722d7c28291213aaa2ba9457",
+        "sha256": "1b3d5252ef5a3741809aecca9b1505c5f47272e5c83ce869de086f708ccef7b2",
+        "start_byte": 21648
+      }
+    ],
+    "mysql-innovation-facility": [
+      {
+        "end_byte_exclusive": 66120,
+        "file": "sources/mysql-innovation-facility.body",
+        "first_line": 703,
+        "last_line": 760,
+        "representation_sha256": "91ae68d7c0c7934b0fcd1e46e73629e4eae3fb7cb9550a953637b3569ec4979a",
+        "sha256": "2887ff1b204bc46eb08c145325ef6f48c101f57203d229b4ae9ecd6a35224d61",
+        "start_byte": 62778
+      }
+    ],
+    "mysql-innovation-model": [
+      {
+        "end_byte_exclusive": 43007,
+        "file": "sources/mysql-innovation-model.body",
+        "first_line": 522,
+        "last_line": 550,
+        "representation_sha256": "6782aa1b926bb532a510459065cd422acd311f65f40280894b948a599f746342",
+        "sha256": "ce72fe9171cae4ad509fdfa90091904ed2e6d14213bd6c95e72970eaf9a8da57",
+        "start_byte": 41826
+      }
+    ],
+    "mysql-oracle-facility": [
+      {
+        "end_byte_exclusive": 5532,
+        "file": "sources/mysql-oracle-facility.body",
+        "first_line": 6,
+        "last_line": 47,
+        "representation_sha256": "97b6246defcedeb9955b7a8d1bf6761add5b330c39a9830961911a40b87105f6",
+        "sha256": "c5fed70a4fbbaedab7bc10b73801333e7d37aad6ceb34f9f2c900c9954c3cc6a",
+        "start_byte": 3398
+      }
+    ],
+    "mysql-oracle-reference": [
+      {
+        "end_byte_exclusive": 3440,
+        "file": "sources/mysql-oracle-reference-p29.extract.txt",
+        "first_line": 1,
+        "last_line": 43,
+        "note": "UTF-8 text derived by pypdf; ranges refer to the derived page text.",
+        "pdf_page_one_based": 29,
+        "representation_sha256": "a44da14e0d0760019d3e45dfda92b254dec87ace38f9999a15636035203b4dff",
+        "sha256": "a44da14e0d0760019d3e45dfda92b254dec87ace38f9999a15636035203b4dff",
+        "start_byte": 0
+      },
+      {
+        "end_byte_exclusive": 3753,
+        "file": "sources/mysql-oracle-reference-p37.extract.txt",
+        "first_line": 1,
+        "last_line": 45,
+        "note": "UTF-8 text derived by pypdf; ranges refer to the derived page text.",
+        "pdf_page_one_based": 37,
+        "representation_sha256": "adfe9325ddb2b8841db7449cba45104a35a9bd0bc4ebac78cd87b127e3f69bf1",
+        "sha256": "adfe9325ddb2b8841db7449cba45104a35a9bd0bc4ebac78cd87b127e3f69bf1",
+        "start_byte": 0
+      },
+      {
+        "end_byte_exclusive": 3397,
+        "file": "sources/mysql-oracle-reference-p2013.extract.txt",
+        "first_line": 1,
+        "last_line": 38,
+        "note": "UTF-8 text derived by pypdf; ranges refer to the derived page text.",
+        "pdf_page_one_based": 2013,
+        "representation_sha256": "6f9a5866fc8b58a86d068013c6c4888359718e6b30032119204ed1ae72c34cba",
+        "sha256": "6f9a5866fc8b58a86d068013c6c4888359718e6b30032119204ed1ae72c34cba",
+        "start_byte": 0
+      },
+      {
+        "end_byte_exclusive": 2470,
+        "file": "sources/mysql-oracle-reference-p2352.extract.txt",
+        "first_line": 1,
+        "last_line": 51,
+        "note": "UTF-8 text derived by pypdf; ranges refer to the derived page text.",
+        "pdf_page_one_based": 2352,
+        "representation_sha256": "6ec77a9e752a27dfbb6221ed2d11bfb44cf0b6147e7e245daef20600fdde3063",
+        "sha256": "6ec77a9e752a27dfbb6221ed2d11bfb44cf0b6147e7e245daef20600fdde3063",
+        "start_byte": 0
+      },
+      {
+        "end_byte_exclusive": 2269,
+        "file": "sources/mysql-oracle-reference-p2353.extract.txt",
+        "first_line": 1,
+        "last_line": 46,
+        "note": "UTF-8 text derived by pypdf; ranges refer to the derived page text.",
+        "pdf_page_one_based": 2353,
+        "representation_sha256": "b7b0d694cbe88d856e33f6d960616b93da6c2183da44905fddcb1ede7991cca6",
+        "sha256": "b7b0d694cbe88d856e33f6d960616b93da6c2183da44905fddcb1ede7991cca6",
+        "start_byte": 0
+      },
+      {
+        "end_byte_exclusive": 2914,
+        "file": "sources/mysql-oracle-reference-p2355.extract.txt",
+        "first_line": 1,
+        "last_line": 46,
+        "note": "UTF-8 text derived by pypdf; ranges refer to the derived page text.",
+        "pdf_page_one_based": 2355,
+        "representation_sha256": "555e509d7cdbd8e26e0a4e2dc10e2d51af51d96aeef41241e2e11f92b04ecc41",
+        "sha256": "555e509d7cdbd8e26e0a4e2dc10e2d51af51d96aeef41241e2e11f92b04ecc41",
+        "start_byte": 0
+      }
+    ],
+    "mysql-original-facility": [
+      {
+        "end_byte_exclusive": 61807,
+        "file": "sources/mysql-original-facility.body",
+        "first_line": 673,
+        "last_line": 682,
+        "representation_sha256": "b77443dd0378d6820a391258e37becb9a106356f8284dba6e4e0011900e3bb56",
+        "sha256": "54e7b5809cd93b402145cdac2b11253696e9a5554990b68ec3acd63ff8458371",
+        "start_byte": 61039
+      },
+      {
+        "end_byte_exclusive": 65477,
+        "file": "sources/mysql-original-facility.body",
+        "first_line": 699,
+        "last_line": 754,
+        "representation_sha256": "b77443dd0378d6820a391258e37becb9a106356f8284dba6e4e0011900e3bb56",
+        "sha256": "b67f97090851dcd91ebc38cebc4d4dc9a51613a0ec32fcac5add071ffde5b186",
+        "start_byte": 62246
+      },
+      {
+        "end_byte_exclusive": 68360,
+        "file": "sources/mysql-original-facility.body",
+        "first_line": 780,
+        "last_line": 799,
+        "representation_sha256": "b77443dd0378d6820a391258e37becb9a106356f8284dba6e4e0011900e3bb56",
+        "sha256": "786d72febf6e6270c1502a2b2e836c2b5747cbed2435ff0b1541175326cf6d31",
+        "start_byte": 66618
+      }
+    ],
+    "strling-planning": [
+      {
+        "end_byte_exclusive": 326,
+        "file": "sources/strling-planning.body",
+        "first_line": 1,
+        "last_line": 8,
+        "representation_sha256": "0601c2c948b19c7f5265bd53260c7c8a47478d12d3dc79e863a2f2f8e411f9f8",
+        "sha256": "e5d1d1bd2be96e1655ff1e4663dd065a97126bb141005f7f7c4cf8748cf7ca52",
+        "start_byte": 0
+      },
+      {
+        "end_byte_exclusive": 22356,
+        "file": "sources/strling-planning.body",
+        "first_line": 108,
+        "last_line": 108,
+        "representation_sha256": "0601c2c948b19c7f5265bd53260c7c8a47478d12d3dc79e863a2f2f8e411f9f8",
+        "sha256": "f56ddb45bfd608dbaa0b53ab48e112d63712b27a9ae31ab2b9e98dc1f44bb4c1",
+        "start_byte": 21907
+      },
+      {
+        "end_byte_exclusive": 24662,
+        "file": "sources/strling-planning.body",
+        "first_line": 113,
+        "last_line": 113,
+        "representation_sha256": "0601c2c948b19c7f5265bd53260c7c8a47478d12d3dc79e863a2f2f8e411f9f8",
+        "sha256": "bb0ac6d86523f137e7590e7717fd27466157429f59240636831104911563e832",
+        "start_byte": 24211
+      },
+      {
+        "end_byte_exclusive": 26360,
+        "file": "sources/strling-planning.body",
+        "first_line": 117,
+        "last_line": 117,
+        "representation_sha256": "0601c2c948b19c7f5265bd53260c7c8a47478d12d3dc79e863a2f2f8e411f9f8",
+        "sha256": "e0591228740ee06c8c9dde11a7ce155af2af5f76ea21061a32de415bbbd1ad4c",
+        "start_byte": 25970
+      }
+    ],
+    "tsql-2025-pinned-applies": [
+      {
+        "end_byte_exclusive": 424,
+        "file": "sources/tsql-2025-pinned-applies.body",
+        "first_line": 11,
+        "last_line": 11,
+        "representation_sha256": "24f6381bd1aa33f0287402b945b53ba288e4304c2a077655d8d70d708ffb79eb",
+        "sha256": "84939d9cff41e5f5c188a2fbf2f0d758925ca605db1e4115f9d19e58952e47f9",
+        "start_byte": 131
+      }
+    ],
+    "tsql-2025-pinned-functions": [
+      {
+        "end_byte_exclusive": 1517,
+        "file": "sources/tsql-2025-pinned-functions.body",
+        "first_line": 12,
+        "last_line": 20,
+        "representation_sha256": "ce39dad99a8f7a9efd8956f5d529646c390a18253842d2fbd53f2c23d8611442",
+        "sha256": "e326b4662585bb2b0a3fb229cb2af3be59fbc18cf18415122c40be5cc4aed9e6",
+        "start_byte": 154
+      }
+    ],
+    "tsql-2025-pinned-overview": [
+      {
+        "end_byte_exclusive": 1773,
+        "file": "sources/tsql-2025-pinned-overview.body",
+        "first_line": 20,
+        "last_line": 34,
+        "representation_sha256": "06b42aff5f206233eb02abfed2596a70ddad9b3cdffa3aae7631e378d49485f9",
+        "sha256": "78f80e718fd31c64b5f1115111d35bd546a539768701c5887bc2d0f8ec6e4f94",
+        "start_byte": 521
+      },
+      {
+        "end_byte_exclusive": 7677,
+        "file": "sources/tsql-2025-pinned-overview.body",
+        "first_line": 167,
+        "last_line": 170,
+        "representation_sha256": "06b42aff5f206233eb02abfed2596a70ddad9b3cdffa3aae7631e378d49485f9",
+        "sha256": "689acbdff30e54b3af46c261c9aa0d85cf6cb32e81721a9fa6bd753be0e31358",
+        "start_byte": 7103
+      },
+      {
+        "end_byte_exclusive": 9137,
+        "file": "sources/tsql-2025-pinned-overview.body",
+        "first_line": 195,
+        "last_line": 195,
+        "representation_sha256": "06b42aff5f206233eb02abfed2596a70ddad9b3cdffa3aae7631e378d49485f9",
+        "sha256": "5a7cf65603582af13ac9350b13a1a80d9ba80ed6d9c95318524093de6f5872e3",
+        "start_byte": 9019
+      }
+    ],
+    "tsql-2025-pinned-regexp-like": [
+      {
+        "end_byte_exclusive": 1309,
+        "file": "sources/tsql-2025-pinned-regexp-like.body",
+        "first_line": 18,
+        "last_line": 37,
+        "representation_sha256": "79ac4d67160f4bbd0380c50edf1f0b01a8c29e1dc7aef84513d9ca4d84d20a9d",
+        "sha256": "499b65f29d60ea170127eff28645c1ac7c9454fc94d9f8bf50e0381206921b36",
+        "start_byte": 497
+      },
+      {
+        "end_byte_exclusive": 3109,
+        "file": "sources/tsql-2025-pinned-regexp-like.body",
+        "first_line": 75,
+        "last_line": 79,
+        "representation_sha256": "79ac4d67160f4bbd0380c50edf1f0b01a8c29e1dc7aef84513d9ca4d84d20a9d",
+        "sha256": "fb716aec065ea485a8198ed2085ae239fac4f9148316d2235af6187ee89a3796",
+        "start_byte": 3035
+      }
+    ],
+    "tsql-2025-regexp-matches-live": [
+      {
+        "end_byte_exclusive": 32224,
+        "file": "sources/tsql-2025-regexp-matches-live.body",
+        "first_line": 858,
+        "last_line": 868,
+        "representation_sha256": "2f668f44ab4a9a86b50aed2ab4b90995b7bf0638853f879fee27a331ee389c01",
+        "sha256": "92003b7f752cec8ed411bae92f76d77ab287670345c90763c2df2cf1d9419615",
+        "start_byte": 30970
+      }
+    ],
+    "tsql-2025-regexp-split-live": [
+      {
+        "end_byte_exclusive": 32466,
+        "file": "sources/tsql-2025-regexp-split-live.body",
+        "first_line": 858,
+        "last_line": 868,
+        "representation_sha256": "d242de9525835145638d5144fd477b4a1eec54c90e22a63c281c0501bf9b1545",
+        "sha256": "76978e867a7a4f6b00650b3816e4e57e6a92f8586b2541a9dd9a0a40dc0418d8",
+        "start_byte": 31258
+      }
+    ],
+    "tsql-builds": [
+      {
+        "end_byte_exclusive": 72007,
+        "file": "sources/tsql-builds.body",
+        "first_line": 776,
+        "last_line": 792,
+        "representation_sha256": "aa01d2386e9a98d74ff0f70fa7a77e0a4a26995d47cb2b2937fa43f1077101b2",
+        "sha256": "1c72443ee2b6f0d884eb6693e684749fc90ebfc2b90f4523f7fef7eff4dece64",
+        "start_byte": 71545
+      }
+    ],
+    "tsql-cu8-canonical": [
+      {
+        "end_byte_exclusive": 65092,
+        "file": "sources/tsql-cu8-canonical.body",
+        "first_line": 734,
+        "last_line": 744,
+        "representation_sha256": "db730f29470020ebe63cd3b4292abe3703dd96725777206e5264641f831b6aff",
+        "sha256": "10e4684369772cf50446c584089b6357affd0cd271363a68f6dd8abf0350a001",
+        "start_byte": 64205
+      }
+    ],
+    "tsql-original-facility": [
+      {
+        "end_byte_exclusive": 28277,
+        "file": "sources/tsql-original-facility.body",
+        "first_line": 764,
+        "last_line": 777,
+        "representation_sha256": "cffe558556fc54886109a43f5d886bef100e2860dbea59331e78f0161af6893b",
+        "sha256": "e33b69450313682fb27c8af61e6fc181d6f3d64fbdc9eeee8ed491a18b247e9b",
+        "start_byte": 26070
+      },
+      {
+        "end_byte_exclusive": 41751,
+        "file": "sources/tsql-original-facility.body",
+        "first_line": 1160,
+        "last_line": 1182,
+        "representation_sha256": "cffe558556fc54886109a43f5d886bef100e2860dbea59331e78f0161af6893b",
+        "sha256": "ef55f37cf89615225d6d4cb4b18c07e44a05c5d395cfb975863f98639b47d066",
+        "start_byte": 39345
+      }
+    ],
+    "tsql-reference": [
+      {
+        "end_byte_exclusive": 1490,
+        "file": "sources/tsql-reference.body",
+        "first_line": 21,
+        "last_line": 34,
+        "representation_sha256": "788db980778b2fa3521fbfaefe9d689e446283a40a39d594fe38ff6adc20d964",
+        "sha256": "644ac6d2bd11927cafcadcc68da5b6519d88d109847537d91a91c205c32722a7",
+        "start_byte": 582
+      },
+      {
+        "end_byte_exclusive": 2387,
+        "file": "sources/tsql-reference.body",
+        "first_line": 40,
+        "last_line": 51,
+        "representation_sha256": "788db980778b2fa3521fbfaefe9d689e446283a40a39d594fe38ff6adc20d964",
+        "sha256": "bc7657569a8c3c4b00a20e94cabf562ee5d0284959c2927c47d3ded8c7b42f38",
+        "start_byte": 1826
+      }
+    ]
+  }
+}

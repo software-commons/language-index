@@ -1,0 +1,771 @@
+{
+  "classifier_commit": "cfd7a0113aa1efab99faeff38756f0ed4d48add8",
+  "leads": [
+    {
+      "candidate_sha256": "d6dc7dacc6cfaf902e35f58d5d7a10c87b7b97dfe13cb87a04d9f65ba7275ae1",
+      "catalog_citation_sha256": "691b5052079258c6733fe5bb9ccbb8ee4a0bdbb35618d3ddb0e974733af1ea20",
+      "catalog_lines": [
+        8805,
+        8824
+      ],
+      "label": "Visual Basic 6.0",
+      "lead_id": "53451fa1ee1b4107bfda56ba44aa7d9a",
+      "original_classifier_locator": "https://github.com/github-linguist/linguist/blob/cfd7a0113aa1efab99faeff38756f0ed4d48add8/lib/linguist/languages.yml#L8805",
+      "sample_checks": [
+        {
+          "git_blob_sha1": "9d2310642c82f659b484e4e0d18bc886cbe61878",
+          "locator": {
+            "end_byte_exclusive": 1512,
+            "file": "sources/wizard-dsr.body",
+            "first_line": 21,
+            "last_line": 35,
+            "representation_sha256": "1c88db0066901b87a84b50d888fc0944d63a59f576b4c97c53e9c32319b3ba6d",
+            "sha256": "495ca6faf3a43128a87097567ac9e4abd85c0aa733fb07a23363ac7cb627f5ac",
+            "start_byte": 959
+          },
+          "path": "samples/Visual Basic 6.0/Wizard.Dsr",
+          "physical_line_count": 99,
+          "source_key": "wizard-dsr"
+        },
+        {
+          "git_blob_sha1": "8d7bd551770a6f324f16cf5175fd3604e4592863",
+          "locator": {
+            "end_byte_exclusive": 154,
+            "file": "sources/datareport-dsr.body",
+            "first_line": 1,
+            "last_line": 4,
+            "representation_sha256": "8878bd6626bff758855f6c9d015a6c6cda80709d3b87dadf624fbdc5013c9ea7",
+            "sha256": "4ad37c53b41e516c58b11f722c31b0d14247580129f9d010469cf359219d36c5",
+            "start_byte": 0
+          },
+          "path": "samples/Visual Basic 6.0/DataReport1.Dsr",
+          "physical_line_count": 364,
+          "source_key": "datareport-dsr"
+        }
+      ],
+      "target_identity": {
+        "id": "073c83d7e2684a64a451652745b0d372",
+        "identity_claim": {
+          "id": "visual-basic-6-edition-boundary",
+          "kind": "claim",
+          "revision": 1
+        },
+        "kind": "edition",
+        "name": "Visual Basic 6.0",
+        "sha256": "8c42240caa255096b8275137a8cf232a13864410b089b6e4bec393e3dada2502"
+      },
+      "witness_keys": [
+        "catalog",
+        "wizard-dsr",
+        "datareport-dsr",
+        "vb-lineage-vs2005-archive",
+        "ms-old-datareport-object"
+      ]
+    },
+    {
+      "candidate_sha256": "445f6241c59ee400653c882b652e156f561f4560d045ec093203633ea54fdb71",
+      "catalog_citation_sha256": "8c07bbf075f2af1483721d188e1b71c1fec2408116aade083a76624505995922",
+      "catalog_lines": [
+        8789,
+        8804
+      ],
+      "label": "Visual Basic .NET",
+      "lead_id": "8f5c8be36362420cb4c116a6cf888aea",
+      "original_classifier_locator": "https://github.com/github-linguist/linguist/blob/cfd7a0113aa1efab99faeff38756f0ed4d48add8/lib/linguist/languages.yml#L8789",
+      "sample_checks": [
+        {
+          "git_blob_sha1": "760635ff6f6d8b5bb7d43180040350abd78a9dcb",
+          "locator": {
+            "end_byte_exclusive": 436,
+            "file": "sources/vballinone-vb.body",
+            "first_line": 7,
+            "last_line": 15,
+            "representation_sha256": "76660d617033dd5ece10e11c04d2a6ac7a426776c5480e2e7d433b5c43ddef7c",
+            "sha256": "ba1a16846ecdec0c38e122857052601f002ec9f85e2a30797d8a64e55d6aec34",
+            "start_byte": 216
+          },
+          "path": "samples/Visual Basic .NET/VBAllInOne.vb",
+          "physical_line_count": 1093,
+          "source_key": "vballinone-vb"
+        }
+      ],
+      "target_identity": {
+        "id": "8232f0f368c54ded97dcfbfb81fa4b17",
+        "identity_claim": {
+          "id": "visual-basic-language-identity",
+          "kind": "claim",
+          "revision": 1
+        },
+        "kind": "language",
+        "name": "Visual Basic for .NET",
+        "sha256": "ea62d11c17e5d326f25c1e2f076604a571338c9bfa3ea1dcee0415ddb9fda94b"
+      },
+      "witness_keys": [
+        "catalog",
+        "vballinone-vb",
+        "vb-dotnet-spec-intro",
+        "vb-dotnet-pinned-imports"
+      ]
+    },
+    {
+      "candidate_sha256": "a6273b513e2c1c1d89a270d6e6409130cfb26bfd98a5ff7ccb5171f35bdf4f43",
+      "catalog_citation_sha256": "a65c029bdb7cd9afab90247a97e290a4f77e68c0095daa1ea9e99eaf9172f396",
+      "catalog_lines": [
+        8632,
+        8641
+      ],
+      "label": "VBScript",
+      "lead_id": "9475d3a8f95b40a89f28cc2c0fcc5524",
+      "original_classifier_locator": "https://github.com/github-linguist/linguist/blob/cfd7a0113aa1efab99faeff38756f0ed4d48add8/lib/linguist/languages.yml#L8632",
+      "sample_checks": [
+        {
+          "git_blob_sha1": "e5073fd59250e58f609387f89cd3259de49fefa0",
+          "locator": {
+            "end_byte_exclusive": 165,
+            "file": "sources/arraylist-vbs.body",
+            "first_line": 1,
+            "last_line": 9,
+            "representation_sha256": "6efc4886dc8c23729694163c85ec3c149b91ade205dadc77b8da2c1b149a8288",
+            "sha256": "04c8ce0c447040d4a115487b449532a10e98c4bfdcf5dcc3c5c40bb0a1b8c32f",
+            "start_byte": 0
+          },
+          "path": "samples/VBScript/v_Data_ArrayList.vbs",
+          "physical_line_count": 140,
+          "source_key": "arraylist-vbs"
+        },
+        {
+          "git_blob_sha1": "e5073fd59250e58f609387f89cd3259de49fefa0",
+          "locator": {
+            "end_byte_exclusive": 2695,
+            "file": "sources/arraylist-vbs.body",
+            "first_line": 129,
+            "last_line": 140,
+            "representation_sha256": "6efc4886dc8c23729694163c85ec3c149b91ade205dadc77b8da2c1b149a8288",
+            "sha256": "0d91382019e2fc87f3cb01db06f17ddcd140a165bd450343f4870ab15f9ed446",
+            "start_byte": 2443
+          },
+          "path": "samples/VBScript/v_Data_ArrayList.vbs",
+          "physical_line_count": 140,
+          "source_key": "arraylist-vbs"
+        }
+      ],
+      "target_identity": {
+        "id": "cde7450c7b6849c393f6f65c214e3634",
+        "identity_claim": {
+          "id": "vbscript-dialect-boundary",
+          "kind": "claim",
+          "revision": 1
+        },
+        "kind": "dialect",
+        "name": "VBScript",
+        "sha256": "e1806a420dbd60f8e59f15b71a136650caec2f63bafe50f8bf473af65447309b"
+      },
+      "witness_keys": [
+        "catalog",
+        "arraylist-vbs",
+        "vb-lineage-vbscript-com-translation-md",
+        "vb-wscript-host-doc",
+        "ms-wscript-md",
+        "ms-arraylist"
+      ]
+    }
+  ],
+  "policy": {
+    "adopter_sha256": "87a1bca34529d1d398e5b7c1e9414ba946585003f06e424431bbad6bbc355e72",
+    "bundle_sha256": "14da3f31f697ab828d4a4560f060dbe511861020db54bea7bc531e20ea0855ce",
+    "caller_sha256": "9ae7780b9eb02efd2823485e0265bab67c2b9d96ac1ea18f674f1fb0f0d42a80",
+    "commit": "ab26f278422772f2d9e5d4dd016407d14372a710",
+    "policy_file_count_verified": 15,
+    "standard": "SCES-1.0"
+  },
+  "primary_bundle_sha256": "669d074dbe03a1ac767fd1a7a1cdcad31d00a0ca0c923fb1f2c24fa5ad67cf3f",
+  "primary_execution": "01a207c2-9f18-72e1-9870-b5472b985b07",
+  "primary_turn": "01a207cc-f892-7793-ab42-ad50b923a3ea",
+  "question": "Does the exact pinned classifier refer to this accepted language or edition in the scoped original-sample context? Check alternative dialect, tooling or file-format interpretations.",
+  "review_method": "Independently reacquire the exact classifier and sample files plus the necessary publisher material. Verify body and span checks, distinguish tooling, format, host, API and language roles, and decide the scoped lead. Investigate potential contrary interpretations before opening the primary decisions.",
+  "source_witnesses_sha256": "f66d8bad0ff018054cb8762883bc9a2c5380fe793bb9890cdf7c29513f6a9afe",
+  "witnesses": {
+    "arraylist-vbs": {
+      "effective_url": "https://raw.githubusercontent.com/github-linguist/linguist/cfd7a0113aa1efab99faeff38756f0ed4d48add8/samples/VBScript/v_Data_ArrayList.vbs",
+      "publisher": "GitHub Linguist",
+      "role": "pinned-classifier-sample",
+      "sha256": "6efc4886dc8c23729694163c85ec3c149b91ade205dadc77b8da2c1b149a8288",
+      "size_bytes": 2695,
+      "source": {
+        "id": "vb-native-arraylist-vbs",
+        "kind": "source",
+        "revision": 1
+      },
+      "source_version": "cfd7a0113aa1efab99faeff38756f0ed4d48add8",
+      "spans": [
+        {
+          "end_byte_exclusive": 165,
+          "file": "sources/arraylist-vbs.body",
+          "first_line": 1,
+          "last_line": 9,
+          "representation_sha256": "6efc4886dc8c23729694163c85ec3c149b91ade205dadc77b8da2c1b149a8288",
+          "sha256": "04c8ce0c447040d4a115487b449532a10e98c4bfdcf5dcc3c5c40bb0a1b8c32f",
+          "start_byte": 0
+        },
+        {
+          "end_byte_exclusive": 403,
+          "file": "sources/arraylist-vbs.body",
+          "first_line": 12,
+          "last_line": 22,
+          "representation_sha256": "6efc4886dc8c23729694163c85ec3c149b91ade205dadc77b8da2c1b149a8288",
+          "sha256": "09bbfff0152bc0fd2141696cd7cc6649e9f17656413a00942a18c1a9a62411c4",
+          "start_byte": 167
+        },
+        {
+          "end_byte_exclusive": 2695,
+          "file": "sources/arraylist-vbs.body",
+          "first_line": 124,
+          "last_line": 140,
+          "representation_sha256": "6efc4886dc8c23729694163c85ec3c149b91ade205dadc77b8da2c1b149a8288",
+          "sha256": "24e65d644c8dcc93fb7c5de6ba757a2efc13f172d16b5aca0c462c122ae143a2",
+          "start_byte": 2365
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/github-linguist/linguist/cfd7a0113aa1efab99faeff38756f0ed4d48add8/samples/VBScript/v_Data_ArrayList.vbs"
+    },
+    "catalog": {
+      "effective_url": "https://raw.githubusercontent.com/github-linguist/linguist/cfd7a0113aa1efab99faeff38756f0ed4d48add8/lib/linguist/languages.yml",
+      "publisher": "GitHub Linguist",
+      "role": "publisher-classifier",
+      "sha256": "05e20bd736808a9e468ae1546e1a3b518b95fa215ee6f746903f7e164a9fd37b",
+      "size_bytes": 168360,
+      "source": {
+        "id": "vb-native-catalog",
+        "kind": "source",
+        "revision": 1
+      },
+      "source_version": "cfd7a0113aa1efab99faeff38756f0ed4d48add8",
+      "spans": [
+        {
+          "end_byte_exclusive": 148647,
+          "file": "sources/catalog.body",
+          "first_line": 8617,
+          "last_line": 8631,
+          "representation_sha256": "05e20bd736808a9e468ae1546e1a3b518b95fa215ee6f746903f7e164a9fd37b",
+          "sha256": "8b8c9183e03e1191377b328aedc5a60128b556c6d637534e6c763adb6030dcfa",
+          "start_byte": 148379
+        },
+        {
+          "end_byte_exclusive": 148858,
+          "file": "sources/catalog.body",
+          "first_line": 8632,
+          "last_line": 8641,
+          "representation_sha256": "05e20bd736808a9e468ae1546e1a3b518b95fa215ee6f746903f7e164a9fd37b",
+          "sha256": "a65c029bdb7cd9afab90247a97e290a4f77e68c0095daa1ea9e99eaf9172f396",
+          "start_byte": 148647
+        },
+        {
+          "end_byte_exclusive": 151529,
+          "file": "sources/catalog.body",
+          "first_line": 8789,
+          "last_line": 8804,
+          "representation_sha256": "05e20bd736808a9e468ae1546e1a3b518b95fa215ee6f746903f7e164a9fd37b",
+          "sha256": "8c07bbf075f2af1483721d188e1b71c1fec2408116aade083a76624505995922",
+          "start_byte": 151255
+        },
+        {
+          "end_byte_exclusive": 151873,
+          "file": "sources/catalog.body",
+          "first_line": 8805,
+          "last_line": 8824,
+          "representation_sha256": "05e20bd736808a9e468ae1546e1a3b518b95fa215ee6f746903f7e164a9fd37b",
+          "sha256": "691b5052079258c6733fe5bb9ccbb8ee4a0bdbb35618d3ddb0e974733af1ea20",
+          "start_byte": 151529
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/github-linguist/linguist/cfd7a0113aa1efab99faeff38756f0ed4d48add8/lib/linguist/languages.yml"
+    },
+    "datareport-dsr": {
+      "effective_url": "https://raw.githubusercontent.com/github-linguist/linguist/cfd7a0113aa1efab99faeff38756f0ed4d48add8/samples/Visual%20Basic%206.0/DataReport1.Dsr",
+      "publisher": "GitHub Linguist",
+      "role": "pinned-classifier-sample",
+      "sha256": "8878bd6626bff758855f6c9d015a6c6cda80709d3b87dadf624fbdc5013c9ea7",
+      "size_bytes": 13885,
+      "source": {
+        "id": "vb-native-datareport-dsr",
+        "kind": "source",
+        "revision": 1
+      },
+      "source_version": "cfd7a0113aa1efab99faeff38756f0ed4d48add8",
+      "spans": [
+        {
+          "end_byte_exclusive": 554,
+          "file": "sources/datareport-dsr.body",
+          "first_line": 1,
+          "last_line": 16,
+          "representation_sha256": "8878bd6626bff758855f6c9d015a6c6cda80709d3b87dadf624fbdc5013c9ea7",
+          "sha256": "8dd4160024fca171dee156397b9c41fa8155c8dadbd038938f5ad4624e979895",
+          "start_byte": 0
+        },
+        {
+          "end_byte_exclusive": 1346,
+          "file": "sources/datareport-dsr.body",
+          "first_line": 24,
+          "last_line": 40,
+          "representation_sha256": "8878bd6626bff758855f6c9d015a6c6cda80709d3b87dadf624fbdc5013c9ea7",
+          "sha256": "8671403a41cf7405fc4a1ec71999dc3d082bde98f8fe9db565854af79a671325",
+          "start_byte": 769
+        },
+        {
+          "end_byte_exclusive": 13885,
+          "file": "sources/datareport-dsr.body",
+          "first_line": 350,
+          "last_line": 364,
+          "representation_sha256": "8878bd6626bff758855f6c9d015a6c6cda80709d3b87dadf624fbdc5013c9ea7",
+          "sha256": "0ff919c0734aaff3a678d860c19e1b31b7276da0433bc32f1fb9f53dc3cc60bc",
+          "start_byte": 13432
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/github-linguist/linguist/cfd7a0113aa1efab99faeff38756f0ed4d48add8/samples/Visual%20Basic%206.0/DataReport1.Dsr"
+    },
+    "ms-arraylist": {
+      "effective_url": "https://learn.microsoft.com/en-us/dotnet/api/system.collections.arraylist?view=netframework-4.8.1",
+      "publisher": "Microsoft",
+      "role": "official-documentation",
+      "sha256": "f04e0d3b9b0c91aca87f5821e2dcfd7f4e598e9ade35959da3aa8d859bfda5e6",
+      "size_bytes": 106235,
+      "source": {
+        "id": "vb-native-ms-arraylist",
+        "kind": "source",
+        "revision": 1
+      },
+      "source_version": ".NET Framework 4.8.1 API view",
+      "spans": [
+        {
+          "end_byte_exclusive": 27630,
+          "file": "sources/ms-arraylist.body",
+          "first_line": 854,
+          "last_line": 860,
+          "representation_sha256": "f04e0d3b9b0c91aca87f5821e2dcfd7f4e598e9ade35959da3aa8d859bfda5e6",
+          "sha256": "a0703fb69e8758b4ad09ef3067d03cd3ee8bae59b9f8dbf30f191cadbf357a4d",
+          "start_byte": 27380
+        },
+        {
+          "end_byte_exclusive": 33133,
+          "file": "sources/ms-arraylist.body",
+          "first_line": 914,
+          "last_line": 923,
+          "representation_sha256": "f04e0d3b9b0c91aca87f5821e2dcfd7f4e598e9ade35959da3aa8d859bfda5e6",
+          "sha256": "2fe5a375a9630c2a2e5a656cd922202fa2416f4defb4a5102b26fd0f3f51815e",
+          "start_byte": 31201
+        }
+      ],
+      "url": "https://learn.microsoft.com/en-us/dotnet/api/system.collections.arraylist?view=netframework-4.8.1"
+    },
+    "ms-old-datareport-object": {
+      "effective_url": "https://learn.microsoft.com/en-us/previous-versions/visualstudio/visual-basic-6/aa267197(v=vs.60)?redirectedfrom=MSDN",
+      "publisher": "Microsoft",
+      "role": "official-documentation",
+      "sha256": "8db3ef3e5d7f416638a0115938c2cec58c811ba2fc0411daea183882e07481fe",
+      "size_bytes": 36681,
+      "source": {
+        "id": "vb-native-ms-old-datareport-object",
+        "kind": "source",
+        "revision": 1
+      },
+      "source_version": "Visual Studio 6.0, MSDN aa267197",
+      "spans": [
+        {
+          "end_byte_exclusive": 2591,
+          "file": "sources/ms-old-datareport-object.body",
+          "first_line": 49,
+          "last_line": 71,
+          "representation_sha256": "8db3ef3e5d7f416638a0115938c2cec58c811ba2fc0411daea183882e07481fe",
+          "sha256": "3bc23d5d8d28448bc61b1a1b0556f755e31df36bbc5a8362358d7f9a39821e1d",
+          "start_byte": 1894
+        },
+        {
+          "end_byte_exclusive": 25425,
+          "file": "sources/ms-old-datareport-object.body",
+          "first_line": 722,
+          "last_line": 746,
+          "representation_sha256": "8db3ef3e5d7f416638a0115938c2cec58c811ba2fc0411daea183882e07481fe",
+          "sha256": "0fb7e6117b370929d15da4ef9caf005d9f6d4876380594b92443bea7d7f60a38",
+          "start_byte": 23373
+        }
+      ],
+      "url": "https://msdn.microsoft.com/en-us/library/aa267197(v=vs.60).aspx"
+    },
+    "ms-vs2005-download-index": {
+      "effective_url": "https://www.microsoft.com/en-us/download/details.aspx?id=55984",
+      "publisher": "Microsoft",
+      "role": "publisher-navigation",
+      "sha256": "c43e96bfebf4c2264cee43bfca0245a9a7e166df564d4eab10fe90a02002503b",
+      "size_bytes": 139995,
+      "source": {
+        "id": "vb-native-ms-vs2005-download-index",
+        "kind": "source",
+        "revision": 1
+      },
+      "source_version": "download manifest 55984",
+      "spans": [
+        {
+          "end_byte_exclusive": 90632,
+          "file": "sources/ms-vs2005-download-index.body",
+          "first_line": 724,
+          "last_line": 724,
+          "representation_sha256": "c43e96bfebf4c2264cee43bfca0245a9a7e166df564d4eab10fe90a02002503b",
+          "sha256": "c28d5e7fcbf2b4314270ff407f4a8c6bda0c6f0683389383c09c264a3e15c159",
+          "start_byte": 57426
+        }
+      ],
+      "url": "https://www.microsoft.com/en-us/download/details.aspx?id=55984"
+    },
+    "ms-wscript-md": {
+      "effective_url": "https://raw.githubusercontent.com/MicrosoftDocs/windowsserverdocs/4b96ac9ec8079452b152db1b8fe3b7566961ec48/WindowsServerDocs/administration/windows-commands/wscript.md",
+      "publisher": "Microsoft",
+      "role": "official-documentation",
+      "sha256": "e654c6465dfcd13f9254c0ad501e6b446fac19309f9306e36dca9e2872634401",
+      "size_bytes": 5631,
+      "source": {
+        "id": "vb-native-ms-wscript-md",
+        "kind": "source",
+        "revision": 1
+      },
+      "source_version": "4b96ac9ec8079452b152db1b8fe3b7566961ec48",
+      "spans": [
+        {
+          "end_byte_exclusive": 824,
+          "file": "sources/ms-wscript-md.body",
+          "first_line": 4,
+          "last_line": 17,
+          "representation_sha256": "e654c6465dfcd13f9254c0ad501e6b446fac19309f9306e36dca9e2872634401",
+          "sha256": "244344a166cf2e6339124a4905901cc1a580f68309ce40b9f3d5cce51830eb14",
+          "start_byte": 212
+        },
+        {
+          "end_byte_exclusive": 2785,
+          "file": "sources/ms-wscript-md.body",
+          "first_line": 32,
+          "last_line": 35,
+          "representation_sha256": "e654c6465dfcd13f9254c0ad501e6b446fac19309f9306e36dca9e2872634401",
+          "sha256": "7fa4ff787324fdb90ef1ccb532c0e660edabe9a313c3de3e11cde9358aeb84ba",
+          "start_byte": 1729
+        },
+        {
+          "end_byte_exclusive": 5556,
+          "file": "sources/ms-wscript-md.body",
+          "first_line": 51,
+          "last_line": 56,
+          "representation_sha256": "e654c6465dfcd13f9254c0ad501e6b446fac19309f9306e36dca9e2872634401",
+          "sha256": "9fae3331e07d3c0c8d7f31c7cc86134bbd2d99c15255bb80d666fb28c791f568",
+          "start_byte": 4244
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/MicrosoftDocs/windowsserverdocs/4b96ac9ec8079452b152db1b8fe3b7566961ec48/WindowsServerDocs/administration/windows-commands/wscript.md"
+    },
+    "vb-dotnet-pinned-imports": {
+      "effective_url": "https://raw.githubusercontent.com/dotnet/vblang/0712f0b8c91dfba593fc16f846c5821ed5cad2f9/spec/source-files-and-namespaces.md",
+      "publisher": "Microsoft/dotnet",
+      "role": "governing-language-specification",
+      "sha256": "b409f7229f0075747e46bdf66dc7982991cbbef07c732a9d28191df6fd3f08a1",
+      "size_bytes": 23634,
+      "source": {
+        "id": "vb-native-vb-dotnet-pinned-imports",
+        "kind": "source",
+        "revision": 1
+      },
+      "source_version": "0712f0b8c91dfba593fc16f846c5821ed5cad2f9",
+      "spans": [
+        {
+          "end_byte_exclusive": 8952,
+          "file": "sources/vb-dotnet-pinned-imports.body",
+          "first_line": 209,
+          "last_line": 235,
+          "representation_sha256": "b409f7229f0075747e46bdf66dc7982991cbbef07c732a9d28191df6fd3f08a1",
+          "sha256": "13ed3a99409fdf82eb6099405b9f43fabb842b85e84497008b198d3fcbfe83fc",
+          "start_byte": 8276
+        },
+        {
+          "end_byte_exclusive": 18431,
+          "file": "sources/vb-dotnet-pinned-imports.body",
+          "first_line": 521,
+          "last_line": 545,
+          "representation_sha256": "b409f7229f0075747e46bdf66dc7982991cbbef07c732a9d28191df6fd3f08a1",
+          "sha256": "4aa0212cc22ca5f40ed77fc11bf1e87c2102fd343432524fad98219bdb17fb66",
+          "start_byte": 17714
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/dotnet/vblang/0712f0b8c91dfba593fc16f846c5821ed5cad2f9/spec/source-files-and-namespaces.md"
+    },
+    "vb-dotnet-spec-intro": {
+      "effective_url": "https://raw.githubusercontent.com/dotnet/vblang/0712f0b8c91dfba593fc16f846c5821ed5cad2f9/spec/introduction.md",
+      "publisher": "Microsoft/dotnet",
+      "role": "governing-language-specification",
+      "sha256": "d3aa8b2db72b683f1bb5ded653637eacf0609690665c8bb016f3c52485e9bfe1",
+      "size_bytes": 10356,
+      "source": {
+        "id": "vb-native-vb-dotnet-spec-intro",
+        "kind": "source",
+        "revision": 1
+      },
+      "source_version": "0712f0b8c91dfba593fc16f846c5821ed5cad2f9",
+      "spans": [
+        {
+          "end_byte_exclusive": 2037,
+          "file": "sources/vb-dotnet-spec-intro.body",
+          "first_line": 1,
+          "last_line": 11,
+          "representation_sha256": "d3aa8b2db72b683f1bb5ded653637eacf0609690665c8bb016f3c52485e9bfe1",
+          "sha256": "f7603618f67575dc75432ce852291be36ec90046549bf10a3e24ac79d9e243db",
+          "start_byte": 0
+        },
+        {
+          "end_byte_exclusive": 3775,
+          "file": "sources/vb-dotnet-spec-intro.body",
+          "first_line": 19,
+          "last_line": 23,
+          "representation_sha256": "d3aa8b2db72b683f1bb5ded653637eacf0609690665c8bb016f3c52485e9bfe1",
+          "sha256": "28df302d88129cbcc886306c07552a91f097afe77cacf5974dab801700514fd5",
+          "start_byte": 2756
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/dotnet/vblang/0712f0b8c91dfba593fc16f846c5821ed5cad2f9/spec/introduction.md"
+    },
+    "vb-lineage-vbscript-com-translation-md": {
+      "effective_url": "https://raw.githubusercontent.com/MicrosoftDocs/win32/215331f9a813328460cc1f0573581da2df1b7a68/desktop-src/com/translating-to-vbscript.md",
+      "publisher": "Microsoft",
+      "role": "official-documentation",
+      "sha256": "2d4135ccf3c77720b11b5eba7560ed47c505c29a33d3a7c2cffee80856b4e52f",
+      "size_bytes": 1548,
+      "source": {
+        "id": "vb-native-vb-lineage-vbscript-com-translation-md",
+        "kind": "source",
+        "revision": 1
+      },
+      "source_version": "215331f9a813328460cc1f0573581da2df1b7a68",
+      "spans": [
+        {
+          "end_byte_exclusive": 1391,
+          "file": "sources/vb-lineage-vbscript-com-translation-md.body",
+          "first_line": 9,
+          "last_line": 21,
+          "representation_sha256": "2d4135ccf3c77720b11b5eba7560ed47c505c29a33d3a7c2cffee80856b4e52f",
+          "sha256": "fad9f107f9fe4fe0c9fa7aceb153dfbd2fe1ce1b74beb45cc4c021f3ccd9495d",
+          "start_byte": 172
+        },
+        {
+          "end_byte_exclusive": 1548,
+          "file": "sources/vb-lineage-vbscript-com-translation-md.body",
+          "first_line": 23,
+          "last_line": 36,
+          "representation_sha256": "2d4135ccf3c77720b11b5eba7560ed47c505c29a33d3a7c2cffee80856b4e52f",
+          "sha256": "f748fc2fcb5576eb48b00bef6678653531b60fdd20c80af52636890b1b1e70e4",
+          "start_byte": 1401
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/MicrosoftDocs/win32/215331f9a813328460cc1f0573581da2df1b7a68/desktop-src/com/translating-to-vbscript.md"
+    },
+    "vb-lineage-vs2005-archive": {
+      "effective_url": "https://download.microsoft.com/download/1/6/d/16d24ada-5317-4de1-b2b2-890b51813d6e/VS2005_VB_en-us.pdf",
+      "publisher": "Microsoft",
+      "role": "official-documentation",
+      "sha256": "8733c2fdf7477060792bc8b95737d4bb746ce116921550306aabc33ffbe0dfc7",
+      "size_bytes": 30592707,
+      "source": {
+        "id": "vb-native-vb-lineage-vs2005-archive",
+        "kind": "source",
+        "revision": 1
+      },
+      "source_version": "VS2005 archive artifact, Microsoft Download Center 55984",
+      "spans": [
+        {
+          "document": "sources/vb-lineage-vs2005-archive.body",
+          "end_byte_exclusive": 1365,
+          "file": "sources/vb-lineage-vs2005-archive-p621.extract.txt",
+          "first_line": 1,
+          "last_line": 17,
+          "method": "pypdf.PdfReader.pages[page-1].extract_text() written as UTF-8",
+          "pdf_page_one_based": 621,
+          "representation_sha256": "77aed68abfec92877dfdea72122ae8d75140cf00b4f9a32565dc0a591a44e572",
+          "sha256": "85b42b89bd972098cf24e151590e87a4186d01c4e0a92ea62c6bbc3e32ebbcea",
+          "start_byte": 0,
+          "text_extraction_tool_call_id": "call_d57b2db73f6c4fe68cb848aa72efc970"
+        },
+        {
+          "document": "sources/vb-lineage-vs2005-archive.body",
+          "end_byte_exclusive": 1235,
+          "file": "sources/vb-lineage-vs2005-archive-p622.extract.txt",
+          "first_line": 1,
+          "last_line": 16,
+          "method": "pypdf.PdfReader.pages[page-1].extract_text() written as UTF-8",
+          "pdf_page_one_based": 622,
+          "representation_sha256": "9c6370c5de864792617ea9d003cdc3106d749a0cad7484b33e461e778a85b659",
+          "sha256": "f68aa27cb2c0de14e123dab86aa95b3a62d9731396c981605178b0b853e1a5f6",
+          "start_byte": 0,
+          "text_extraction_tool_call_id": "call_d57b2db73f6c4fe68cb848aa72efc970"
+        },
+        {
+          "document": "sources/vb-lineage-vs2005-archive.body",
+          "end_byte_exclusive": 1032,
+          "file": "sources/vb-lineage-vs2005-archive-p624.extract.txt",
+          "first_line": 1,
+          "last_line": 12,
+          "method": "pypdf.PdfReader.pages[page-1].extract_text() written as UTF-8",
+          "pdf_page_one_based": 624,
+          "representation_sha256": "f069ae47fabbec0ef7dfb8f4696f3e42f2c603e1ceacb00ed50e01ac2c2e1e43",
+          "sha256": "faf669385effb7176f190e9e619846234c80b420fd71dbc9be41b3b78ebbd15f",
+          "start_byte": 0,
+          "text_extraction_tool_call_id": "call_d57b2db73f6c4fe68cb848aa72efc970"
+        },
+        {
+          "document": "sources/vb-lineage-vs2005-archive.body",
+          "end_byte_exclusive": 1140,
+          "file": "sources/vb-lineage-vs2005-archive-p643.extract.txt",
+          "first_line": 1,
+          "last_line": 12,
+          "method": "pypdf.PdfReader.pages[page-1].extract_text() written as UTF-8",
+          "pdf_page_one_based": 643,
+          "representation_sha256": "21d514aceb03b551c66df655a3063612f7bd82ae0764d84afa64c2146dd5b6fb",
+          "sha256": "7d8dfe2d4bbf1c520e51d025cefa17925517c89dbe0baf7e5f8d7efdf48a6908",
+          "start_byte": 0,
+          "text_extraction_tool_call_id": "call_d57b2db73f6c4fe68cb848aa72efc970"
+        }
+      ],
+      "url": "https://download.microsoft.com/download/1/6/d/16d24ada-5317-4de1-b2b2-890b51813d6e/VS2005_VB_en-us.pdf"
+    },
+    "vb-wscript-host-doc": {
+      "effective_url": "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/wscript",
+      "publisher": "Microsoft",
+      "role": "official-documentation",
+      "sha256": "8f5628b38b4a7c349360d2a128b5b0fd2865335d449a76bdaac7b4c957ea962a",
+      "size_bytes": 54458,
+      "source": {
+        "id": "vb-native-vb-wscript-host-doc",
+        "kind": "source",
+        "revision": 1
+      },
+      "source_version": "native Microsoft Learn WScript HTML snapshot",
+      "spans": [
+        {
+          "end_byte_exclusive": 3278,
+          "file": "sources/vb-wscript-host-doc.body",
+          "first_line": 71,
+          "last_line": 73,
+          "representation_sha256": "8f5628b38b4a7c349360d2a128b5b0fd2865335d449a76bdaac7b4c957ea962a",
+          "sha256": "58258260056a0f20a5c60a00b2f60978999034be8aba1567f635e26c181b5341",
+          "start_byte": 2899
+        },
+        {
+          "end_byte_exclusive": 27642,
+          "file": "sources/vb-wscript-host-doc.body",
+          "first_line": 750,
+          "last_line": 754,
+          "representation_sha256": "8f5628b38b4a7c349360d2a128b5b0fd2865335d449a76bdaac7b4c957ea962a",
+          "sha256": "705dcd76b90d8843a7345484a049395edf8d4063bb1c0a1beec78093fe4f8ec1",
+          "start_byte": 26408
+        },
+        {
+          "end_byte_exclusive": 29254,
+          "file": "sources/vb-wscript-host-doc.body",
+          "first_line": 779,
+          "last_line": 782,
+          "representation_sha256": "8f5628b38b4a7c349360d2a128b5b0fd2865335d449a76bdaac7b4c957ea962a",
+          "sha256": "b3eaf539bd16f4018759e381ada87cf8fd179e4921a8e9374689f07a6669f477",
+          "start_byte": 28372
+        },
+        {
+          "end_byte_exclusive": 32862,
+          "file": "sources/vb-wscript-host-doc.body",
+          "first_line": 833,
+          "last_line": 837,
+          "representation_sha256": "8f5628b38b4a7c349360d2a128b5b0fd2865335d449a76bdaac7b4c957ea962a",
+          "sha256": "18c2fea933d743d454ec6952f70c1829884c677af2ac81af981d2d7c759f1124",
+          "start_byte": 31420
+        }
+      ],
+      "url": "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/wscript"
+    },
+    "vballinone-vb": {
+      "effective_url": "https://raw.githubusercontent.com/github-linguist/linguist/cfd7a0113aa1efab99faeff38756f0ed4d48add8/samples/Visual%20Basic%20.NET/VBAllInOne.vb",
+      "publisher": "GitHub Linguist",
+      "role": "pinned-classifier-sample",
+      "sha256": "76660d617033dd5ece10e11c04d2a6ac7a426776c5480e2e7d433b5c43ddef7c",
+      "size_bytes": 31785,
+      "source": {
+        "id": "vb-native-vballinone-vb",
+        "kind": "source",
+        "revision": 1
+      },
+      "source_version": "cfd7a0113aa1efab99faeff38756f0ed4d48add8",
+      "spans": [
+        {
+          "end_byte_exclusive": 436,
+          "file": "sources/vballinone-vb.body",
+          "first_line": 1,
+          "last_line": 15,
+          "representation_sha256": "76660d617033dd5ece10e11c04d2a6ac7a426776c5480e2e7d433b5c43ddef7c",
+          "sha256": "bbd5a074639367481936edd0a0a4e5c188b13465e7ed1a7f69caedc6930c6a98",
+          "start_byte": 0
+        },
+        {
+          "end_byte_exclusive": 800,
+          "file": "sources/vballinone-vb.body",
+          "first_line": 29,
+          "last_line": 35,
+          "representation_sha256": "76660d617033dd5ece10e11c04d2a6ac7a426776c5480e2e7d433b5c43ddef7c",
+          "sha256": "a678252b45162e90ef2c54d262150a66ff9617c9d72efe135428e8885998991a",
+          "start_byte": 652
+        },
+        {
+          "end_byte_exclusive": 1185,
+          "file": "sources/vballinone-vb.body",
+          "first_line": 41,
+          "last_line": 50,
+          "representation_sha256": "76660d617033dd5ece10e11c04d2a6ac7a426776c5480e2e7d433b5c43ddef7c",
+          "sha256": "580fe6a124d8b003c2279b34786a250f178bad34623be8e2989b10ddf147f716",
+          "start_byte": 878
+        },
+        {
+          "end_byte_exclusive": 26617,
+          "file": "sources/vballinone-vb.body",
+          "first_line": 901,
+          "last_line": 915,
+          "representation_sha256": "76660d617033dd5ece10e11c04d2a6ac7a426776c5480e2e7d433b5c43ddef7c",
+          "sha256": "fdcdc9fa4240ed64c666e33241bd52f86b3261b56e4fbf8fecae31b5211a19d8",
+          "start_byte": 26071
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/github-linguist/linguist/cfd7a0113aa1efab99faeff38756f0ed4d48add8/samples/Visual%20Basic%20.NET/VBAllInOne.vb"
+    },
+    "wizard-dsr": {
+      "effective_url": "https://raw.githubusercontent.com/github-linguist/linguist/cfd7a0113aa1efab99faeff38756f0ed4d48add8/samples/Visual%20Basic%206.0/Wizard.Dsr",
+      "publisher": "GitHub Linguist",
+      "role": "pinned-classifier-sample",
+      "sha256": "1c88db0066901b87a84b50d888fc0944d63a59f576b4c97c53e9c32319b3ba6d",
+      "size_bytes": 3723,
+      "source": {
+        "id": "vb-native-wizard-dsr",
+        "kind": "source",
+        "revision": 1
+      },
+      "source_version": "cfd7a0113aa1efab99faeff38756f0ed4d48add8",
+      "spans": [
+        {
+          "end_byte_exclusive": 1716,
+          "file": "sources/wizard-dsr.body",
+          "first_line": 21,
+          "last_line": 42,
+          "representation_sha256": "1c88db0066901b87a84b50d888fc0944d63a59f576b4c97c53e9c32319b3ba6d",
+          "sha256": "8b062905be85c0c2002dc2539c9b47b0839af6bc28256f5a7467ca99b589551d",
+          "start_byte": 959
+        },
+        {
+          "end_byte_exclusive": 2793,
+          "file": "sources/wizard-dsr.body",
+          "first_line": 43,
+          "last_line": 67,
+          "representation_sha256": "1c88db0066901b87a84b50d888fc0944d63a59f576b4c97c53e9c32319b3ba6d",
+          "sha256": "d779810aadb0473680aa204cd5a3a0f130d7e1aeeca1c5e6e424b318810ad06d",
+          "start_byte": 1716
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/github-linguist/linguist/cfd7a0113aa1efab99faeff38756f0ed4d48add8/samples/Visual%20Basic%206.0/Wizard.Dsr"
+    }
+  }
+}

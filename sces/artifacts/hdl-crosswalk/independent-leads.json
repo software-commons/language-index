@@ -1,0 +1,175 @@
+{
+  "independent_lead_decisions": [
+    {
+      "candidate_sha256": "bf8dce59ca7b5191dbc344a66502e20e8391ea184b59cc5bc59a0415972ee744",
+      "classifier_line": null,
+      "disposition": "canonical",
+      "entity": "cfa68aea56d15ca78dfd9cbbedb02f91",
+      "findings": "The authority's exact 1076-2019 heading and description name VHDL and distinguish the LRM edition from the base language. IEEE 1076.1-2017 describes a separate VHDL-AMS extension.",
+      "identity_claim": {
+        "id": "vhdl-ieee-1076-2019-language-identity",
+        "kind": "claim",
+        "revision": 1
+      },
+      "lead": {
+        "id": "32633b17e8bf4c0d907127c834d74b81",
+        "name": "VHDL",
+        "origins": [
+          "https://standards.ieee.org/ieee/1076/5179/"
+        ]
+      },
+      "limitations": [
+        "The registry entity is the named language. The catalog is the supporting origin and describes a specific published edition."
+      ],
+      "method": "Inspect the independently reacquired IEEE catalog's exact heading and main description, and challenge adjacent editions, syntactic relatives, and profile boundaries.",
+      "publisher_reference": {
+        "id": "hdl-ieee-sa-vhdl-1076-2019",
+        "kind": "source",
+        "revision": 1
+      }
+    },
+    {
+      "candidate_sha256": "f325abf5c3362049068814eeae3e81878568d382e21c0ce022bad11b9864a953",
+      "classifier_line": 8650,
+      "disposition": "duplicate",
+      "entity": "cfa68aea56d15ca78dfd9cbbedb02f91",
+      "findings": "The committed classifier row has language_id 385 and VHDL-specific extensions and scope. Its foo.vhd sample contains an entity and architecture. The row and sample connect this lead to the publisher-backed VHDL language.",
+      "identity_claim": {
+        "id": "vhdl-ieee-1076-2019-language-identity",
+        "kind": "claim",
+        "revision": 1
+      },
+      "lead": {
+        "id": "632532a37eee4cb2a2f60f1e7c3f8118",
+        "name": "VHDL",
+        "origins": [
+          "https://github.com/github-linguist/linguist/blob/cfd7a0113aa1efab99faeff38756f0ed4d48add8/lib/linguist/languages.yml#L8650"
+        ]
+      },
+      "limitations": [
+        "Linguist is classification evidence. The linked IEEE publisher claim supplies language identity.",
+        "Samples were inspected as source text and establish no conformance or implementation result."
+      ],
+      "method": "Inspect the exact pinned Linguist row, compare committed blob digests and native samples, and corroborate the target with independently reacquired IEEE catalog text.",
+      "publisher_reference": {
+        "id": "hdl-ieee-sa-vhdl-1076-2019",
+        "kind": "source",
+        "revision": 1
+      }
+    },
+    {
+      "candidate_sha256": "22604a3361a07697d557fff98134519fa1216337bedf127281fe48647b32e8f1",
+      "classifier_line": null,
+      "disposition": "canonical",
+      "entity": "19bfa118ceba5b069fedf21491890b3b",
+      "findings": "The authority's exact 1364-2005 heading and description name Verilog HDL. The 1800-2009 merger and separate 1364.1 synthesis subset do not turn the historical language into the merged SystemVerilog identity or into a synthesis profile.",
+      "identity_claim": {
+        "id": "verilog-ieee-1364-2005-language-identity",
+        "kind": "claim",
+        "revision": 1
+      },
+      "lead": {
+        "id": "45146b99ec3b4126b9d8851c9e6cd173",
+        "name": "Verilog",
+        "origins": [
+          "https://standards.ieee.org/ieee/1364/3641/"
+        ]
+      },
+      "limitations": [
+        "The registry entity is the named language. The catalog is the supporting origin and describes a specific published edition."
+      ],
+      "method": "Inspect the independently reacquired IEEE catalog's exact heading and main description, and challenge adjacent editions, syntactic relatives, and profile boundaries.",
+      "publisher_reference": {
+        "id": "hdl-ieee-sa-verilog-1364-2005",
+        "kind": "source",
+        "revision": 1
+      }
+    },
+    {
+      "candidate_sha256": "d47cf3ab7d2bb060bc785980929833e17b1a478f0b17f54418728177a4aaecbc",
+      "classifier_line": 8709,
+      "disposition": "duplicate",
+      "entity": "19bfa118ceba5b069fedf21491890b3b",
+      "findings": "The classifier row has language_id 387 and .v and .veo entries. Committed .v heuristics distinguish Verilog from Rocq Prover and V, and the native design samples corroborate what the classifier category points to. The protected example is classified as a fixture without reading or executing its protected payload.",
+      "identity_claim": {
+        "id": "verilog-ieee-1364-2005-language-identity",
+        "kind": "claim",
+        "revision": 1
+      },
+      "lead": {
+        "id": "876ecfaa96fb4acf806366e51bc3264f",
+        "name": "Verilog",
+        "origins": [
+          "https://github.com/github-linguist/linguist/blob/cfd7a0113aa1efab99faeff38756f0ed4d48add8/lib/linguist/languages.yml#L8709"
+        ]
+      },
+      "limitations": [
+        "Linguist is classification evidence. The linked IEEE publisher claim supplies language identity.",
+        "Samples were inspected as source text and establish no conformance or implementation result."
+      ],
+      "method": "Inspect the exact pinned Linguist row, compare committed blob digests and native samples, and corroborate the target with independently reacquired IEEE catalog text.",
+      "publisher_reference": {
+        "id": "hdl-ieee-sa-verilog-1364-2005",
+        "kind": "source",
+        "revision": 1
+      }
+    },
+    {
+      "candidate_sha256": "12b05d3e964ebf5244ff0fef77ed481ae666b22382a674c837e9c64abee5189d",
+      "classifier_line": null,
+      "disposition": "canonical",
+      "entity": "25a64cee75c65f60af5d103ac1f0224d",
+      "findings": "The authority's exact 1800-2023 heading and description name the unified SystemVerilog language. Accellera's 3.1a extension-era base requirement, the 1800-2009 merger, and specific tool or verification framework identities are separate boundaries.",
+      "identity_claim": {
+        "id": "systemverilog-ieee-1800-2023-language-identity",
+        "kind": "claim",
+        "revision": 1
+      },
+      "lead": {
+        "id": "86c6fc17640b46c58ab85b76fe3c1f82",
+        "name": "SystemVerilog",
+        "origins": [
+          "https://standards.ieee.org/ieee/1800/7743/"
+        ]
+      },
+      "limitations": [
+        "The registry entity is the named language. The catalog is the supporting origin and describes a specific published edition."
+      ],
+      "method": "Inspect the independently reacquired IEEE catalog's exact heading and main description, and challenge adjacent editions, syntactic relatives, and profile boundaries.",
+      "publisher_reference": {
+        "id": "hdl-ieee-sa-systemverilog-1800-2023",
+        "kind": "source",
+        "revision": 1
+      }
+    },
+    {
+      "candidate_sha256": "3313e8152119cc991e24a1f2de4332abd6dd2f4197ad7ff2129334b6adbc44d3",
+      "classifier_line": 8046,
+      "disposition": "duplicate",
+      "entity": "25a64cee75c65f60af5d103ac1f0224d",
+      "findings": "The classifier row has language_id 363, source.systemverilog scope and .sv, .svh and .vh entries. The .sv priority encoder contains always_comb, while the .vh helper illustrates why a suffix alone is insufficient. The shared editor mode with Verilog does not collapse the separately documented identities.",
+      "identity_claim": {
+        "id": "systemverilog-ieee-1800-2023-language-identity",
+        "kind": "claim",
+        "revision": 1
+      },
+      "lead": {
+        "id": "c4c325d862bd43a88ec2e1d80025c807",
+        "name": "SystemVerilog",
+        "origins": [
+          "https://github.com/github-linguist/linguist/blob/cfd7a0113aa1efab99faeff38756f0ed4d48add8/lib/linguist/languages.yml#L8046"
+        ]
+      },
+      "limitations": [
+        "Linguist is classification evidence. The linked IEEE publisher claim supplies language identity.",
+        "Samples were inspected as source text and establish no conformance or implementation result."
+      ],
+      "method": "Inspect the exact pinned Linguist row, compare committed blob digests and native samples, and corroborate the target with independently reacquired IEEE catalog text.",
+      "publisher_reference": {
+        "id": "hdl-ieee-sa-systemverilog-1800-2023",
+        "kind": "source",
+        "revision": 1
+      }
+    }
+  ]
+}

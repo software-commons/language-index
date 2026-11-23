@@ -1,0 +1,1234 @@
+{
+  "candidate_input_sha256": "c02c1d90479c1dfc1857d483061d802f43f1a3922c361d2d41ecaac1d2b56061",
+  "classifier_commit": "cfd7a0113aa1efab99faeff38756f0ed4d48add8",
+  "disclosures": [
+    "Blind review consumed the neutral input and pinned policy without reading primary conclusions. Candidate byte digests and target identity pins are bound from that neutral input. Original candidate record serialization and registry dependency IDs were outside the handoff.",
+    "Classifiers are source authority for their own pinned taxonomy. Microsoft sources provide language and product context. GitHub raw and connector views have common source lineage. Microsoft's archived publisher, rendered and pinned documentation has shared publisher provenance where applicable.",
+    "Source documents and samples were statically inspected. No sample was executed. Body, line ranges, Git blob IDs, policy file hashes and the policy bundle were independently recomputed.",
+    "Initial sandbox workspace call could not resolve raw.githubusercontent.com. An approved HTTPS rerun acquired the originals and supplemental documents. Native response, transport and evidence hashes are retained.",
+    "Direct source receipts bind public HTTPS transport to native execution provenance. The account-scoped Codex run and successful connected GitHub witness are recoverable through native records. Public HTTPS sources require no authentication. The export is not a signed endorsement."
+  ],
+  "execution_evidence_sha256": "e8e9014afe40dd824ff3dc9b9018b09f5d3e9279077b68eeeb3d9ff461302b99",
+  "phase": "independent-review",
+  "policy": {
+    "adopter_sha256": "87a1bca34529d1d398e5b7c1e9414ba946585003f06e424431bbad6bbc355e72",
+    "bundle_sha256": "14da3f31f697ab828d4a4560f060dbe511861020db54bea7bc531e20ea0855ce",
+    "caller_sha256": "9ae7780b9eb02efd2823485e0265bab67c2b9d96ac1ea18f674f1fb0f0d42a80",
+    "checkout": "ab26f278422772f2d9e5d4dd016407d14372a710",
+    "commit": "ab26f278422772f2d9e5d4dd016407d14372a710",
+    "computed_bundle_sha256": "14da3f31f697ab828d4a4560f060dbe511861020db54bea7bc531e20ea0855ce",
+    "file_records": {
+      ".gitattributes": "4f3bff76cb90da4c7eb9f25c2699c4e356e0a9457e2aa79e6f0a2742f0a9ca86",
+      ".github/workflows/sces-policy.yml": "6f61302219a6ce42dc3946e5bc893e94eead974a6ae70f465ef356637bb33299",
+      ".github/workflows/sces-validate.yml": "851cdc2e2abda96cf01adc96aefd7e708f1798459ebb0cae14cb65752c49c3b4",
+      "docs/decisions/EVIDENCE_ARCHITECTURE.md": "2087e9ff0b5bde241bbba6eefdfb5abc9a7681e0b597a380eb4ff25122f8965c",
+      "docs/protocols/CODEX_RESEARCH_PROTOCOL.md": "257e11de064cdc5fd19a0ccdf989fd461d5377fc0870f693d1c433ff380ad8d6",
+      "docs/standards/EVIDENCE_STANDARD.md": "0e3d95d3acea861e9e2126cb23ddf2e950afba6b6681cb263112400492cee62e",
+      "docs/standards/SCES_ADOPTION.md": "7e9a9320a694b960925a871217c4b3f0721606ae9fd86039e81a0aecff70557a",
+      "evidence/v1/contracts.schema.json": "574956395247de677332da8e2cec19453bd34cf0497b40c31280b202cfd8630c",
+      "templates/SCES_AGENTS.md": "675e1e204e785226ac8496db8cf139cc3fd79b7f049d5873ae96292878e03afd",
+      "templates/SCES_RESEARCH_TASK.md": "fc91a3ae2a26894a2f08575140cbb14c6df0a557b1a955857124589b3909e27c",
+      "templates/sces-adoption.json": "589840a5bad2c06ed4c81bfc5a073cbe029fa425a9858412049f6164b626236e",
+      "templates/sces-ci.yml": "5b283eda430472a4f4271b25b14830903ea96e4bdf68741367aa3f8832a92257",
+      "tests/sces/test_validation.py": "95e0b12abfc9e50e5b4c0040eb2a2581e9cd4766bfda5921fae78764d87d2ee1",
+      "tools/sces/requirements.txt": "116d67c0ffddfa016dba2b974c9b12a98e5a4ea9dbbc4e29e3fd43b9e41eab5b",
+      "tools/sces/validate.py": "d9cc54c045722a9449f9dcdecfa0c1a73f15e7cf14a27e8b79b56cce6157822f"
+    },
+    "policy_file_count_verified": 15,
+    "standard": "SCES-1.0"
+  },
+  "primary_bundle_sha256": "669d074dbe03a1ac767fd1a7a1cdcad31d00a0ca0c923fb1f2c24fa5ad67cf3f",
+  "primary_execution": "01a207c2-9f18-72e1-9870-b5472b985b07",
+  "primary_turn": "01a207cc-f892-7793-ab42-ad50b923a3ea",
+  "qualification_status": "scoped review handoff",
+  "question": "Does the exact pinned classifier refer to this accepted language or edition in the scoped original-sample context? Check alternative dialect, tooling or file-format interpretations.",
+  "recomputation": {
+    "native_tool": "exec-1c566ea1-6d8f-4fa8-922b-6dd6dfb4694b",
+    "path": "recomputed-evidence.json",
+    "sha256": "4379cf15191e0e7ede073c662ab3b812a27cfc6bbd10c167b2eecebe72b06a7b"
+  },
+  "run": {
+    "agent": "codex",
+    "completed": "2026-11-23T10:01:31Z",
+    "execution": "01a207d2-bd21-7a41-9b62-6f8832d7c190",
+    "harness": "Codex Desktop 0.171.0-alpha.13",
+    "model": "gpt-6.2-sol",
+    "started": "2026-11-23T09:53:02Z",
+    "trace": {
+      "path": "visual-basic-native-review/direct-inspection-receipts.jsonl",
+      "sha256": "af24169bab3b8ca0d785fa1ce952ebf1aa66ac0f6c1a6452c8e943eac4fdb806"
+    }
+  },
+  "source_witnesses_sha256": "f66d8bad0ff018054cb8762883bc9a2c5380fe793bb9890cdf7c29513f6a9afe",
+  "standard": "SCES-1.0",
+  "supplementary_witnesses": {
+    "linguist-language-code": {
+      "binding": "supplementary source inspection without an original candidate dependency",
+      "content_type": "text/plain; charset=utf-8",
+      "curl_exit": 0,
+      "effective_url": "https://raw.githubusercontent.com/github-linguist/linguist/cfd7a0113aa1efab99faeff38756f0ed4d48add8/lib/linguist/language.rb",
+      "execution": "01a207d2-bd21-7a41-9b62-6f8832d7c190",
+      "expected_sha256": null,
+      "harness_version": "0.171.0-alpha.13",
+      "http_status": "200",
+      "https_tls_verify_result": "0",
+      "key": "linguist-language-code",
+      "native_tool_id": "exec-6caf0308-c39e-46e2-8466-ddde86171575",
+      "path": "sources/linguist-language-code.body",
+      "redirect_count": "0",
+      "retrieved_at": "2026-11-23T09:54:58.916898+00:00",
+      "session": "01a20663-ce3c-79b3-a9fd-137b04c310e2",
+      "sha256": "fc3ff70400cc06e765260a7b02d06cc0eec2dc91eb3d7281f0ebf14ec8a81851",
+      "size_bytes": 14118,
+      "spans": [
+        {
+          "end_byte_exclusive": 2457,
+          "first_line": 66,
+          "last_line": 80,
+          "representation_sha256": "fc3ff70400cc06e765260a7b02d06cc0eec2dc91eb3d7281f0ebf14ec8a81851",
+          "sha256": "3ad87e04e02b605f90c20a3c274beb36b69baf75e2be5ffcd222795c1a63404a",
+          "start_byte": 1923
+        },
+        {
+          "end_byte_exclusive": 5028,
+          "first_line": 153,
+          "last_line": 174,
+          "representation_sha256": "fc3ff70400cc06e765260a7b02d06cc0eec2dc91eb3d7281f0ebf14ec8a81851",
+          "sha256": "a7cd2d0768dc1437325a7eaadf7302002ba93aabd0007a9bc2d6460ede1ae53a",
+          "start_byte": 4351
+        }
+      ],
+      "started_at": "2026-11-23T09:54:58.722810+00:00",
+      "stderr": "",
+      "url": "https://raw.githubusercontent.com/github-linguist/linguist/cfd7a0113aa1efab99faeff38756f0ed4d48add8/lib/linguist/language.rb"
+    },
+    "linguist-samples-code": {
+      "binding": "supplementary source inspection without an original candidate dependency",
+      "content_type": "text/plain; charset=utf-8",
+      "curl_exit": 0,
+      "effective_url": "https://raw.githubusercontent.com/github-linguist/linguist/cfd7a0113aa1efab99faeff38756f0ed4d48add8/lib/linguist/samples.rb",
+      "execution": "01a207d2-bd21-7a41-9b62-6f8832d7c190",
+      "expected_sha256": null,
+      "harness_version": "0.171.0-alpha.13",
+      "http_status": "200",
+      "https_tls_verify_result": "0",
+      "key": "linguist-samples-code",
+      "native_tool_id": "exec-6caf0308-c39e-46e2-8466-ddde86171575",
+      "path": "sources/linguist-samples-code.body",
+      "redirect_count": "0",
+      "retrieved_at": "2026-11-23T09:54:58.890976+00:00",
+      "session": "01a20663-ce3c-79b3-a9fd-137b04c310e2",
+      "sha256": "f606d4bf95bbed85c90a1b3a5c37bf65eb1d7230894cf47aed3c695f1417eed7",
+      "size_bytes": 3135,
+      "spans": [
+        {
+          "end_byte_exclusive": 1797,
+          "first_line": 37,
+          "last_line": 64,
+          "representation_sha256": "f606d4bf95bbed85c90a1b3a5c37bf65eb1d7230894cf47aed3c695f1417eed7",
+          "sha256": "fa69ba3d6a14d0ec3b10f6e0d553f9d4f2488d62817280fc35b7eb533797be9f",
+          "start_byte": 798
+        },
+        {
+          "end_byte_exclusive": 3008,
+          "first_line": 77,
+          "last_line": 107,
+          "representation_sha256": "f606d4bf95bbed85c90a1b3a5c37bf65eb1d7230894cf47aed3c695f1417eed7",
+          "sha256": "6fc76a6330bec62b38849105925f2489450bd63ab454d5aff2f61a706a89f555",
+          "start_byte": 1974
+        }
+      ],
+      "started_at": "2026-11-23T09:54:58.723546+00:00",
+      "stderr": "",
+      "url": "https://raw.githubusercontent.com/github-linguist/linguist/cfd7a0113aa1efab99faeff38756f0ed4d48add8/lib/linguist/samples.rb"
+    },
+    "ms-script-createobject": {
+      "binding": "supplementary source inspection without an original candidate dependency",
+      "content_type": "text/html",
+      "curl_exit": 0,
+      "effective_url": "https://learn.microsoft.com/en-us/windows/win32/wmisdk/creating-an-object-using-vbscript",
+      "execution": "01a207d2-bd21-7a41-9b62-6f8832d7c190",
+      "expected_sha256": null,
+      "harness_version": "0.171.0-alpha.13",
+      "http_status": "200",
+      "https_tls_verify_result": "0",
+      "key": "ms-script-createobject",
+      "native_tool_id": "exec-6caf0308-c39e-46e2-8466-ddde86171575",
+      "path": "sources/ms-script-createobject.body",
+      "redirect_count": "0",
+      "retrieved_at": "2026-11-23T09:54:58.973400+00:00",
+      "session": "01a20663-ce3c-79b3-a9fd-137b04c310e2",
+      "sha256": "9f3935f9397213868fcd7ce87dfffb4aab39407680dc30ac89d64a95170dabb7",
+      "size_bytes": 49420,
+      "spans": [
+        {
+          "end_byte_exclusive": 25931,
+          "first_line": 749,
+          "last_line": 753,
+          "representation_sha256": "9f3935f9397213868fcd7ce87dfffb4aab39407680dc30ac89d64a95170dabb7",
+          "sha256": "efb7c0e395b2184976520397b2b4378f405c2501496edf4bbde1eaa20cf93813",
+          "start_byte": 25552
+        }
+      ],
+      "started_at": "2026-11-23T09:54:58.721751+00:00",
+      "stderr": "",
+      "url": "https://learn.microsoft.com/en-us/windows/win32/wmisdk/creating-an-object-using-vbscript"
+    },
+    "ms-vb6-support-policy": {
+      "binding": "supplementary source inspection without an original candidate dependency",
+      "content_type": "text/html",
+      "curl_exit": 0,
+      "effective_url": "https://learn.microsoft.com/en-us/previous-versions/visualstudio/visual-basic-6/visual-basic-6-support-policy?view=vs-2019",
+      "execution": "01a207d2-bd21-7a41-9b62-6f8832d7c190",
+      "expected_sha256": null,
+      "harness_version": "0.171.0-alpha.13",
+      "http_status": "200",
+      "https_tls_verify_result": "0",
+      "key": "ms-vb6-support-policy",
+      "native_tool_id": "exec-6caf0308-c39e-46e2-8466-ddde86171575",
+      "path": "sources/ms-vb6-support-policy.body",
+      "redirect_count": "0",
+      "retrieved_at": "2026-11-23T09:54:58.934201+00:00",
+      "session": "01a20663-ce3c-79b3-a9fd-137b04c310e2",
+      "sha256": "3320a14ec7781a5400cdbf548f5b3341b8dff8ae1c2ccf1301497944b875ec9e",
+      "size_bytes": 59881,
+      "spans": [
+        {
+          "end_byte_exclusive": 27215,
+          "first_line": 747,
+          "last_line": 755,
+          "representation_sha256": "3320a14ec7781a5400cdbf548f5b3341b8dff8ae1c2ccf1301497944b875ec9e",
+          "sha256": "1c8eb7b45d164df14cfdcc77c298d71ffd7d72dedb00d278328c124cdac1951c",
+          "start_byte": 26165
+        },
+        {
+          "end_byte_exclusive": 33786,
+          "first_line": 872,
+          "last_line": 876,
+          "representation_sha256": "3320a14ec7781a5400cdbf548f5b3341b8dff8ae1c2ccf1301497944b875ec9e",
+          "sha256": "ef391a92db2a873c429269d15d65952b9a8cc801bad7d4a23c70025d297aaff6",
+          "start_byte": 32769
+        }
+      ],
+      "started_at": "2026-11-23T09:54:58.722186+00:00",
+      "stderr": "",
+      "url": "https://learn.microsoft.com/en-us/previous-versions/visualstudio/visual-basic-6/visual-basic-6-support-policy?view=vs-2019"
+    },
+    "ms-vs2005-download-index": {
+      "binding": "optional navigation only",
+      "content_type": "text/html; charset=utf-8",
+      "curl_exit": 0,
+      "effective_url": "https://www.microsoft.com/en-us/download/details.aspx?id=55984",
+      "execution": "01a207d2-bd21-7a41-9b62-6f8832d7c190",
+      "expected_sha256": "c43e96bfebf4c2264cee43bfca0245a9a7e166df564d4eab10fe90a02002503b",
+      "finding": "Fresh download index has different body and line 724 span bytes. The exact PDF URL is present on line 724, and the PDF body and inspected page spans match. No receipt for the prior HTML representation.",
+      "harness_version": "0.171.0-alpha.13",
+      "http_status": "200",
+      "https_tls_verify_result": "0",
+      "key": "ms-vs2005-download-index",
+      "native_tool_id": "exec-6caf0308-c39e-46e2-8466-ddde86171575",
+      "path": "sources/ms-vs2005-download-index.body",
+      "redirect_count": "0",
+      "retrieved_at": "2026-11-23T09:54:58.034975+00:00",
+      "session": "01a20663-ce3c-79b3-a9fd-137b04c310e2",
+      "sha256": "712702b4e7444ffb91c9321c2b8f7e60765af44d35b1dbb7f9088949187f32c7",
+      "size_bytes": 139995,
+      "spans": [
+        {
+          "end_byte_exclusive": 90632,
+          "first_line": 724,
+          "last_line": 724,
+          "representation_sha256": "712702b4e7444ffb91c9321c2b8f7e60765af44d35b1dbb7f9088949187f32c7",
+          "sha256": "c28d5e7fcbf2b4314270ff407f4a8c6bda0c6f0683389383c09c264a3e15c159",
+          "start_byte": 57426
+        }
+      ],
+      "started_at": "2026-11-23T09:54:57.692972+00:00",
+      "stderr": "",
+      "url": "https://www.microsoft.com/en-us/download/details.aspx?id=55984"
+    },
+    "ms-wsh-com": {
+      "binding": "supplementary source inspection without an original candidate dependency",
+      "content_type": "text/html",
+      "curl_exit": 0,
+      "effective_url": "https://learn.microsoft.com/en-us/windows/win32/com/using-com-objects-in-windows-script-host",
+      "execution": "01a207d2-bd21-7a41-9b62-6f8832d7c190",
+      "expected_sha256": null,
+      "harness_version": "0.171.0-alpha.13",
+      "http_status": "200",
+      "https_tls_verify_result": "0",
+      "key": "ms-wsh-com",
+      "native_tool_id": "exec-6caf0308-c39e-46e2-8466-ddde86171575",
+      "path": "sources/ms-wsh-com.body",
+      "redirect_count": "0",
+      "retrieved_at": "2026-11-23T09:54:58.957173+00:00",
+      "session": "01a20663-ce3c-79b3-a9fd-137b04c310e2",
+      "sha256": "5ae5c20b7f776e2be2d03d674cd5826eedfda2869cb3ba6f07dddf013978e83b",
+      "size_bytes": 49265,
+      "spans": [
+        {
+          "end_byte_exclusive": 25937,
+          "first_line": 737,
+          "last_line": 740,
+          "representation_sha256": "5ae5c20b7f776e2be2d03d674cd5826eedfda2869cb3ba6f07dddf013978e83b",
+          "sha256": "3cc90f95702e76f28f2c24859c080240a66ad41f70afc8915072432aeb840d59",
+          "start_byte": 24891
+        },
+        {
+          "end_byte_exclusive": 27328,
+          "first_line": 748,
+          "last_line": 759,
+          "representation_sha256": "5ae5c20b7f776e2be2d03d674cd5826eedfda2869cb3ba6f07dddf013978e83b",
+          "sha256": "5a41fb21216a9a73509e7b63168bfbf3bd4f20b4252bca13f7176e54661c7941",
+          "start_byte": 26440
+        }
+      ],
+      "started_at": "2026-11-23T09:54:58.721317+00:00",
+      "stderr": "",
+      "url": "https://learn.microsoft.com/en-us/windows/win32/com/using-com-objects-in-windows-script-host"
+    }
+  },
+  "verdicts": [
+    {
+      "challenges": [
+        {
+          "challenge": "Mixed editions or a misleading 5.00 header",
+          "finding": "Wizard itself pairs VERSION 5.00 with an explicit VB6 application/version and registry key. Two separate pinned form samples and a user-control sample also begin VERSION 5.00 under the label. This string cannot carry a language-edition identity on its own."
+        },
+        {
+          "challenge": "VBA, broader Classic Visual Basic, or a mere file-format lead",
+          "finding": "Catalog VBA shares its grammar scope and several extensions with VB6. VB6 catalog aliases include broader Classic labels. The two exact .Dsr witnesses plus Microsoft's product versus successor contrast anchor the edition referent. Any universal extension, whole classifier sample population, alias equivalence or code compatibility claim remains open."
+        },
+        {
+          "challenge": "Whether both .Dsr artifacts are programming-language proof",
+          "finding": "The DataReport sample contains persisted designer properties and VB attributes. Wizard separately pairs persisted metadata and code. This supports a product-tool sample context for the linked edition, with no normative language semantics or parser demonstration."
+        }
+      ],
+      "conclusion": "supported",
+      "dependency_assessments": [
+        {
+          "capture": "01a207d2-bd21-7a41-9b62-6f8832d7c190/call_c7557a4f41f14b739e2f6aa9a7bc1fcf/exec-6caf0308-c39e-46e2-8466-ddde86171575/catalog",
+          "findings": {
+            "applicability": {
+              "note": "Apply the exact revision and these named samples. The broad classic aliases carry no direct VB6 coverage claim.",
+              "result": "pass"
+            },
+            "authenticity": {
+              "note": "Pinned Linguist catalog path and exact block acquired over HTTPS and reread through the connected GitHub tool.",
+              "result": "pass"
+            },
+            "contradiction": {
+              "note": "VBA overlap and ambiguous classic aliases block inference to all classified files. They do not dislodge the two restricted witnesses.",
+              "result": "pass"
+            },
+            "integrity": {
+              "note": "Catalog body and lines 8805–8824 matched the independent byte and range checks.",
+              "result": "pass"
+            },
+            "interpretation": {
+              "note": "Classifier type, extension list, grammar scope and aliases are tool configuration. VBA shares .bas, .cls, .frm and source.vba in this catalog.",
+              "result": "pass"
+            },
+            "relevance": {
+              "note": "The exact label and language ID identify the source classifier entry.",
+              "result": "pass"
+            }
+          },
+          "source": {
+            "id": "vb-native-catalog",
+            "kind": "source",
+            "revision": 1
+          },
+          "witness_key": "catalog"
+        },
+        {
+          "capture": "01a207d2-bd21-7a41-9b62-6f8832d7c190/call_c7557a4f41f14b739e2f6aa9a7bc1fcf/exec-6caf0308-c39e-46e2-8466-ddde86171575/wizard-dsr",
+          "findings": {
+            "applicability": {
+              "note": "Supports the VB6 referent for this self-marked tool/designer sample, including mixed designer metadata and class code.",
+              "result": "pass"
+            },
+            "authenticity": {
+              "note": "Pinned original Linguist sample recovered through the repository path, raw GitHub URL and connected GitHub file reader.",
+              "result": "pass"
+            },
+            "contradiction": {
+              "note": "A VB5 product claim based solely on VERSION is undermined by the adjacent explicit tags; compatibility of code between VB5 and VB6 remains untested.",
+              "result": "pass"
+            },
+            "integrity": {
+              "note": "Full body, independent Git blob ID, physical lines and lines 21–35 matched.",
+              "result": "pass"
+            },
+            "interpretation": {
+              "note": "VERSION 5.00 appears next to explicit VB6 product metadata in the same artifact. It is a designer/file header in this context, without a normative format-version finding.",
+              "result": "pass"
+            },
+            "relevance": {
+              "note": "AppVer and registry location directly identify VB6 in the sample's designer context.",
+              "result": "pass"
+            }
+          },
+          "source": {
+            "id": "vb-native-wizard-dsr",
+            "kind": "source",
+            "revision": 1
+          },
+          "witness_key": "wizard-dsr"
+        },
+        {
+          "capture": "01a207d2-bd21-7a41-9b62-6f8832d7c190/call_c7557a4f41f14b739e2f6aa9a7bc1fcf/exec-6caf0308-c39e-46e2-8466-ddde86171575/datareport-dsr",
+          "findings": {
+            "applicability": {
+              "note": "Apply together with the Microsoft DataReport object page and the exact classifier sample path.",
+              "result": "pass"
+            },
+            "authenticity": {
+              "note": "Pinned original Linguist sample recovered from its exact origin path. The connected directory listing identifies this path and blob.",
+              "result": "pass"
+            },
+            "contradiction": {
+              "note": "Same header as Wizard does not prove an earlier VB edition or common language syntax. Publisher documents the relevant Data Report designer role.",
+              "result": "pass"
+            },
+            "integrity": {
+              "note": "Full body, Git blob ID, physical lines and lines 1–4 matched.",
+              "result": "pass"
+            },
+            "interpretation": {
+              "note": "The header and property/list layout are designer data. Tail has VB attributes. The artifact does not by itself establish an exact language syntax or a product version.",
+              "result": "pass"
+            },
+            "relevance": {
+              "note": "Designer object name, companion .dsx binding and persisted properties corroborate the designer-artifact context.",
+              "result": "pass"
+            }
+          },
+          "source": {
+            "id": "vb-native-datareport-dsr",
+            "kind": "source",
+            "revision": 1
+          },
+          "witness_key": "datareport-dsr"
+        },
+        {
+          "capture": "01a207d2-bd21-7a41-9b62-6f8832d7c190/call_c7557a4f41f14b739e2f6aa9a7bc1fcf/exec-6caf0308-c39e-46e2-8466-ddde86171575/vb-lineage-vs2005-archive",
+          "findings": {
+            "applicability": {
+              "note": "Relevant only as publisher contrast for the scoped identifier. Does not describe Linguist configuration.",
+              "result": "pass"
+            },
+            "authenticity": {
+              "note": "Microsoft Download Center navigated to the exact PDF on download.microsoft.com, independently fetched via HTTPS and opened and rendered locally.",
+              "result": "pass"
+            },
+            "contradiction": {
+              "note": "Publisher guidance weighs against treating an application moving to Visual Basic 2005 as keeping all VB6 language/form behavior.",
+              "result": "pass"
+            },
+            "integrity": {
+              "note": "PDF body and extracted page witnesses 621, 622, 624 and 643 all matched.",
+              "result": "pass"
+            },
+            "interpretation": {
+              "note": "Migration documentation evidences a published edition/language boundary, alongside separate environment and forms changes.",
+              "result": "pass"
+            },
+            "relevance": {
+              "note": "Microsoft describes distinct VB6 and Visual Basic 2005 code/project contexts and changes required when upgrading.",
+              "result": "pass"
+            }
+          },
+          "source": {
+            "id": "vb-native-vb-lineage-vs2005-archive",
+            "kind": "source",
+            "revision": 1
+          },
+          "witness_key": "vb-lineage-vs2005-archive"
+        },
+        {
+          "capture": "01a207d2-bd21-7a41-9b62-6f8832d7c190/call_c7557a4f41f14b739e2f6aa9a7bc1fcf/exec-6caf0308-c39e-46e2-8466-ddde86171575/ms-old-datareport-object",
+          "findings": {
+            "applicability": {
+              "note": "Applicable to the designer artifact identified in the pinned sample, as corroboration alongside the classifier and explicit wizard product target.",
+              "result": "pass"
+            },
+            "authenticity": {
+              "note": "Original Microsoft MSDN address redirected by its publisher to Microsoft Learn Previous Versions, preserving the Visual Studio 6.0 route.",
+              "result": "pass"
+            },
+            "contradiction": {
+              "note": "The designer role narrows the inference. The page supplies no universal edition/format mapping.",
+              "result": "pass"
+            },
+            "integrity": {
+              "note": "Full HTML and both exact byte-range witnesses matched.",
+              "result": "pass"
+            },
+            "interpretation": {
+              "note": "The object represents the designer. This is tooling/API documentation and does not define .Dsr grammar.",
+              "result": "pass"
+            },
+            "relevance": {
+              "note": "Governs the publisher description of DataReport and the Data Report designer relationship.",
+              "result": "pass"
+            }
+          },
+          "source": {
+            "id": "vb-native-ms-old-datareport-object",
+            "kind": "source",
+            "revision": 1
+          },
+          "witness_key": "ms-old-datareport-object"
+        }
+      ],
+      "exact_origin_checks": {
+        "candidate_catalog_hash_matches": true,
+        "candidate_sha256": "d6dc7dacc6cfaf902e35f58d5d7a10c87b7b97dfe13cb87a04d9f65ba7275ae1",
+        "catalog_span": {
+          "end_byte_exclusive": 151873,
+          "first_line": 8805,
+          "last_line": 8824,
+          "representation_sha256": "05e20bd736808a9e468ae1546e1a3b518b95fa215ee6f746903f7e164a9fd37b",
+          "sha256": "691b5052079258c6733fe5bb9ccbb8ee4a0bdbb35618d3ddb0e974733af1ea20",
+          "start_byte": 151529
+        },
+        "label": "Visual Basic 6.0",
+        "lead_id": "53451fa1ee1b4107bfda56ba44aa7d9a",
+        "sample_checks": [
+          {
+            "crlf_count": 99,
+            "exact_span": {
+              "end_byte_exclusive": 1512,
+              "first_line": 21,
+              "last_line": 35,
+              "matches": true,
+              "representation_sha256": "1c88db0066901b87a84b50d888fc0944d63a59f576b4c97c53e9c32319b3ba6d",
+              "sha256": "495ca6faf3a43128a87097567ac9e4abd85c0aa733fb07a23363ac7cb627f5ac",
+              "start_byte": 959
+            },
+            "git_blob_sha1": "9d2310642c82f659b484e4e0d18bc886cbe61878",
+            "lf_count": 99,
+            "path": "samples/Visual Basic 6.0/Wizard.Dsr",
+            "physical_line_count": 99,
+            "source_key": "wizard-dsr",
+            "trailing_lf": true
+          },
+          {
+            "crlf_count": 0,
+            "exact_span": {
+              "end_byte_exclusive": 154,
+              "first_line": 1,
+              "last_line": 4,
+              "matches": true,
+              "representation_sha256": "8878bd6626bff758855f6c9d015a6c6cda80709d3b87dadf624fbdc5013c9ea7",
+              "sha256": "4ad37c53b41e516c58b11f722c31b0d14247580129f9d010469cf359219d36c5",
+              "start_byte": 0
+            },
+            "git_blob_sha1": "8d7bd551770a6f324f16cf5175fd3604e4592863",
+            "lf_count": 364,
+            "path": "samples/Visual Basic 6.0/DataReport1.Dsr",
+            "physical_line_count": 364,
+            "source_key": "datareport-dsr",
+            "trailing_lf": true
+          }
+        ],
+        "target_identity": {
+          "id": "073c83d7e2684a64a451652745b0d372",
+          "identity_claim": {
+            "id": "visual-basic-6-edition-boundary",
+            "kind": "claim",
+            "revision": 1
+          },
+          "kind": "edition",
+          "name": "Visual Basic 6.0",
+          "sha256": "8c42240caa255096b8275137a8cf232a13864410b089b6e4bec393e3dada2502"
+        }
+      },
+      "finding": "The scoped Linguist label refers to the Visual Basic 6.0 edition in the Wizard.Dsr and DataReport1.Dsr context. Wizard.Dsr identifies its application version and registry target as Visual Basic 6.0. Microsoft identifies DataReport as the programmable object representing the Data Report designer in Visual Studio 6.0 documentation. The archived Microsoft migration material distinguishes the VB6 language and project form from its .NET successor.",
+      "lead": {
+        "candidate_sha256": "d6dc7dacc6cfaf902e35f58d5d7a10c87b7b97dfe13cb87a04d9f65ba7275ae1",
+        "catalog_citation_sha256": "691b5052079258c6733fe5bb9ccbb8ee4a0bdbb35618d3ddb0e974733af1ea20",
+        "catalog_lines": [
+          8805,
+          8824
+        ],
+        "label": "Visual Basic 6.0",
+        "lead_id": "53451fa1ee1b4107bfda56ba44aa7d9a",
+        "original_classifier_locator": "https://github.com/github-linguist/linguist/blob/cfd7a0113aa1efab99faeff38756f0ed4d48add8/lib/linguist/languages.yml#L8805",
+        "sample_checks": [
+          {
+            "git_blob_sha1": "9d2310642c82f659b484e4e0d18bc886cbe61878",
+            "locator": {
+              "end_byte_exclusive": 1512,
+              "file": "sources/wizard-dsr.body",
+              "first_line": 21,
+              "last_line": 35,
+              "representation_sha256": "1c88db0066901b87a84b50d888fc0944d63a59f576b4c97c53e9c32319b3ba6d",
+              "sha256": "495ca6faf3a43128a87097567ac9e4abd85c0aa733fb07a23363ac7cb627f5ac",
+              "start_byte": 959
+            },
+            "path": "samples/Visual Basic 6.0/Wizard.Dsr",
+            "physical_line_count": 99,
+            "source_key": "wizard-dsr"
+          },
+          {
+            "git_blob_sha1": "8d7bd551770a6f324f16cf5175fd3604e4592863",
+            "locator": {
+              "end_byte_exclusive": 154,
+              "file": "sources/datareport-dsr.body",
+              "first_line": 1,
+              "last_line": 4,
+              "representation_sha256": "8878bd6626bff758855f6c9d015a6c6cda80709d3b87dadf624fbdc5013c9ea7",
+              "sha256": "4ad37c53b41e516c58b11f722c31b0d14247580129f9d010469cf359219d36c5",
+              "start_byte": 0
+            },
+            "path": "samples/Visual Basic 6.0/DataReport1.Dsr",
+            "physical_line_count": 364,
+            "source_key": "datareport-dsr"
+          }
+        ],
+        "target_identity": {
+          "id": "073c83d7e2684a64a451652745b0d372",
+          "identity_claim": {
+            "id": "visual-basic-6-edition-boundary",
+            "kind": "claim",
+            "revision": 1
+          },
+          "kind": "edition",
+          "name": "Visual Basic 6.0",
+          "sha256": "8c42240caa255096b8275137a8cf232a13864410b089b6e4bec393e3dada2502"
+        },
+        "witness_keys": [
+          "catalog",
+          "wizard-dsr",
+          "datareport-dsr",
+          "vb-lineage-vs2005-archive",
+          "ms-old-datareport-object"
+        ]
+      },
+      "limitations": [
+        "Edition identity is limited to Visual Basic 6.0 as a language edition in the two named tool/designer samples and the exact classifier revision.",
+        "No claim that every sample, shared extension, classic label, designer-format version, service pack, SKU or prior VB edition is interchangeable. Professional/Enterprise SKU and .Dsr file-format semantics were not established.",
+        "The material was inspected statically. Project setup, executability, portability and runtime behavior are outside this review."
+      ],
+      "recommended_scope": "pinned-classifier edition referent in the named .Dsr designer-sample context"
+    },
+    {
+      "challenges": [
+        {
+          "challenge": "Generic Visual Basic alias, classic VB, or VBA",
+          "finding": "Read the adjacent labels and exact alias overlaps. Imports alias and XML namespace forms match the Microsoft .NET Visual Basic specification, providing the distinguishing evidence in the sample."
+        },
+        {
+          "challenge": "VBScript or framework classified by source.vbnet",
+          "finding": "Linguist also uses source.vbnet for VBScript. Publisher specification expressly defines the language separately from framework classes. Actual sample grammar supports the .NET language identity rather than the highlighting grammar, runtime, or library."
+        },
+        {
+          "challenge": "Specific compiler, Visual Basic edition, or successful compilation",
+          "finding": "Named imports and syntactic shapes suffice for language association. Some declarations are context-bound. The review did not run the sample or assign a compiler/runtime version."
+        }
+      ],
+      "conclusion": "supported",
+      "dependency_assessments": [
+        {
+          "capture": "01a207d2-bd21-7a41-9b62-6f8832d7c190/call_c7557a4f41f14b739e2f6aa9a7bc1fcf/exec-6caf0308-c39e-46e2-8466-ddde86171575/catalog",
+          "findings": {
+            "applicability": {
+              "note": "Only the exact label/commit and named source sample form the identity link.",
+              "result": "pass"
+            },
+            "authenticity": {
+              "note": "Exact GitHub Linguist publisher file independently acquired and exact block retrieved with the connected GitHub file reader.",
+              "result": "pass"
+            },
+            "contradiction": {
+              "note": "A generic Visual Basic alias and the shared VBScript grammar scope do not identify a language by themselves.",
+              "result": "pass"
+            },
+            "integrity": {
+              "note": "Full body and lines 8789–8804 matched the neutral fingerprints.",
+              "result": "pass"
+            },
+            "interpretation": {
+              "note": "Classifier aliases, .vb/.vbhtml and source.vbnet are configuration; the shared grammar label is weak evidence.",
+              "result": "pass"
+            },
+            "relevance": {
+              "note": "Exact classifier label and language ID define the candidate origin.",
+              "result": "pass"
+            }
+          },
+          "source": {
+            "id": "vb-native-catalog",
+            "kind": "source",
+            "revision": 1
+          },
+          "witness_key": "catalog"
+        },
+        {
+          "capture": "01a207d2-bd21-7a41-9b62-6f8832d7c190/call_c7557a4f41f14b739e2f6aa9a7bc1fcf/exec-6caf0308-c39e-46e2-8466-ddde86171575/vballinone-vb",
+          "findings": {
+            "applicability": {
+              "note": "The static sample is evidence of syntax and context. Full compilation or an exact language version is not needed for the scoped link.",
+              "result": "pass"
+            },
+            "authenticity": {
+              "note": "Pinned raw GitHub path and connected GitHub range read agree.",
+              "result": "pass"
+            },
+            "contradiction": {
+              "note": "The XML namespace and alias constructions, with the Microsoft specification, defeat a VB6 or VBScript interpretation of the scoped sample.",
+              "result": "pass"
+            },
+            "integrity": {
+              "note": "Body, Git blob ID and lines 7–15 matched. Physical line count includes the final LF terminator.",
+              "result": "pass"
+            },
+            "interpretation": {
+              "note": "Specific grammar constructions strengthen the link. Framework namespace identifiers alone do not govern the language identity.",
+              "result": "pass"
+            },
+            "relevance": {
+              "note": "The sample shows namespace, alias and XML namespace Imports forms and corroborating typed, generic and assembly declarations later in the sample.",
+              "result": "pass"
+            }
+          },
+          "source": {
+            "id": "vb-native-vballinone-vb",
+            "kind": "source",
+            "revision": 1
+          },
+          "witness_key": "vballinone-vb"
+        },
+        {
+          "capture": "01a207d2-bd21-7a41-9b62-6f8832d7c190/call_c7557a4f41f14b739e2f6aa9a7bc1fcf/exec-6caf0308-c39e-46e2-8466-ddde86171575/vb-dotnet-spec-intro",
+          "findings": {
+            "applicability": {
+              "note": "Supports identity at language level, without assigning the test sample to a compiler or a language edition.",
+              "result": "pass"
+            },
+            "authenticity": {
+              "note": "Pinned file in Microsoft's dotnet/vblang language specification acquired directly.",
+              "result": "pass"
+            },
+            "contradiction": {
+              "note": "The framework as such is outside the language definition, consistent with the proposed target.",
+              "result": "pass"
+            },
+            "integrity": {
+              "note": "Body and both witnesses matched content hashes.",
+              "result": "pass"
+            },
+            "interpretation": {
+              "note": "The scope concerns the language and separates .NET Framework classes from syntax and semantics.",
+              "result": "pass"
+            },
+            "relevance": {
+              "note": "Publisher explicitly identifies the Visual Basic programming language for the .NET Framework.",
+              "result": "pass"
+            }
+          },
+          "source": {
+            "id": "vb-native-vb-dotnet-spec-intro",
+            "kind": "source",
+            "revision": 1
+          },
+          "witness_key": "vb-dotnet-spec-intro"
+        },
+        {
+          "capture": "01a207d2-bd21-7a41-9b62-6f8832d7c190/call_c7557a4f41f14b739e2f6aa9a7bc1fcf/exec-6caf0308-c39e-46e2-8466-ddde86171575/vb-dotnet-pinned-imports",
+          "findings": {
+            "applicability": {
+              "note": "Interpretation is a language-level grammar discriminator within the exact sample context.",
+              "result": "pass"
+            },
+            "authenticity": {
+              "note": "Pinned publisher specification source acquired from the same original dotnet/vblang commit.",
+              "result": "pass"
+            },
+            "contradiction": {
+              "note": "A filename or tool syntax-highlighting category cannot establish that discriminator alone.",
+              "result": "pass"
+            },
+            "integrity": {
+              "note": "Body and both declared spans matched.",
+              "result": "pass"
+            },
+            "interpretation": {
+              "note": "Read syntax constructions independently of whether the entire specimen compiles.",
+              "result": "pass"
+            },
+            "relevance": {
+              "note": "The grammar describes member, alias and XML namespace Imports forms present in the pinned sample.",
+              "result": "pass"
+            }
+          },
+          "source": {
+            "id": "vb-native-vb-dotnet-pinned-imports",
+            "kind": "source",
+            "revision": 1
+          },
+          "witness_key": "vb-dotnet-pinned-imports"
+        }
+      ],
+      "exact_origin_checks": {
+        "candidate_catalog_hash_matches": true,
+        "candidate_sha256": "445f6241c59ee400653c882b652e156f561f4560d045ec093203633ea54fdb71",
+        "catalog_span": {
+          "end_byte_exclusive": 151529,
+          "first_line": 8789,
+          "last_line": 8804,
+          "representation_sha256": "05e20bd736808a9e468ae1546e1a3b518b95fa215ee6f746903f7e164a9fd37b",
+          "sha256": "8c07bbf075f2af1483721d188e1b71c1fec2408116aade083a76624505995922",
+          "start_byte": 151255
+        },
+        "label": "Visual Basic .NET",
+        "lead_id": "8f5c8be36362420cb4c116a6cf888aea",
+        "sample_checks": [
+          {
+            "crlf_count": 0,
+            "exact_span": {
+              "end_byte_exclusive": 436,
+              "first_line": 7,
+              "last_line": 15,
+              "matches": true,
+              "representation_sha256": "76660d617033dd5ece10e11c04d2a6ac7a426776c5480e2e7d433b5c43ddef7c",
+              "sha256": "ba1a16846ecdec0c38e122857052601f002ec9f85e2a30797d8a64e55d6aec34",
+              "start_byte": 216
+            },
+            "git_blob_sha1": "760635ff6f6d8b5bb7d43180040350abd78a9dcb",
+            "lf_count": 1093,
+            "path": "samples/Visual Basic .NET/VBAllInOne.vb",
+            "physical_line_count": 1093,
+            "source_key": "vballinone-vb",
+            "trailing_lf": true
+          }
+        ],
+        "target_identity": {
+          "id": "8232f0f368c54ded97dcfbfb81fa4b17",
+          "identity_claim": {
+            "id": "visual-basic-language-identity",
+            "kind": "claim",
+            "revision": 1
+          },
+          "kind": "language",
+          "name": "Visual Basic for .NET",
+          "sha256": "ea62d11c17e5d326f25c1e2f076604a571338c9bfa3ea1dcee0415ddb9fda94b"
+        }
+      },
+      "finding": "The exact Linguist Visual Basic .NET label maps to Microsoft’s Visual Basic language for .NET at language level. The pinned sample contains .NET namespace imports, a namespaced alias and XML namespace imports whose shape matches the publisher specification.",
+      "lead": {
+        "candidate_sha256": "445f6241c59ee400653c882b652e156f561f4560d045ec093203633ea54fdb71",
+        "catalog_citation_sha256": "8c07bbf075f2af1483721d188e1b71c1fec2408116aade083a76624505995922",
+        "catalog_lines": [
+          8789,
+          8804
+        ],
+        "label": "Visual Basic .NET",
+        "lead_id": "8f5c8be36362420cb4c116a6cf888aea",
+        "original_classifier_locator": "https://github.com/github-linguist/linguist/blob/cfd7a0113aa1efab99faeff38756f0ed4d48add8/lib/linguist/languages.yml#L8789",
+        "sample_checks": [
+          {
+            "git_blob_sha1": "760635ff6f6d8b5bb7d43180040350abd78a9dcb",
+            "locator": {
+              "end_byte_exclusive": 436,
+              "file": "sources/vballinone-vb.body",
+              "first_line": 7,
+              "last_line": 15,
+              "representation_sha256": "76660d617033dd5ece10e11c04d2a6ac7a426776c5480e2e7d433b5c43ddef7c",
+              "sha256": "ba1a16846ecdec0c38e122857052601f002ec9f85e2a30797d8a64e55d6aec34",
+              "start_byte": 216
+            },
+            "path": "samples/Visual Basic .NET/VBAllInOne.vb",
+            "physical_line_count": 1093,
+            "source_key": "vballinone-vb"
+          }
+        ],
+        "target_identity": {
+          "id": "8232f0f368c54ded97dcfbfb81fa4b17",
+          "identity_claim": {
+            "id": "visual-basic-language-identity",
+            "kind": "claim",
+            "revision": 1
+          },
+          "kind": "language",
+          "name": "Visual Basic for .NET",
+          "sha256": "ea62d11c17e5d326f25c1e2f076604a571338c9bfa3ea1dcee0415ddb9fda94b"
+        },
+        "witness_keys": [
+          "catalog",
+          "vballinone-vb",
+          "vb-dotnet-spec-intro",
+          "vb-dotnet-pinned-imports"
+        ]
+      },
+      "limitations": [
+        "Language-level link to Visual Basic for .NET at the pinned origin and exact sample. No language-version or runtime-generation claim.",
+        "The sample’s entire semantics or successful build were not assessed. Presence of .vb, .vbhtml, linguistic aliases or grammar strings is insufficient by itself."
+      ],
+      "recommended_scope": "pinned-classifier referent of the Visual Basic for .NET language in the named .vb sample"
+    },
+    {
+      "challenges": [
+        {
+          "challenge": "WScript or JScript as a competing language identity",
+          "finding": "Microsoft’s Windows Script Host documents multiple engines and both WScript/CScript executable surfaces. Its explicit JScript CreateObject alternatives separate host syntax from the VBScript class form in the named sample."
+        },
+        {
+          "challenge": "VBA or .NET as the enclosing language",
+          "finding": "Microsoft explicitly gives the VBScript/VBA subset relation. The linked .vbs sample uses VBScript class initialization and host-facing statements, and its System.Collections.ArrayList reference identifies an external library class from Microsoft's API documentation."
+        },
+        {
+          "challenge": "File/body scope and exact last line",
+          "finding": "Exact pinned Git blob and two source spans were reproduced. Final End If is physical line 140 without a trailing LF. The reader’s rendered slices provide line discrimination and the raw body preserves exact byte semantics."
+        }
+      ],
+      "conclusion": "supported",
+      "dependency_assessments": [
+        {
+          "capture": "01a207d2-bd21-7a41-9b62-6f8832d7c190/call_c7557a4f41f14b739e2f6aa9a7bc1fcf/exec-6caf0308-c39e-46e2-8466-ddde86171575/catalog",
+          "findings": {
+            "applicability": {
+              "note": "Apply only the catalog line block and the named .vbs sample at the pinned revision.",
+              "result": "pass"
+            },
+            "authenticity": {
+              "note": "Pinned Linguist catalog came from the original raw path and was cross-read through the GitHub connector.",
+              "result": "pass"
+            },
+            "contradiction": {
+              "note": "Shared grammar scope and filename convention are inadequate for general language or engine identity.",
+              "result": "pass"
+            },
+            "integrity": {
+              "note": "Full body and lines 8632–8641 matched.",
+              "result": "pass"
+            },
+            "interpretation": {
+              "note": "The language ID is classifier-local. source.vbnet is styling/classifier metadata shared with Visual Basic .NET.",
+              "result": "pass"
+            },
+            "relevance": {
+              "note": "The .vbs label block, language ID and exact path define the candidate origin.",
+              "result": "pass"
+            }
+          },
+          "source": {
+            "id": "vb-native-catalog",
+            "kind": "source",
+            "revision": 1
+          },
+          "witness_key": "catalog"
+        },
+        {
+          "capture": "01a207d2-bd21-7a41-9b62-6f8832d7c190/call_c7557a4f41f14b739e2f6aa9a7bc1fcf/exec-6caf0308-c39e-46e2-8466-ddde86171575/arraylist-vbs",
+          "findings": {
+            "applicability": {
+              "note": "The conjunction is meaningful in the named sample and documentation context. Environment, registration and engine availability are outside the observation.",
+              "result": "pass"
+            },
+            "authenticity": {
+              "note": "Original pinned Linguist sample downloaded and both critical spans were read through the connected GitHub tool.",
+              "result": "pass"
+            },
+            "contradiction": {
+              "note": "JScript can call WScript.CreateObject, and the framework class is not a VBScript type. Neither fact changes the scoped script dialect.",
+              "result": "pass"
+            },
+            "integrity": {
+              "note": "Body, Git blob ID and both exact spans matched. 139 LF bytes with last line unterminated yield 140 physical lines.",
+              "result": "pass"
+            },
+            "interpretation": {
+              "note": "Unqualified CreateObject is read in VBScript context. WScript is a host object and ArrayList an external class.",
+              "result": "pass"
+            },
+            "relevance": {
+              "note": "Sample shows class initialization, unqualified CreateObject, VB-style class/property constructs, and WScript script-name and Echo usage.",
+              "result": "pass"
+            }
+          },
+          "source": {
+            "id": "vb-native-arraylist-vbs",
+            "kind": "source",
+            "revision": 1
+          },
+          "witness_key": "arraylist-vbs"
+        },
+        {
+          "capture": "01a207d2-bd21-7a41-9b62-6f8832d7c190/call_c7557a4f41f14b739e2f6aa9a7bc1fcf/exec-6caf0308-c39e-46e2-8466-ddde86171575/vb-lineage-vbscript-com-translation-md",
+          "findings": {
+            "applicability": {
+              "note": "The lineage relation and host distinction inform this identity boundary only.",
+              "result": "pass"
+            },
+            "authenticity": {
+              "note": "Pinned MicrosoftDocs/win32 source independently acquired.",
+              "result": "pass"
+            },
+            "contradiction": {
+              "note": "Subset relation does not collapse this distinct classifier entry into VBA or the full VB language.",
+              "result": "pass"
+            },
+            "integrity": {
+              "note": "Full body and both witnesses matched.",
+              "result": "pass"
+            },
+            "interpretation": {
+              "note": "Publisher describes a related scripting dialect with host-specific objects available separately.",
+              "result": "pass"
+            },
+            "relevance": {
+              "note": "Microsoft identifies VBScript as a subset of Visual Basic for Applications and separately describes a host-supplied object model.",
+              "result": "pass"
+            }
+          },
+          "source": {
+            "id": "vb-native-vb-lineage-vbscript-com-translation-md",
+            "kind": "source",
+            "revision": 1
+          },
+          "witness_key": "vb-lineage-vbscript-com-translation-md"
+        },
+        {
+          "capture": "01a207d2-bd21-7a41-9b62-6f8832d7c190/call_c7557a4f41f14b739e2f6aa9a7bc1fcf/exec-6caf0308-c39e-46e2-8466-ddde86171575/vb-wscript-host-doc",
+          "findings": {
+            "applicability": {
+              "note": "Useful for explaining host object context. No release lifecycle finding is part of the candidate.",
+              "result": "pass"
+            },
+            "authenticity": {
+              "note": "Microsoft Learn Windows commands endpoint acquired directly.",
+              "result": "pass"
+            },
+            "contradiction": {
+              "note": "Alternative interpretation as a WScript or Windows runtime language fails because the host can run multiple languages.",
+              "result": "pass"
+            },
+            "integrity": {
+              "note": "Full HTML and all witnesses matched.",
+              "result": "pass"
+            },
+            "interpretation": {
+              "note": "The wscript command is a host application and engine availability depends on its environment.",
+              "result": "pass"
+            },
+            "relevance": {
+              "note": "Publisher describes Windows Script Host as multi-language and shows engine selection distinct from extension selection.",
+              "result": "pass"
+            }
+          },
+          "source": {
+            "id": "vb-native-vb-wscript-host-doc",
+            "kind": "source",
+            "revision": 1
+          },
+          "witness_key": "vb-wscript-host-doc"
+        },
+        {
+          "capture": "01a207d2-bd21-7a41-9b62-6f8832d7c190/call_c7557a4f41f14b739e2f6aa9a7bc1fcf/exec-6caf0308-c39e-46e2-8466-ddde86171575/ms-wscript-md",
+          "findings": {
+            "applicability": {
+              "note": "Useful as precise publisher source with exact commit.",
+              "result": "pass"
+            },
+            "authenticity": {
+              "note": "Pinned MicrosoftDocs source independently opened.",
+              "result": "pass"
+            },
+            "contradiction": {
+              "note": "Supports separation of host and engines and leaves installation/run details untested.",
+              "result": "pass"
+            },
+            "integrity": {
+              "note": "Body and each declared witness matched.",
+              "result": "pass"
+            },
+            "interpretation": {
+              "note": "Pinned source and rendered Microsoft host page share relevant publisher/editorial lineage and are not separate corroborating authorities.",
+              "result": "pass"
+            },
+            "relevance": {
+              "note": "Publisher source exposes the same host and selectable-engine distinction.",
+              "result": "pass"
+            }
+          },
+          "source": {
+            "id": "vb-native-ms-wscript-md",
+            "kind": "source",
+            "revision": 1
+          },
+          "witness_key": "ms-wscript-md"
+        },
+        {
+          "capture": "01a207d2-bd21-7a41-9b62-6f8832d7c190/call_c7557a4f41f14b739e2f6aa9a7bc1fcf/exec-6caf0308-c39e-46e2-8466-ddde86171575/ms-arraylist",
+          "findings": {
+            "applicability": {
+              "note": "Corroborates API role only; does not prove COM registration or successful object creation on any system.",
+              "result": "pass"
+            },
+            "authenticity": {
+              "note": "Microsoft Learn .NET Framework 4.8.1 API view independently acquired.",
+              "result": "pass"
+            },
+            "contradiction": {
+              "note": "A .NET library call does not turn surrounding sample source into Visual Basic for .NET.",
+              "result": "pass"
+            },
+            "integrity": {
+              "note": "Full HTML and both declared witnesses matched.",
+              "result": "pass"
+            },
+            "interpretation": {
+              "note": "External API identity is distinct from the language that requests it.",
+              "result": "pass"
+            },
+            "relevance": {
+              "note": "The document places System.Collections.ArrayList in the .NET API and identifies a COM-visible view.",
+              "result": "pass"
+            }
+          },
+          "source": {
+            "id": "vb-native-ms-arraylist",
+            "kind": "source",
+            "revision": 1
+          },
+          "witness_key": "ms-arraylist"
+        }
+      ],
+      "exact_origin_checks": {
+        "candidate_catalog_hash_matches": true,
+        "candidate_sha256": "a6273b513e2c1c1d89a270d6e6409130cfb26bfd98a5ff7ccb5171f35bdf4f43",
+        "catalog_span": {
+          "end_byte_exclusive": 148858,
+          "first_line": 8632,
+          "last_line": 8641,
+          "representation_sha256": "05e20bd736808a9e468ae1546e1a3b518b95fa215ee6f746903f7e164a9fd37b",
+          "sha256": "a65c029bdb7cd9afab90247a97e290a4f77e68c0095daa1ea9e99eaf9172f396",
+          "start_byte": 148647
+        },
+        "label": "VBScript",
+        "lead_id": "9475d3a8f95b40a89f28cc2c0fcc5524",
+        "sample_checks": [
+          {
+            "crlf_count": 0,
+            "exact_span": {
+              "end_byte_exclusive": 165,
+              "first_line": 1,
+              "last_line": 9,
+              "matches": true,
+              "representation_sha256": "6efc4886dc8c23729694163c85ec3c149b91ade205dadc77b8da2c1b149a8288",
+              "sha256": "04c8ce0c447040d4a115487b449532a10e98c4bfdcf5dcc3c5c40bb0a1b8c32f",
+              "start_byte": 0
+            },
+            "git_blob_sha1": "e5073fd59250e58f609387f89cd3259de49fefa0",
+            "lf_count": 139,
+            "path": "samples/VBScript/v_Data_ArrayList.vbs",
+            "physical_line_count": 140,
+            "source_key": "arraylist-vbs",
+            "trailing_lf": false
+          },
+          {
+            "crlf_count": 0,
+            "exact_span": {
+              "end_byte_exclusive": 2695,
+              "first_line": 129,
+              "last_line": 140,
+              "matches": true,
+              "representation_sha256": "6efc4886dc8c23729694163c85ec3c149b91ade205dadc77b8da2c1b149a8288",
+              "sha256": "0d91382019e2fc87f3cb01db06f17ddcd140a165bd450343f4870ab15f9ed446",
+              "start_byte": 2443
+            },
+            "git_blob_sha1": "e5073fd59250e58f609387f89cd3259de49fefa0",
+            "lf_count": 139,
+            "path": "samples/VBScript/v_Data_ArrayList.vbs",
+            "physical_line_count": 140,
+            "source_key": "arraylist-vbs",
+            "trailing_lf": false
+          }
+        ],
+        "target_identity": {
+          "id": "cde7450c7b6849c393f6f65c214e3634",
+          "identity_claim": {
+            "id": "vbscript-dialect-boundary",
+            "kind": "claim",
+            "revision": 1
+          },
+          "kind": "dialect",
+          "name": "VBScript",
+          "sha256": "e1806a420dbd60f8e59f15b71a136650caec2f63bafe50f8bf473af65447309b"
+        }
+      },
+      "finding": "The pinned Linguist VBScript label and the named .vbs class and script match the Microsoft-documented scripting dialect. Microsoft explicitly distinguishes the language from the Windows Script Host and from VBA. In the sample, WScript is a host-facing object and System.Collections.ArrayList is the requested external API object.",
+      "lead": {
+        "candidate_sha256": "a6273b513e2c1c1d89a270d6e6409130cfb26bfd98a5ff7ccb5171f35bdf4f43",
+        "catalog_citation_sha256": "a65c029bdb7cd9afab90247a97e290a4f77e68c0095daa1ea9e99eaf9172f396",
+        "catalog_lines": [
+          8632,
+          8641
+        ],
+        "label": "VBScript",
+        "lead_id": "9475d3a8f95b40a89f28cc2c0fcc5524",
+        "original_classifier_locator": "https://github.com/github-linguist/linguist/blob/cfd7a0113aa1efab99faeff38756f0ed4d48add8/lib/linguist/languages.yml#L8632",
+        "sample_checks": [
+          {
+            "git_blob_sha1": "e5073fd59250e58f609387f89cd3259de49fefa0",
+            "locator": {
+              "end_byte_exclusive": 165,
+              "file": "sources/arraylist-vbs.body",
+              "first_line": 1,
+              "last_line": 9,
+              "representation_sha256": "6efc4886dc8c23729694163c85ec3c149b91ade205dadc77b8da2c1b149a8288",
+              "sha256": "04c8ce0c447040d4a115487b449532a10e98c4bfdcf5dcc3c5c40bb0a1b8c32f",
+              "start_byte": 0
+            },
+            "path": "samples/VBScript/v_Data_ArrayList.vbs",
+            "physical_line_count": 140,
+            "source_key": "arraylist-vbs"
+          },
+          {
+            "git_blob_sha1": "e5073fd59250e58f609387f89cd3259de49fefa0",
+            "locator": {
+              "end_byte_exclusive": 2695,
+              "file": "sources/arraylist-vbs.body",
+              "first_line": 129,
+              "last_line": 140,
+              "representation_sha256": "6efc4886dc8c23729694163c85ec3c149b91ade205dadc77b8da2c1b149a8288",
+              "sha256": "0d91382019e2fc87f3cb01db06f17ddcd140a165bd450343f4870ab15f9ed446",
+              "start_byte": 2443
+            },
+            "path": "samples/VBScript/v_Data_ArrayList.vbs",
+            "physical_line_count": 140,
+            "source_key": "arraylist-vbs"
+          }
+        ],
+        "target_identity": {
+          "id": "cde7450c7b6849c393f6f65c214e3634",
+          "identity_claim": {
+            "id": "vbscript-dialect-boundary",
+            "kind": "claim",
+            "revision": 1
+          },
+          "kind": "dialect",
+          "name": "VBScript",
+          "sha256": "e1806a420dbd60f8e59f15b71a136650caec2f63bafe50f8bf473af65447309b"
+        },
+        "witness_keys": [
+          "catalog",
+          "arraylist-vbs",
+          "vb-lineage-vbscript-com-translation-md",
+          "vb-wscript-host-doc",
+          "ms-wscript-md",
+          "ms-arraylist"
+        ]
+      },
+      "limitations": [
+        "Dialect link is confined to the named .vbs sample and pinned GitHub Linguist entry.",
+        "Runtime execution, WScript engine availability on a specific operating system version, COM registration, and ArrayList service behavior were not tested.",
+        "The host and its rendered or pinned documents are related authorities, not additional independent corroboration."
+      ],
+      "recommended_scope": "pinned-classifier referent of the VBScript dialect in the named .vbs sample"
+    }
+  ]
+}

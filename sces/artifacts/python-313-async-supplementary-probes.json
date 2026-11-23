@@ -1,0 +1,61 @@
+{
+  "implementation": "cpython",
+  "runtime": "3.13.5 (tags/v3.13.5:6cb20a2, Jun 11 2025, 16:15:46) [MSC v.1943 64 bit (AMD64)]",
+  "scope": "Supplementary controlled observations on the installed CPython 3.13.5 runtime.",
+  "tests": {
+    "async_generator_close": {
+      "completed": true,
+      "result": {
+        "await_discovers_invalid_yield": "RuntimeError",
+        "awaitable_construction": "no injection",
+        "graceful_close": "completed with cleanup"
+      }
+    },
+    "context_boundaries": {
+      "completed": true,
+      "result": {
+        "assignment_truthy_exit": "suppressed with details",
+        "entry_failure": "propagated; exit skipped",
+        "exit_failure": "exit exception with suite context",
+        "normal_exit": "three None arguments",
+        "suite_falsey_exit": "propagated with details"
+      }
+    },
+    "coroutine_result": {
+      "completed": true,
+      "result": {
+        "await_value": "returned object",
+        "coroutine_raises": "original exception propagated",
+        "direct_iter": "TypeError",
+        "iterator_completion": "StopIteration.value is the returned object"
+      }
+    },
+    "finally_unwinding": {
+      "completed": true,
+      "result": {
+        "nested_break_continue_inside_clause": "original exception re-raised",
+        "new_exception": "propagated with saved exception as context",
+        "return_break_continue_out": "saved exception discarded"
+      }
+    },
+    "iteration_boundaries": {
+      "completed": true,
+      "result": {
+        "iteration_raises_StopAsyncIteration": [
+          21,
+          "normal end"
+        ],
+        "suite_StopAsyncIteration": "propagated",
+        "target_StopAsyncIteration": "propagated"
+      }
+    },
+    "iterator_contract": {
+      "completed": true,
+      "result": {
+        "NotAnIterator": "TypeError",
+        "NotAwaitable": "TypeError",
+        "valid_await_result": 21
+      }
+    }
+  }
+}

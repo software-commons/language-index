@@ -1,0 +1,1 @@
+{"aliases":[],"id":"f8c43e29ee084981bd8387e2e0709bc6","identity_claim":{"id":"algol68s-ifip-sublanguage-identity","kind":"claim","revision":1},"kind":"dialect","name":"ALGOL 68S","relations":[{"claim":{"id":"algol68s-dialect-of-algol68","kind":"claim","revision":1},"target":{"id":"075fb038b7e84e29ab8b0f6e4ea5f35c"},"type":"dialect-of"}],"state":"active"}

@@ -1,0 +1,1 @@
+{"basis":{"id":"rfc4180","kind":"source","revision":1},"citation":{"locator":"Status, Abstract, §§1–3, especially §2 items 1–7 and ABNF","modality":"descriptive"},"claim":{"id":"csv-common-record-format","kind":"claim","revision":1},"id":"support-csv-common-record-format","kind":"dependency","relation":"support","revision":1}

@@ -1,0 +1,1 @@
+{"aliases":[],"id":"672745d82c6c42deb3d38822c0e444ab","identity_claim":{"id":"algol68r-rre-dialect-identity","kind":"claim","revision":1},"kind":"dialect","name":"ALGOL 68-R","relations":[{"claim":{"id":"algol68r-dialect-of-algol68","kind":"claim","revision":1},"target":{"id":"075fb038b7e84e29ab8b0f6e4ea5f35c"},"type":"dialect-of"}],"state":"active"}

@@ -1,0 +1,146 @@
+{
+  "independent_lead_reviews": [
+    {
+      "capture_url": "https://raw.githubusercontent.com/github-linguist/linguist/cfd7a0113aa1efab99faeff38756f0ed4d48add8/lib/linguist/languages.yml",
+      "lead_id": "c08e0ee10f584454a1fb17c99a392a64",
+      "name": "Prolog",
+      "origin_sha256": "05e20bd736808a9e468ae1546e1a3b518b95fa215ee6f746903f7e164a9fd37b",
+      "raw_anchor": "Prolog",
+      "raw_line": 6329,
+      "registered_origin": "https://github.com/github-linguist/linguist/blob/cfd7a0113aa1efab99faeff38756f0ed4d48add8/lib/linguist/languages.yml#L6329",
+      "inspected_file": "linguist.yml",
+      "scope_gap": "Linguist classification is a discovery basis. Its interpreters and extensions neither establish historical edition boundaries nor equivalence among implementations.",
+      "finding": "Pinned Linguist recognition and file classification, with a separately examined designers’ manuscript for history.",
+      "evidence_routes": [
+        "https://prolog.academy/DOCS/the%20birth%20of%20prolog%20-%20Colmerauer%20-%20nov%201992.pdf"
+      ],
+      "result": "The frozen historical-identity binding is incomplete. Two historical edition relationships have separate supported bindings."
+    },
+    {
+      "capture_url": "https://softwarepreservation.computerhistory.org/prolog/",
+      "lead_id": "e5adaab79c0441be8429f80cad2e5185",
+      "name": "Preliminary Prolog (Prolog 0)",
+      "origin_sha256": "ec3b5b3d7681f447577db03e7da889f61d15568a1c90c8c7199df014c085897d",
+      "raw_anchor": "Prolog0",
+      "raw_line": 81,
+      "registered_origin": "https://softwarepreservation.computerhistory.org/prolog/#Prolog0",
+      "inspected_file": "archive.html",
+      "scope_gap": "The archive's fall 1972 label and the manuscript Abstract's preliminary-version timing do not on their own identify the same milestone. Keep precise genesis dating and the numeric label outside the frozen edition claim.",
+      "finding": "The archive's Preliminary Prolog heading and author-history cross-reference track the p. 14 language design and distinguish p. 16's Algol-W interpreter.",
+      "evidence_routes": [
+        "https://softwarepreservation.computerhistory.org/prolog/#ColmerauerAndRoussel1996",
+        "http://alain.colmerauer.free.fr/alcol/ArchivesPublications/PrologHistory/19november92.pdf",
+        "http://alain.colmerauer.free.fr/alcol/ArchivesPublications/HommeMachineFr/HoMa.pdf"
+      ],
+      "result": "Supported scoped preliminary edition and bound language-history description."
+    },
+    {
+      "capture_url": "https://softwarepreservation.computerhistory.org/prolog/",
+      "lead_id": "f50ee001bd874821ae0e653457e98a15",
+      "name": "Final Prolog (Prolog 1)",
+      "origin_sha256": "ec3b5b3d7681f447577db03e7da889f61d15568a1c90c8c7199df014c085897d",
+      "raw_anchor": "Prolog1",
+      "raw_line": 130,
+      "registered_origin": "https://softwarepreservation.computerhistory.org/prolog/#Prolog1",
+      "inspected_file": "archive.html",
+      "scope_gap": "The archival summer-fall 1973 heading, the manuscript's definitive-design history and dated interpreter documentation concern milestones that require separate analysis. No claim about exact dates, surviving-code absence or general compatibility follows.",
+      "finding": "The archive's Final Prolog heading leads to the same authors' account and lists a separate interpreter report. The frozen source describes the final Marseille language design in §5.",
+      "evidence_routes": [
+        "https://softwarepreservation.computerhistory.org/prolog/#ColmerauerAndRoussel1996",
+        "http://alain.colmerauer.free.fr/alcol/ArchivesPublications/PrologHistory/19november92.pdf",
+        "http://alain.colmerauer.free.fr/alcol/ArchivesPublications/Prolog1BattaniMeloni/BattaniMeloniProlog1973.pdf"
+      ],
+      "result": "Supported scoped final edition and bound comparison with the preliminary transition."
+    },
+    {
+      "capture_url": "https://softwarepreservation.computerhistory.org/prolog/",
+      "lead_id": "9602ed1d9e6c4281990e253e252b6c96",
+      "name": "Prolog IV",
+      "origin_sha256": "ec3b5b3d7681f447577db03e7da889f61d15568a1c90c8c7199df014c085897d",
+      "raw_anchor": "PrologIV",
+      "raw_line": 336,
+      "registered_origin": "https://softwarepreservation.computerhistory.org/prolog/#PrologIV",
+      "inspected_file": "archive.html",
+      "scope_gap": "The manual bounds the distinct design and explicitly distinguishes it from a Prolog III revision. The frozen identity locator needs the adjacent constraint-programming prose. ISO mentions do not prove compatibility.",
+      "finding": "The archive cross-links a separately authored technical bases publication and a heritage copy of the PrologIA June 1996 manual. The frozen PDF and its exact French paragraphs were directly inspected.",
+      "evidence_routes": [
+        "https://www.prolog-heritage.org/en/m4.html",
+        "https://prolog.academy/DOCS/documentation_PrologIV-manuel-pdfA.pdf",
+        "http://alain.colmerauer.free.fr/alcol/ArchivesPublications/Prolog4Bases96juillet/bases0.pdf"
+      ],
+      "result": "Supported scoped lineage relationship and mathematical-design description. The frozen historical-identity binding is incomplete."
+    },
+    {
+      "capture_url": "https://softwarepreservation.computerhistory.org/prolog/",
+      "lead_id": "96955ad589364147b4f4944e549b55c1",
+      "name": "PARLOG",
+      "origin_sha256": "ec3b5b3d7681f447577db03e7da889f61d15568a1c90c8c7199df014c085897d",
+      "raw_anchor": "PARLOG",
+      "raw_line": 1286,
+      "registered_origin": "https://softwarepreservation.computerhistory.org/prolog/#PARLOG",
+      "inspected_file": "archive.html",
+      "scope_gap": "The group heading cannot establish synonyms, edition edges or identical language implementations. Later implementation work and or-parallel behavior require their own scope.",
+      "finding": "The archive’s group heading covers three related names and links the same Clark–Gregory 1984 proceedings work via a second archive route. The frozen AIST scan shows printed p. 299 and the scoped and-parallel discussion.",
+      "evidence_routes": [
+        "https://www.ueda.info.waseda.ac.jp/AITEC_ICOT_ARCHIVES/ICOT/Museum/FGCS/FGCS84en-proc/84eLPLM1-5.pdf",
+        "https://www.airc.aist.go.jp/aitec-icot/ICOT/Museum/FGCS/FGCS84en-proc/84eLPLM1-5.pdf",
+        "https://doi.org/10.1016/0743-1066(85)90003-2"
+      ],
+      "result": "Supported scoped language identity and documented stream communication."
+    },
+    {
+      "capture_url": "https://softwarepreservation.computerhistory.org/prolog/",
+      "lead_id": "54f7c4aee1d3428f86810986df6fcfee",
+      "name": "Prolog-X",
+      "origin_sha256": "ec3b5b3d7681f447577db03e7da889f61d15568a1c90c8c7199df014c085897d",
+      "raw_anchor": "PrologX",
+      "raw_line": 740,
+      "registered_origin": "https://softwarepreservation.computerhistory.org/prolog/#PrologX",
+      "inspected_file": "archive.html",
+      "scope_gap": "The scope is the Prolog-X implementation and ZIP design. Common code, the virtual machine and the NIP version relationship do not prove a registry identity merge or a release-wide compatibility statement.",
+      "finding": "The archive directly links the exact Clocksin ZIP scan. The first-person archive excerpt gives context on the reference implementation, Orion variant and NIP lineage.",
+      "evidence_routes": [
+        "https://softwarepreservation.computerhistory.org/prolog/edinburgh/doc/Clocksin-ZIP_VM-1983_01.pdf",
+        "https://softwarepreservation.computerhistory.org/prolog/#NIP"
+      ],
+      "result": "Supported scoped implementation identity and implementation-of relation."
+    },
+    {
+      "capture_url": "https://softwarepreservation.computerhistory.org/prolog/",
+      "lead_id": "f888ffad2c754e2ea7cdc91a24136bb0",
+      "name": "MProlog",
+      "origin_sha256": "ec3b5b3d7681f447577db03e7da889f61d15568a1c90c8c7199df014c085897d",
+      "raw_anchor": "MPROLOG",
+      "raw_line": 1205,
+      "registered_origin": "https://softwarepreservation.computerhistory.org/prolog/#MPROLOG",
+      "inspected_file": "archive.html",
+      "scope_gap": "The first Hungarian Prolog and MProlog are distinct in the author’s account. Extension inheritance and discussion of an Edinburgh baseline establish neither an identity merge nor release-by-release guarantees.",
+      "finding": "The archive quotes the same Szeredi retrospective inspected in the NJSZT PDF and newsletter HTML. Its listed 1994 implementation overview is a separate prospect.",
+      "evidence_routes": [
+        "https://softwarepreservation.computerhistory.org/prolog/#Szeredi2004",
+        "https://dtai.cs.kuleuven.be/projects/ALP/newsletter/nov04/nav/articles/szeredi/szeredi.html",
+        "https://itf.njszt.hu/wp-content/uploads/2020/01/szeredi1.pdf",
+        "https://www.springer.com/us/book/9780792394570"
+      ],
+      "result": "Supported scoped identity, implementation-of relation and named-module description."
+    },
+    {
+      "capture_url": "https://softwarepreservation.computerhistory.org/prolog/",
+      "lead_id": "c54014d8528e4c6ba80f7523507d9bf1",
+      "name": "New Implementation of Prolog (NIP)",
+      "origin_sha256": "ec3b5b3d7681f447577db03e7da889f61d15568a1c90c8c7199df014c085897d",
+      "raw_anchor": "NIP",
+      "raw_line": 824,
+      "registered_origin": "https://softwarepreservation.computerhistory.org/prolog/#NIP",
+      "inspected_file": "archive.html",
+      "scope_gap": "The Bowen link is commented out in the acquired HTML and both manual citations are unlinked. The exact RAL path failed in the web tool and curl could not resolve the HTTPS host. The archive quotations show a reported product and lineage, while an exact independently captured primary identity binding and evidence for the merge or separate implementation boundary are outside this frozen review.",
+      "finding": "The archive gives a first-person Clocksin version-lineage excerpt, a participant report excerpt on RAL distribution and releases, and bibliographic leads toward Bowen's progress report and Edinburgh manuals.",
+      "evidence_routes": [
+        "https://softwarepreservation.computerhistory.org/prolog/#PrologX",
+        "http://www.chilton-computing.org.uk/inf/literature/inf_reports/p002.htm#c3p2",
+        "https://softwarepreservation.computerhistory.org/prolog/edinburgh/doc/Bowen-NIP_Progress_Report-1983_08_30.pdf"
+      ],
+      "result": "Provisional discovery lead. No frozen claim or source edge for NIP was presented for disposition."
+    }
+  ]
+}
