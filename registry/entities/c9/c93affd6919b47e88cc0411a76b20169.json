@@ -1,0 +1,1 @@
+{"aliases":[],"id":"c93affd6919b47e88cc0411a76b20169","identity_claim":{"id":"pli-language-identity-ibm-61","kind":"claim","revision":1},"kind":"language","name":"PL/I","relations":[{"claim":{"id":"pli-implemented-by-enterprise-pli-zos-61","kind":"claim","revision":1},"target":{"id":"104e2b60c746459b88ebc8bf8c8bb609"},"type":"implemented-by"}],"state":"active"}
