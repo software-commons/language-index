@@ -1,0 +1,7 @@
+# ABAP CDS DCL profile depth
+
+The five independently reviewed claims use exact SAP Release 754 DCL documentation. They cover the mandatory mapping-role annotation, the full-access rule form, the documented composition of access rules, Boolean operator precedence within an access condition, and the treatment of `VOID` in condition composition. [Research receipts](../../sces/artifacts/abap-dcl-proof-research.jsonl) · [Independent review receipts](../../sces/artifacts/abap-dcl-proof-review.jsonl)
+
+The profile distinguishes rule declaration syntax and composition from individual application authorization. The original title of the SAP developer guide spans CDS DDL and DCL. The pinned Linguist entries, original addition discussion and grammar links support the mixed source context. The inspected specimens are DDL. Both broad lead records retain their exact origins and an unresolved classification. [Lead review](../../sces/artifacts/abap-dcl-depth-crosswalk/independent-leads.json)
+
+The exact technical review was blind to the primary claim conclusions. A handoff sentence exposed the primary lead summary during the separate contextual review. The reviewer directly reacquired the source records and documented the disclosure. The contextual outcome leaves both existing unresolved dispositions in place. ABAP Cloud documentation returned generic HTML shells and contributes no rule qualification.

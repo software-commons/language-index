@@ -1,0 +1,238 @@
+{
+  "catalog_coordinates": {
+    "byte_range": [
+      3386,
+      3532
+    ],
+    "commit": "cfd7a0113aa1efab99faeff38756f0ed4d48add8",
+    "lines": [
+      71,
+      78
+    ],
+    "sha256": "e2279dc4229ce34971651e7510a221c8925db67932d0c620616f0ba447b10978"
+  },
+  "frozen_registry_records": {
+    "registry/candidates/40/4084d24a90f54554a9c295339346e8d5.json": "ca373ad8211fad0a4b2739a844a9217d313ee4b8eaa9d6d9667cae3d1200a9bd",
+    "registry/candidates/91/914ebbee9f8249d1a90a22cb91b39217.json": "9cd97137f510ecd2120cbed32ca2aae7c6bf57a5c09738e9dac75f0eed29a11a",
+    "registry/entities/a8/a83ad44fab995c09a2bc646a7e887e5a.json": "da44272d87b65ddd35733f1b269f7cd54f13527cbb2789c997fea8b0c58c9fc5",
+    "registry/entities/c0/c02fbbd35ebf4091895c12fae629dfb4.json": "9405dffe93f405c40562948e484c87812f0c103be3e876e505974deb1a96b2fc"
+  },
+  "guide_pages_reproduced": [
+    {
+      "extracted_page_sha256": "008366038265c4726589d750bc1a089324d65a232501649c4259e9ab499fd575",
+      "extractor": "pypdf 6.19.0",
+      "physical_page": 1,
+      "printed_page": null
+    },
+    {
+      "extracted_page_sha256": "a02d7863abb9ec05856613e068c1a404a287b9f3e77d46acfc5d8fcb378908e4",
+      "extractor": "pypdf 6.19.0",
+      "physical_page": 33,
+      "printed_page": 33
+    },
+    {
+      "extracted_page_sha256": "13aee10adeb8e8a36a8348d6231541fedac4708b3ae2bc4101cd370d6f59bd4d",
+      "extractor": "pypdf 6.19.0",
+      "physical_page": 75,
+      "printed_page": 75
+    },
+    {
+      "extracted_page_sha256": "67b6d976358dd358f2dc5b4fbba01a6268681117bd414a10d36350868b342fc7",
+      "extractor": "pypdf 6.19.0",
+      "physical_page": 108,
+      "printed_page": 108
+    }
+  ],
+  "lead_assessments": [
+    {
+      "candidate_id": "4084d24a90f54554a9c295339346e8d5",
+      "candidate_sha256": "ca373ad8211fad0a4b2739a844a9217d313ee4b8eaa9d6d9667cae3d1200a9bd",
+      "disposition": "unresolved",
+      "equivalence": "insufficient-for-exact-one-entity-equivalence",
+      "finding": "classifier origin with DDL examples and shared DDL/DCL highlighting",
+      "origin": "https://github.com/github-linguist/linguist/blob/cfd7a0113aa1efab99faeff38756f0ed4d48add8/lib/linguist/languages.yml#L71",
+      "reasoning": "The pinned row classifies .asddls and the two unchanged original fixtures are DDL view definitions, using an association and parameters respectively. Their authorization-check annotation configures a CDS entity in DDL and does not declare a role. PR 4614 and the associated comment describe a selected suffix, and the originally linked grammar and later pinned grammar both highlight DDL and DCL keywords. The original contributor supplied a classifier contribution in a personal capacity. A narrow DDL sample association is well supported. The source and its label leave exact identity with either accepted language unestablished.",
+      "related_entities": [
+        {
+          "id": "a83ad44fab995c09a2bc646a7e887e5a",
+          "identity_claim": {
+            "id": "sap-abap-cds-ddl-language-identity",
+            "kind": "claim",
+            "revision": 1
+          }
+        },
+        {
+          "id": "c02fbbd35ebf4091895c12fae629dfb4",
+          "identity_claim": {
+            "id": "sap-abap-cds-dcl-754-language-identity",
+            "kind": "claim",
+            "revision": 1
+          }
+        }
+      ]
+    },
+    {
+      "candidate_id": "914ebbee9f8249d1a90a22cb91b39217",
+      "candidate_sha256": "9cd97137f510ecd2120cbed32ca2aae7c6bf57a5c09738e9dac75f0eed29a11a",
+      "disposition": "unresolved",
+      "equivalence": "insufficient-for-exact-one-entity-equivalence",
+      "finding": "publisher technology guide with separate DDL and DCL contexts",
+      "origin": "https://help.sap.com/doc/6bbeffd4801447c0a67b30968778a24f/Dev/en-US/abap_cds_dev_user_guide_EN.pdf",
+      "reasoning": "The SAP Developer Guide cover identifies client version 3.16 and broadly describes ABAP CDS technology. Printed pages 33, 75 and 108 separately describe data definitions, access controls, and the DDL/DCL terminology and editors. This directly supports distinct contexts within the guide, while the title alone leaves the original source lead ambiguous between the two accepted targets. Cross-product Cloud Help shell responses supply no exact rule text for any of the five claims.",
+      "related_entities": [
+        {
+          "id": "a83ad44fab995c09a2bc646a7e887e5a",
+          "identity_claim": {
+            "id": "sap-abap-cds-ddl-language-identity",
+            "kind": "claim",
+            "revision": 1
+          }
+        },
+        {
+          "id": "c02fbbd35ebf4091895c12fae629dfb4",
+          "identity_claim": {
+            "id": "sap-abap-cds-dcl-754-language-identity",
+            "kind": "claim",
+            "revision": 1
+          }
+        }
+      ]
+    }
+  ],
+  "lead_input_sha256": "7a6b8c8fe311db01a10c18cf030faf7fd7c6f37039643ba0b2e0bbb94ef5163b",
+  "provenance": {
+    "cloud_shells": [
+      {
+        "bytes": 1160,
+        "capture": "native/sap-abap-cloud-access-control.bytes",
+        "error": "",
+        "exit": 0,
+        "final_url": "https://help.sap.com/docs/abap-cloud/abap-data-models/cds-authorization-concept",
+        "headers": "native/sap-abap-cloud-access-control.http",
+        "locator": "https://help.sap.com/docs/abap-cloud/abap-data-models/cds-authorization-concept",
+        "media_type": "text/html; charset=UTF-8",
+        "retrieved_at": "2026-11-23T10:44:39.925826+00:00",
+        "sha256": "f6f1ff2e0d4370a9a19d9676341a32eae4de100314716a9d2b78e01c31b54112",
+        "source": "sap-abap-cloud-access-control",
+        "start": "2026-11-23T10:44:39.675553+00:00",
+        "status": 200
+      },
+      {
+        "bytes": 1160,
+        "capture": "native/sap-abap-cloud-dcl-overview.bytes",
+        "error": "",
+        "exit": 0,
+        "final_url": "https://help.sap.com/docs/abap-cloud/abap-data-models/cds-access-control",
+        "headers": "native/sap-abap-cloud-dcl-overview.http",
+        "locator": "https://help.sap.com/docs/abap-cloud/abap-data-models/cds-access-control",
+        "media_type": "text/html; charset=UTF-8",
+        "retrieved_at": "2026-11-23T10:44:40.044446+00:00",
+        "sha256": "f6f1ff2e0d4370a9a19d9676341a32eae4de100314716a9d2b78e01c31b54112",
+        "source": "sap-abap-cloud-dcl-overview",
+        "start": "2026-11-23T10:44:39.704030+00:00",
+        "status": 200
+      },
+      {
+        "bytes": 1160,
+        "capture": "native/sap-abap-cloud-dcl-restrictions.bytes",
+        "error": "",
+        "exit": 0,
+        "final_url": "https://help.sap.com/docs/abap-cloud/abap-keywords/abap-cds-restrictions-in-dcl-in-cloud-development",
+        "headers": "native/sap-abap-cloud-dcl-restrictions.http",
+        "locator": "https://help.sap.com/docs/abap-cloud/abap-keywords/abap-cds-restrictions-in-dcl-in-cloud-development",
+        "media_type": "text/html; charset=UTF-8",
+        "retrieved_at": "2026-11-23T10:45:43.249949+00:00",
+        "sha256": "f6f1ff2e0d4370a9a19d9676341a32eae4de100314716a9d2b78e01c31b54112",
+        "source": "sap-abap-cloud-dcl-restrictions",
+        "start": "2026-11-23T10:45:42.753227+00:00",
+        "status": 200
+      }
+    ],
+    "exact_passages": {
+      "lead-initial-grammar-syntax": {
+        "byte_range": [
+          396,
+          934
+        ],
+        "lines": [
+          32,
+          35
+        ],
+        "sha256": "fba71007eac21ca7076f1950f755b30b16aaf71b5f62a651e5088ba34c6a8daf"
+      },
+      "lead-linguist-cds-association": {
+        "byte_range": [
+          117,
+          440
+        ],
+        "lines": [
+          4,
+          10
+        ],
+        "sha256": "98f30068314052d55c4724f4b19aca7b255cd92e618bef919ea15215bece05dd"
+      },
+      "lead-linguist-cds-parameters": {
+        "byte_range": [
+          87,
+          457
+        ],
+        "lines": [
+          3,
+          12
+        ],
+        "sha256": "57101378124c7b15ab8668f4173725ed514bcce97459a07c8a1c95833ba1da32"
+      },
+      "lead-linguist-gitmodules": {
+        "byte_range": [
+          11342,
+          11479
+        ],
+        "lines": [
+          251,
+          253
+        ],
+        "sha256": "3f4f96b6f209b71838dcd58531183d8dc94aef4e3e4743836c28f5e8d8a684b2"
+      },
+      "lead-linguist-grammar-map": {
+        "byte_range": [
+          4825,
+          4876
+        ],
+        "lines": [
+          205,
+          206
+        ],
+        "sha256": "43c011fcc1e63b888eead197994d61a69f82df4c705c89d9fdc2d6b7e62d134c"
+      },
+      "lead-original-grammar-syntax": {
+        "byte_range": [
+          1585,
+          2480
+        ],
+        "lines": [
+          99,
+          103
+        ],
+        "sha256": "d471e0c7a3836df320d5c7bdb15880fbfc20d260db9dae2fdc6d2593e68a4e34"
+      }
+    },
+    "original_grammar_blob_sha1": "ce9663496acbff93366b2970a34de5be3fc761f6",
+    "original_merge_grammar_gitlink": "534201199f4f80da8d34ac1601edc7b9b28b4ca9",
+    "pinned_grammar_blob_sha1": "f87809dec28924f3fdfd67d8ace2c885e2e86ae2",
+    "pinned_grammar_gitlink": "dd803e6ad2eea202b537a87c0da0536b92f60d3e",
+    "pr": {
+      "created_at": "2019-08-20T17:19:03Z",
+      "merge_commit_sha": "9bcbcb830213eee1e5b5ee11ea39115a1da0da5c",
+      "merged_at": "2021-02-12T10:47:08Z",
+      "number": 4614,
+      "updated_at": "2024-06-17T10:08:02Z"
+    },
+    "suffix_comment": {
+      "created_at": "2021-02-12T10:10:45Z",
+      "html_url": "https://github.com/github-linguist/linguist/pull/4614#issuecomment-778103495",
+      "id": 778103495,
+      "updated_at": "2021-02-12T10:10:45Z"
+    }
+  },
+  "review_blinding_note": "A filename-filtered HANDOFF line also displayed its short primary lead disposition summary. The full primary assessments were not opened. Lead passages and exact outcomes were assessed from newly fetched source bytes."
+}
