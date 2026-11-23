@@ -7,3 +7,9 @@ The C linking decision used the exact retained IEC catalog bytes after the publi
 Three cases retain explicit questions. Ada's pinned grammar dependency needs a separate primary assessment. The Clojure classifier covers ClojureScript files alongside Clojure samples, leaving the complete classifier referent open. The Oberon sample uses a typed receiver form absent from the inspected Wirth grammar passages. The registry preserves the original leads and the reasons for these decisions.
 
 An inventory pass matched all 849 recorded Linguist anchors to their exact rows in the pinned catalog. Of those leads, 838 remain unresolved in this cohort. The catalog classifies their files as programming (562), data (187), markup (71), and prose (18). Each identity disposition requires separate evidence.
+
+## Ada and Oberon follow-up
+
+Separate reviews of the pinned Ada grammar dependency and dated language references support the narrow Ada discovery link. The grammar's rule names and extensions identify the language referent. Classifier aliases, particular Ada editions, and conformance have separate scopes.
+
+The original Oberon submission names base Oberon and Oberon-2. Its exact sample uses a receiver declaration documented by the Oberon-2 authors. The mixed classifier remains unresolved as a single-identity link. The authors' report supplies a distinct Oberon-2 discovery lead. Other features of the sample retain their implementation context. [Independent source witnesses](../../sces/artifacts/ada-oberon-locator-review.json) · [Oberon-2 report](https://ssw.jku.at/Research/Papers/Oberon2.pdf)

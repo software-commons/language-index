@@ -1,0 +1,1 @@
+{"aliases":[],"id":"596be69f38f248d3949e4a5b6c261a6d","identity_claim":{"id":"mini-algol68-ammeraal-dialect-identity","kind":"claim","revision":1},"kind":"dialect","name":"Mini ALGOL 68","relations":[{"claim":{"id":"mini-algol68-dialect-of-algol68","kind":"claim","revision":1},"target":{"id":"075fb038b7e84e29ab8b0f6e4ea5f35c"},"type":"dialect-of"}],"state":"active"}
