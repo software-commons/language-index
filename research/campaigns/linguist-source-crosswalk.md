@@ -5,3 +5,5 @@ Separate Codex investigations compared twelve exact catalog leads with same-comm
 The C linking decision used the exact retained IEC catalog bytes after the public endpoint returned a different capture. A separately reacquired WG14 working draft and the sample support the scoped language comparison. The binding carries no cross-edition behavior claim.
 
 Three cases retain explicit questions. Ada's pinned grammar dependency needs a separate primary assessment. The Clojure classifier covers ClojureScript files alongside Clojure samples, leaving the complete classifier referent open. The Oberon sample uses a typed receiver form absent from the inspected Wirth grammar passages. The registry preserves the original leads and the reasons for these decisions.
+
+An inventory pass matched all 849 recorded Linguist anchors to their exact rows in the pinned catalog. Of those leads, 838 remain unresolved in this cohort. The catalog classifies their files as programming (562), data (187), markup (71), and prose (18). Each identity disposition requires separate evidence.
