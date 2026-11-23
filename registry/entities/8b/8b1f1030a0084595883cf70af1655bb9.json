@@ -1,0 +1,1 @@
+{"aliases":[],"id":"8b1f1030a0084595883cf70af1655bb9","identity_claim":{"id":"postgresql-language-identity","kind":"claim","revision":1},"kind":"dialect","name":"PostgreSQL SQL dialect","relations":[{"claim":{"id":"postgresql-sql-parent","kind":"claim","revision":1},"target":{"id":"b97a2dbaf9d644488c87e934193b55ff"},"type":"dialect-of"}],"state":"active"}

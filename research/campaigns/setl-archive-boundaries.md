@@ -1,0 +1,7 @@
+# SETL family archive boundaries
+
+Six exact original Computer History Museum archive locators were inspected. They cover LITTLE-based SETL, SETL4, SETL2, ISETL, ISETL-LINDA, and SetlX. The archived inventory matched SHA-256 `70f055f3ca256d804170e2f58a055ef277950c1855f9d3d1d9659950ced52a05`. Separate language, project, author, and university sources support the recorded claims.
+
+Independent review supported 17 of the 18 original claims against seven exact source revisions. The SETL4 composite identity citation ends before the extension description. That revision remains inconclusive. Independently verified revision 2 binds the maintainer's self-identification of SETL4 as a SETL implementation to lines 72–75 of the pinned README. The subsequent SetlX procedure revision binds the unchanged finding to section 2.6, Figure 2.7, printed page 28 and physical PDF page 29 of the version 2.7.0 tutorial.
+
+The successor links six exact archive leads. SETL2 and ISETL link to language identities, ISETL-LINDA and SetlX to dialect identities, and LITTLE SETL and SETL4 to implementation identities. The ISETL crosswalk applies to the named language referent. The archive and manuals also discuss interactive implementation contexts, which are separately scoped. Original SETL reference editions and documented implementation deviations retain separate applicability. [Independent locator decisions](../../sces/artifacts/setl-locator-audit/decisions.json) · [Capture manifest](../../sces/artifacts/setl-locator-audit/captures.json)

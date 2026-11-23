@@ -114,6 +114,24 @@ class RegistryArchitecture(unittest.TestCase):
             Index(self.root).import_candidates([dict(lead, name="Conflicting fixture label")])
         self.assertEqual(snapshots(self.root), before)
 
+    def test_candidate_adjudication_preserves_original_source(self):
+        subprocess.run(["git", "init", "-q", str(self.root)], check=True)
+        original = Index(self.root).add("Incorrectly transcribed label", "https://example.invalid/report#page=27")
+        path = f"registry/candidates/{original['id'][:2]}/{original['id']}.json"
+        subprocess.run(["git", "-C", str(self.root), "add", "registry"], check=True)
+        subprocess.run(["git", "-C", str(self.root), "-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
+                        "-c", "commit.gpgsign=false", "commit", "-qm", "Add original candidate"], check=True)
+        base = subprocess.check_output(["git", "-C", str(self.root), "rev-parse", "HEAD"], text=True).strip()
+
+        corrected = dict(original, name="Corrected label", reason="Checked printed page and project locator.",
+                         origins=[*original["origins"], "https://example.invalid/project#identity"])
+        write(self.root, path, corrected)
+        Index(self.root).check_history(base)
+
+        write(self.root, path, dict(corrected, origins=corrected["origins"][1:]))
+        with self.assertRaisesRegex(RegistryError, "Discovery origins must remain"):
+            Index(self.root).check_history(base)
+
     def test_missing_sces_qualification_blocks_accepted_identity(self):
         write(self.root, entity_path(FIRST), entity(FIRST, "language", "Fixture Alpha"))
         with self.assertRaises(RegistryError):

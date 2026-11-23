@@ -1,0 +1,1 @@
+{"aliases":[],"id":"073c83d7e2684a64a451652745b0d372","identity_claim":{"id":"visual-basic-6-edition-boundary","kind":"claim","revision":1},"kind":"edition","name":"Visual Basic 6.0","relations":[{"claim":{"id":"visual-basic-6-edition-of-classic","kind":"claim","revision":1},"target":{"id":"2d204f5d229f4cf7af923afec039d8c6"},"type":"edition-of"}],"state":"active"}

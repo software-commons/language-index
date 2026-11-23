@@ -1,0 +1,1 @@
+{"basis":{"id":"goal-tsql-ms-standards","kind":"source","revision":1},"citation":{"locator":"Introduction and glossary, [MS-TSQLISO02] v20160510, physical PDF page 9","modality":"descriptive"},"claim":{"id":"microsoft-tsql-dialect-parent","kind":"claim","revision":1},"id":"supports-microsoft-tsql-dialect-parent","kind":"dependency","relation":"support","revision":1}

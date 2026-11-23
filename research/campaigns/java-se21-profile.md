@@ -1,0 +1,7 @@
+# Java SE 21 language profile
+
+The Java identity and three technical claims use edition 21 of the Java Language Specification. The introduction identifies the language. Section 4.2.5 specifies the two values of primitive `boolean`. Sections 10.1 and 10.2 distinguish a created array's fixed length from its array type. A separate Codex execution reacquired the publisher chapters and reviewed each technical claim against its exact section and scope. [Introduction](https://docs.oracle.com/javase/specs/jls/se21/html/jls-1.html) · [Primitive boolean](https://docs.oracle.com/javase/specs/jls/se21/html/jls-4.html#jls-4.2.5) · [Array types](https://docs.oracle.com/javase/specs/jls/se21/html/jls-10.html#jls-10.1) · [Array variables](https://docs.oracle.com/javase/specs/jls/se21/html/jls-10.html#jls-10.2)
+
+The selected claims apply to the Java language at this specification edition. Java Virtual Machine semantics, boxed `Boolean`, compatibility across editions, and mapping the original regex facility lead to the language identity remain separate research questions.
+
+[Technical research acquisition](../../sces/artifacts/java-se21-research.jsonl) · [Independent technical acquisition](../../sces/artifacts/java-se21-review.jsonl) · [Identity research acquisition](../../sces/artifacts/java-identity-r3-proof-research.jsonl) · [Independent identity acquisition](../../sces/artifacts/java-identity-r3-proof-review.jsonl) · [Earlier review history](../reviews/java-se21-role-mismatch/README.md)

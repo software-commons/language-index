@@ -1,0 +1,1 @@
+{"basis":{"id":"pg-170-sql-conformance","kind":"source","revision":1},"citation":{"locator":"SQL Conformance appendix opening, lines 3–30 and 89–99","modality":"descriptive"},"claim":{"id":"postgresql-language-identity","kind":"claim","revision":1},"id":"supports-postgresql-language-identity","kind":"dependency","relation":"support","revision":1}

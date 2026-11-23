@@ -1,0 +1,1 @@
+{"basis":{"id":"goal-tsql-ms-top","kind":"source","revision":1},"citation":{"locator":"TOP (Transact-SQL), WITH TIES, Markdown lines 63–67","modality":"descriptive"},"claim":{"id":"microsoft-tsql-top-with-ties-can-exceed-count","kind":"claim","revision":1},"id":"supports-microsoft-tsql-top-with-ties-can-exceed-count","kind":"dependency","relation":"support","revision":1}

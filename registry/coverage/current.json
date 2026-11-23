@@ -1,13 +1,1 @@
-{
-  "snapshot": "census-2026-11-22-targeted",
-  "campaign": "Predecessor reconciliation and targeted public discovery",
-  "cutoff": "2026-11-22",
-  "scope": "1,120 distinct source rows from tooling, Regex Conformance fallback, historical, enterprise, academic, international, and formal-language routes.",
-  "method": "Pinned Linguist intake and exact Regex Conformance fallback, followed by independent targeted passes with unique qualified discovery locators. Keep distinct origins and unresolved identities.",
-  "limitations": [
-    "The recorded population contains labels and research leads. It does not denote a count of distinct languages.",
-    "The original Regex Conformance census artifact was unavailable. The private Atlas overlay remains outside the public registry.",
-    "Some publisher pointers were restricted or unavailable. Several catalog entries may be dialects, aliases, implementations, notations, or duplicates.",
-    "Identity, source qualification, and individual profile depth remain independently tracked."
-  ]
-}
+{"campaign":"Archival identity, SQL dialect boundaries and Java SE 21","cutoff":"2026-11-23","limitations":["The original RPG IV and TSO/E REXX locators returned HTTP 403. The Enterprise COBOL link applies to IBM's 6.4 implementation as documented in June 2024.","The MySQL, DuckDB and SQL Server regex facility leads retain distinct identity questions.","The Java claims apply to edition 21 of the language specification.","The 1,102 unresolved leads include investigated evidence gaps and leads awaiting direct source inspection. Most accepted profiles still lack research in multiple applicable dimensions."],"method":"Verify exact original locators and governing source revisions in separate Codex executions. Link six archival and publisher origins and six SETL origins to scoped language, dialect or implementation identities. Preserve unresolved contexts, original claim dispositions and corrected claim revisions.","scope":"The existing 1,122-lead census, six SETL archive leads, eight original-language crosswalks, three vendor SQL dialect investigations and the introduction and three sections of the Java SE 21 specification.","snapshot":"archive-and-dialects-2026-11-23"}

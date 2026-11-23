@@ -1,0 +1,1 @@
+{"basis":{"id":"sqlite-346-parser","kind":"source","revision":1},"citation":{"locator":"create_table_args and table_option_set productions, lines 203–214","modality":"descriptive"},"claim":{"id":"development-sqlite-sql-dialect-1","kind":"claim","revision":2},"id":"supports-development-sqlite-sql-dialect-1-r2","kind":"dependency","relation":"support","revision":1}

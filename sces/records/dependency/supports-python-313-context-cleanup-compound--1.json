@@ -1,0 +1,1 @@
+{"basis":{"id":"python-313-compound","kind":"source","revision":1},"citation":{"locator":"The with statement, lines 479–522","modality":"descriptive"},"claim":{"id":"python-313-context-cleanup","kind":"claim","revision":1},"id":"supports-python-313-context-cleanup-compound","kind":"dependency","relation":"support","revision":1}

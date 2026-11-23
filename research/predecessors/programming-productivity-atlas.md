@@ -25,4 +25,4 @@ The records support a set of identity questions for independent primary-source r
 
 ## Reuse boundary
 
-Retain the Atlas keys as predecessor references only after an independently reviewed crosswalk. Use public primary material to corroborate identity leads before entering canonical knowledge. The private overlay's row extraction remains internal. This reconciliation includes no measurement values, numerical comparisons, private supporting data, or reuse of the Atlas eligibility method. Outstanding rows require public-source discovery, exact identity investigation, and separate SCES verification.
+Retain the Atlas keys as predecessor references only after an independently reviewed crosswalk. Use public primary material to corroborate identity leads before entering canonical knowledge. The private overlay's row extraction remains internal. This reconciliation includes no measurement values, numerical comparisons, private supporting data, or reuse of the Atlas eligibility method. The [six unmatched-label follow-ups](atlas-label-followup-2026-11-22.md) record the public sources and remaining identity decisions.

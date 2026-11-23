@@ -1,0 +1,1 @@
+{"basis":{"id":"ecma262-15-2024","kind":"source","revision":1},"citation":{"locator":"§13.3.9.1 Runtime Semantics: Evaluation (#sec-optional-chaining-evaluation)","modality":"required"},"claim":{"id":"ecma262-15-optional-chain-nullish","kind":"claim","revision":1},"id":"supports-ecma262-15-optional-chain-nullish","kind":"dependency","relation":"support","revision":1}

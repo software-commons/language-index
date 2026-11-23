@@ -1,0 +1,1 @@
+{"aliases":[],"id":"c46eb05a99444d81a272b6b131064aec","identity_claim":{"id":"microsoft-tsql-dialect-identity","kind":"claim","revision":1},"kind":"dialect","name":"Transact-SQL (Microsoft)","relations":[{"claim":{"id":"microsoft-tsql-dialect-parent","kind":"claim","revision":1},"target":{"id":"b97a2dbaf9d644488c87e934193b55ff"},"type":"dialect-of"}],"state":"active"}

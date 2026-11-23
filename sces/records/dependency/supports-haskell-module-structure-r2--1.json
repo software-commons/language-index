@@ -1,0 +1,1 @@
+{"basis":{"id":"haskell2010-modules","kind":"source","revision":1},"citation":{"locator":"Chapter 5 Modules opening, lines 24–44, and §5.2 Export Lists, lines 470–480","modality":"descriptive"},"claim":{"id":"haskell-module-structure","kind":"claim","revision":2},"id":"supports-haskell-module-structure-r2","kind":"dependency","relation":"support","revision":1}

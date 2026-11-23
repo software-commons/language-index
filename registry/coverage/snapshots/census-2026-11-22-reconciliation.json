@@ -1,0 +1,12 @@
+{
+  "campaign": "Predecessor label follow-up and discovery locator audit",
+  "cutoff": "2026-11-22",
+  "limitations": [
+    "The population is a set of source leads. Identity, family, alias, and edition adjudication remains incomplete.",
+    "Original external Regex census artifacts remain unavailable. Private Atlas row data is excluded.",
+    "Some sources were accessible through indexed publisher text only. Those routes do not establish full byte preservation or support canonical qualification."
+  ],
+  "method": "Compare six unmatched predecessor labels with original catalog rows and publisher sources. Recheck PLOC, Nadeshiko, and VDM locators against source material. Retain source row identities and record provisional findings.",
+  "scope": "The 1,120 original public source rows and two new publisher leads for Delphi language and the PL/I General-Purpose Subset.",
+  "snapshot": "census-2026-11-22-reconciliation"
+}

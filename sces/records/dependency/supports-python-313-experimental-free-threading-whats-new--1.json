@@ -1,0 +1,1 @@
+{"basis":{"id":"python-313-whats-new","kind":"source","revision":1},"citation":{"locator":"Free-threaded CPython, lines 311–348","modality":"descriptive"},"claim":{"id":"python-313-experimental-free-threading","kind":"claim","revision":1},"id":"supports-python-313-experimental-free-threading-whats-new","kind":"dependency","relation":"support","revision":1}

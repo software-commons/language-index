@@ -1,0 +1,1 @@
+{"aliases":[],"id":"cde7450c7b6849c393f6f65c214e3634","identity_claim":{"id":"vbscript-dialect-boundary","kind":"claim","revision":1},"kind":"dialect","name":"VBScript","relations":[{"claim":{"id":"vbscript-dialect-of-vba","kind":"claim","revision":1},"target":{"id":"3d54956a11704c489e01aada8e291114"},"type":"dialect-of"}],"state":"active"}

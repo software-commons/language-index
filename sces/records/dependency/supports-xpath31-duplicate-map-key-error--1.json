@@ -1,0 +1,1 @@
+{"basis":{"id":"xpath31-rec","kind":"source","revision":1},"citation":{"locator":"§3.11.1.1 Map Constructors, same-key definition and duplicate-entry paragraph, lines 10295–10312","modality":"required"},"claim":{"id":"xpath31-duplicate-map-key-error","kind":"claim","revision":1},"id":"supports-xpath31-duplicate-map-key-error","kind":"dependency","relation":"support","revision":1}

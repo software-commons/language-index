@@ -393,8 +393,16 @@ class Index:
         old = git_blobs(self.root, base, "registry/entities")
         require(old.keys() <= self.entity_blobs.keys(), "Accepted identities must be retained at their permanent paths")
         past_candidates = git_blobs(self.root, base, "registry/candidates")
-        candidates = {f"registry/candidates/{identifier[:2]}/{identifier}.json" for identifier in self.candidates}
-        require(past_candidates.keys() <= candidates, "Discovered candidates must be retained in the ledger")
+        candidates = {f"registry/candidates/{identifier[:2]}/{identifier}.json": record
+                      for identifier, record in self.candidates.items()}
+        require(past_candidates.keys() <= candidates.keys(), "Discovered candidates must be retained in the ledger")
+        for name, oid in past_candidates.items():
+            path = self.root / name
+            if git_blob_id(path.read_bytes()) == oid:
+                continue
+            previous = decode(git(self.root, "show", f"{base}:{name}"))
+            require(set(previous["origins"]) <= set(candidates[name]["origins"]),
+                    f"Discovery origins must remain with the original candidate: {name}")
         for name, oid in git_blobs(self.root, base, "registry/coverage/snapshots").items():
             path = self.root / name
             require(path.is_file() and path.resolve() == path and git_blob_id(path.read_bytes()) == oid,
