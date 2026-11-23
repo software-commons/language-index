@@ -1,0 +1,1 @@
+{"aliases":[],"id":"0b0517b25b6f556995649aaabe7bc1ba","identity_claim":{"id":"nadesiko-v3-edition-identity","kind":"claim","revision":1},"kind":"edition","name":"なでしこ3","relations":[{"claim":{"id":"nadesiko-v3-edition-of-parent","kind":"claim","revision":1},"target":{"id":"dbda3b4c717b57cf8f954ac747d98927"},"type":"edition-of"}],"state":"active"}

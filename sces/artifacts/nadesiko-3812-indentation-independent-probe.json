@@ -1,0 +1,114 @@
+{
+  "engine": "v24.4.1",
+  "module_sha256": {
+    "package/core/src/nako_errors.mjs": "d5ad6e169db1d3238e87d4b6015320a8ca36e6dc153ce82e9408e3a3d6ffb190",
+    "package/core/src/nako_indent.mjs": "fa203dbb8b01c21f6ad6d434d0f7c6173cc6317605d63e53c2d67825efe5bb25",
+    "package/core/src/nako_prepare.mjs": "ad8f48cf05dea6ee72127bc311c47cee6e20ff8da1a4c98eda209ab8cdf1588f"
+  },
+  "npm_archive_sha256": "17fc2e34b4061e96ac5102d6f2e34f004a4c219d83ee98ea72c8414832853bf9",
+  "npm_package": "nadesiko3",
+  "npm_version": "3.8.12",
+  "probe_sha256": "e0f9462cae1bd80d25723ed2a3bfacaef85c01dc9cc54b59ed06867cce8b1172",
+  "publisher_integrity": "sha512-CVm3IYYA029n1o/BUO7i1bbKvsYVsC8zkseXhN+LNo7ASHAa9BwHgG/ZfOSS9a7DUTAQ2iaj8+6eym1i6ZjONQ==",
+  "release_commit": "d24c8f150850221133f605c3da3d03f99ec1b2fb",
+  "results": [
+    {
+      "actual": true,
+      "expected": true,
+      "test": "exact trimmed segment",
+      "utf16_length": 6
+    },
+    {
+      "actual": false,
+      "expected": false,
+      "test": "partial segment",
+      "utf16_length": 5
+    },
+    {
+      "actual": true,
+      "expected": true,
+      "test": "256th code unit",
+      "utf16_length": 256
+    },
+    {
+      "actual": false,
+      "expected": false,
+      "test": "257th code unit",
+      "utf16_length": 257
+    },
+    {
+      "actual": false,
+      "expected": false,
+      "test": "supplementary characters measured as two code units",
+      "utf16_length": 257
+    },
+    {
+      "actual": true,
+      "expected": true,
+      "test": "30th segment",
+      "utf16_length": 60
+    },
+    {
+      "actual": false,
+      "expected": false,
+      "test": "31st segment",
+      "utf16_length": 62
+    },
+    {
+      "actual": true,
+      "expected": true,
+      "test": "Japanese full stop delimiter",
+      "utf16_length": 4
+    },
+    {
+      "actual": true,
+      "expected": true,
+      "test": "newline delimiter",
+      "utf16_length": 4
+    },
+    {
+      "actual": true,
+      "expected": true,
+      "test": "fullwidth exclamation normalization",
+      "utf16_length": 2
+    },
+    {
+      "actual": true,
+      "expected": true,
+      "test": "light bulb normalization",
+      "utf16_length": 3
+    },
+    {
+      "actual": false,
+      "expected": false,
+      "test": "first marker normalization only",
+      "utf16_length": 5
+    },
+    {
+      "actual": true,
+      "expected": true,
+      "test": "single-line block comment removal",
+      "utf16_length": 7
+    },
+    {
+      "actual": false,
+      "expected": false,
+      "test": "multiline comment exclusion from the regex",
+      "utf16_length": 8
+    },
+    {
+      "actual": true,
+      "test": "unchanged path without recognized directive"
+    },
+    {
+      "actual": true,
+      "keyword": "!インデント構文",
+      "test": "recognized directive and filtered terminator rejection"
+    },
+    {
+      "actual": true,
+      "keyword": "!ここまでだるい",
+      "test": "recognized directive and filtered terminator rejection"
+    }
+  ]
+}

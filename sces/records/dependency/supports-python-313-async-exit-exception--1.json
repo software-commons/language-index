@@ -1,0 +1,1 @@
+{"basis":{"id":"python-313-compound","kind":"source","revision":1},"citation":{"locator":"The async with statement, equivalence outline, lines 1584–1612","modality":"descriptive"},"claim":{"id":"python-313-async-exit-exception","kind":"claim","revision":1},"id":"supports-python-313-async-exit-exception","kind":"dependency","relation":"support","revision":1}
