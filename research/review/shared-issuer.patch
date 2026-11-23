@@ -968,7 +968,7 @@ index 0000000000000000000000000000000000000000..a4786ae97e13d1285b44bb64706f734e
 +            with self.assertRaisesRegex(DataError, "retrieval could not complete"):
 +                _fetch_frozen_records(REPOSITORY, commit, expected, len(raw))
 diff --git a/tests/test_review_gate.py b/tests/test_review_gate.py
-index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..0ccc2449186a1e72ebde2c7cbe11184a3a15b210 100644
+index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..0a3edee467d94ff07058e731e625cf89b21ed3d3 100644
 --- a/tests/test_review_gate.py
 +++ b/tests/test_review_gate.py
 @@ -2,7 +2,7 @@
@@ -1078,7 +1078,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..0ccc2449186a1e72ebde2c7cbe11184a
              "required_status_checks": [*checks, {"context": CHECK_NAME, "integration_id": 123}],
              "strict_required_status_checks_policy": True,
              "do_not_enforce_on_create": False,
-@@ -66,7 +98,221 @@ def active_queue_rules():
+@@ -66,7 +98,257 @@ def active_queue_rules():
      ]
  
  
@@ -1148,6 +1148,42 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..0ccc2449186a1e72ebde2c7cbe11184a
 +        runs = {1: [self.check(check_id, 1) for check_id in range(1, 1001)],
 +                2: [self.check(1001, 2, "success")]}
 +        self.assertEqual(successful_checks(self.github(suites, runs), SNAPSHOT, SNAPSHOT.head, 123), runs[2])
++
++    def test_revokes_exact_legacy_success_regardless_of_its_external_id(self):
++        for external in ({}, {"external_id": None}, {"external_id": "legacy-without-sha"}):
++            with self.subTest(external=external):
++                prior = self.check(43, 12, "success")
++                del prior["external_id"]
++                prior.update(external)
++                runs = {12: [prior]}
++                github = self.github([self.suite(12)], runs)
++                self.assertEqual(successful_checks(github, SNAPSHOT, SNAPSHOT.head, 123), [prior])
++
++                def publish(token, payload, *, check_id):
++                    self.assertEqual((token, payload["conclusion"], check_id), (LEGACY_TOKEN, "failure", prior["id"]))
++                    self.assertNotIn("external_id", payload)
++                    replacement = {**prior, "conclusion": "failure", "external_id": None}
++                    runs[12][0] = replacement
++                    return replacement
++
++                freshness = Mock()
++                with patch("tools.review_gate.token_is_target_only", return_value=True):
++                    supersede_checks(github, SNAPSHOT, SNAPSHOT.head, 123, LEGACY_TOKEN, [prior], publish, freshness)
++                freshness.assert_called_once()
++                self.assertEqual(successful_checks(github, SNAPSHOT, SNAPSHOT.head, 123), [])
++
++    def test_legacy_revocation_requires_exact_failed_check_readback(self):
++        prior = {**self.check(43, 12, "success"), "external_id": None}
++        github = self.github([self.suite(12)], {12: [prior]})
++        for changed in ({"id": 44}, {"head_sha": SNAPSHOT.base}, {"app": {"id": 119}}, {"conclusion": "success"}):
++            with self.subTest(changed=changed), patch("tools.review_gate.token_is_target_only", return_value=True):
++                response = {**prior, "conclusion": "failure", **changed}
++                with self.assertRaises(DataError):
++                    supersede_checks(github, SNAPSHOT, SNAPSHOT.head, 123, LEGACY_TOKEN, [prior], Mock(return_value=response), Mock())
++        with patch("tools.review_gate.token_is_target_only", return_value=True):
++            with self.assertRaisesRegex(DataError, "superseded success remains visible"):
++                response = {**prior, "conclusion": "failure"}
++                supersede_checks(github, SNAPSHOT, SNAPSHOT.head, 123, LEGACY_TOKEN, [prior], Mock(return_value=response), Mock())
 +
 +    def test_unstable_partial_duplicate_or_wrong_scope_history_is_rejected(self):
 +        runs = [self.check(check_id, 12) for check_id in range(1, 102)]
@@ -1300,7 +1336,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..0ccc2449186a1e72ebde2c7cbe11184a
      def test_accepts_only_complete_bound_verdicts(self):
          execution, verdict = review_result(make_trace(), BINDING, "abc", PATCH)
          self.assertEqual(execution, EXECUTION)
-@@ -79,6 +325,34 @@ class ReviewGateTests(unittest.TestCase):
+@@ -79,6 +361,34 @@ class ReviewGateTests(unittest.TestCase):
          _, verdict = review_result(make_trace(verdict={"decision": "inconclusive"}, inspect=False), BINDING, "abc", PATCH)
          self.assertEqual(verdict["decision"], "inconclusive")
  
@@ -1335,7 +1371,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..0ccc2449186a1e72ebde2c7cbe11184a
      def test_installation_token_accepts_supported_formats_without_header_delimiters(self):
          for token in (LEGACY_TOKEN, STATELESS_TOKEN):
              self.assertIsNotNone(APP_TOKEN.fullmatch(token))
-@@ -86,40 +360,304 @@ class ReviewGateTests(unittest.TestCase):
+@@ -86,40 +396,304 @@ class ReviewGateTests(unittest.TestCase):
              self.assertIsNone(APP_TOKEN.fullmatch(token))
  
      def test_issuer_refuses_unverified_repository_scope_before_writing(self):
@@ -1668,7 +1704,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..0ccc2449186a1e72ebde2c7cbe11184a
              def respond(_, payload, *, check_id=None):
                  return api_check({"name": CHECK_NAME, "head_sha": QUEUE["merge"],
                                    "external_id": publisher.call_args_list[-2].args[1]["external_id"],
-@@ -142,7 +680,7 @@ class ReviewGateTests(unittest.TestCase):
+@@ -142,7 +716,7 @@ class ReviewGateTests(unittest.TestCase):
                    patch("tools.review_gate.launch_review", side_effect=fake_launch)):
                  result = run(args, github, token_input=lambda: STATELESS_TOKEN, publisher=publisher)
                  self.assertEqual(result["status"], "check-issued")
@@ -1677,7 +1713,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..0ccc2449186a1e72ebde2c7cbe11184a
                  scope._get_json.assert_called_once_with(SCOPE_PATH)
                  first, last = publisher.call_args_list
                  self.assertEqual(first.args[0], STATELESS_TOKEN)
-@@ -186,49 +724,54 @@ class ReviewGateTests(unittest.TestCase):
+@@ -186,49 +760,54 @@ class ReviewGateTests(unittest.TestCase):
                  publisher.assert_not_called()
  
      def test_queue_admission_targets_only_the_head_and_records_its_purpose(self):
@@ -1759,7 +1795,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..0ccc2449186a1e72ebde2c7cbe11184a
  
      def test_wrong_source_and_stale_returned_checks_are_rejected(self):
          payload = {"name": CHECK_NAME, "head_sha": SNAPSHOT.merge,
-@@ -257,9 +800,9 @@ class ReviewGateTests(unittest.TestCase):
+@@ -257,9 +836,9 @@ class ReviewGateTests(unittest.TestCase):
              state = Path(directory)
              args = SimpleNamespace(state_dir=state, mode="review", pull=1, model="fixture", codex=Path("fixture"),
                                     app_id=123, reviewer=Reviewer(4001, 4002, state / "reviewer-home"),
@@ -1771,7 +1807,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..0ccc2449186a1e72ebde2c7cbe11184a
              github.get_pull.return_value = SNAPSHOT
              credential = Mock()
              publisher = Mock()
-@@ -277,9 +820,9 @@ class ReviewGateTests(unittest.TestCase):
+@@ -277,9 +856,9 @@ class ReviewGateTests(unittest.TestCase):
              state = Path(directory)
              args = SimpleNamespace(state_dir=state, mode="review", pull=1, model="fixture", codex=Path("fixture"),
                                     app_id=123, reviewer=Reviewer(4001, 4002, state / "reviewer-home"),
@@ -1783,7 +1819,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..0ccc2449186a1e72ebde2c7cbe11184a
              github.get_pull.return_value = SNAPSHOT
              credential = Mock()
              publisher = Mock()
-@@ -305,6 +848,206 @@ class ReviewGateTests(unittest.TestCase):
+@@ -305,6 +884,206 @@ class ReviewGateTests(unittest.TestCase):
              credential.assert_not_called()
              publisher.assert_not_called()
  
@@ -1796,7 +1832,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..0ccc2449186a1e72ebde2c7cbe11184a
 +            github = Mock()
 +            use_queue_rules(github)
 +            github.get_pull.return_value = SNAPSHOT
-+            prior = api_check({"name": CHECK_NAME, "head_sha": SNAPSHOT.head, "external_id": "a" * 64,
++            prior = api_check({"name": CHECK_NAME, "head_sha": SNAPSHOT.head, "external_id": "legacy-external-id",
 +                               "status": "completed", "conclusion": "success"})
 +            self.successful_checks.side_effect = [[prior], [prior], []]
 +            publisher = Mock(return_value={**prior, "conclusion": "failure"})
@@ -1990,7 +2026,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..0ccc2449186a1e72ebde2c7cbe11184a
      def test_protected_launcher_uses_separate_identity_and_scoped_filesystem(self):
          with TemporaryDirectory() as directory:
              root = Path(directory)
-@@ -352,7 +1095,8 @@ class ReviewGateTests(unittest.TestCase):
+@@ -352,7 +1131,8 @@ class ReviewGateTests(unittest.TestCase):
                  token = json.loads((input_dir / "review-input.json").read_bytes())["inspection_token"]
                  return make_trace(token)
  
@@ -2000,7 +2036,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..0ccc2449186a1e72ebde2c7cbe11184a
                    patch("tools.review_gate.GitHub", return_value=github),
                    patch("tools.review_gate.capture_diff", return_value=("e" * 40, PATCH)) as capture,
                    patch("tools.review_gate.protected_staging", return_value=root),
-@@ -363,7 +1107,7 @@ class ReviewGateTests(unittest.TestCase):
+@@ -363,7 +1143,7 @@ class ReviewGateTests(unittest.TestCase):
                    patch("tools.review_gate.sys.stdin", stdin)):
                  self.assertEqual(main(["review", "1", "--rehearsal-config", str(config), "--queue-admission"]), 0)
  
@@ -2009,7 +2045,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..0ccc2449186a1e72ebde2c7cbe11184a
              self.assertTrue(capture.call_args.kwargs["linear_head"])
              self.assertEqual(share.call_args.args[1], reviewer.gid)
              self.assertEqual(launch.call_args.kwargs["reviewer"], reviewer)
-@@ -378,6 +1122,49 @@ class ReviewGateTests(unittest.TestCase):
+@@ -378,6 +1158,49 @@ class ReviewGateTests(unittest.TestCase):
              self.assertEqual(result["decision_sha256"], sha256(decision).hexdigest())
              self.assertFalse((Path(result["audit"]) / "issued-check.json").exists())
  
@@ -2059,7 +2095,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..0ccc2449186a1e72ebde2c7cbe11184a
      @unittest.skipUnless(os.name == "posix", "issuer deployment requires POSIX permissions")
      def test_protected_issuer_config_rejects_unpinned_runner_and_shared_permissions(self):
          with TemporaryDirectory() as directory:
-@@ -387,6 +1174,7 @@ class ReviewGateTests(unittest.TestCase):
+@@ -387,6 +1210,7 @@ class ReviewGateTests(unittest.TestCase):
              config = root / "review.json"
              settings = {
                  "app_id": 123, "audit_dir": str(root), "codex": str(codex), "model": "fixture",
@@ -2067,7 +2103,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..0ccc2449186a1e72ebde2c7cbe11184a
                  "codex_sha256": sha256(codex.read_bytes()).hexdigest(),
                  "reviewer_uid": 4001, "reviewer_gid": 4002, "reviewer_home": str(root / "reviewer-home"),
              }
-@@ -394,9 +1182,50 @@ class ReviewGateTests(unittest.TestCase):
+@@ -394,9 +1218,50 @@ class ReviewGateTests(unittest.TestCase):
              config.chmod(0o600)
              reviewer = Reviewer(4001, 4002, root / "reviewer-home")
              with patch("tools.review_gate.load_reviewer", return_value=reviewer):
@@ -2119,7 +2155,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..0ccc2449186a1e72ebde2c7cbe11184a
                  config.chmod(0o640)
                  with self.assertRaisesRegex(DataError, "must be private"):
                      load_issuer(config)
-@@ -410,8 +1239,10 @@ class ReviewGateTests(unittest.TestCase):
+@@ -410,8 +1275,10 @@ class ReviewGateTests(unittest.TestCase):
                      load_issuer(config)
                  codex.write_bytes(b"synthetic executable")
                  del settings["app_id"]
@@ -3386,7 +3422,7 @@ index 0000000000000000000000000000000000000000..3769ba069014c0e1aa09dd2f950f26bb
 +            raise
 +        raise DataError(f"could not capture the SCES publication evidence: {error}") from error
 diff --git a/tools/review_gate.py b/tools/review_gate.py
-index 46c36046f0bc7015d9fef4bb287659a424941a21..9ce5b3ee92f2e2a2b21ffef5264d7117233b796e 100644
+index 46c36046f0bc7015d9fef4bb287659a424941a21..55a261fd5bda97e14e19d84598347d23b3fdd1c1 100644
 --- a/tools/review_gate.py
 +++ b/tools/review_gate.py
 @@ -5,6 +5,7 @@ from __future__ import annotations
@@ -3551,7 +3587,22 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..9ce5b3ee92f2e2a2b21ffef5264d7117
          "in the rationale. This is technical review only. You have no authority to verify scientific claims or "
          "authorize a release."
      )
-@@ -165,10 +226,11 @@ def verify_issued_check(check, merge, app_id, external_id, status, conclusion=No
+@@ -158,17 +219,23 @@ def launch_review(codex, model, input_dir, schema, audit_dir, *, reviewer=None):
+     return path.read_bytes()
+ 
+ 
++def _verify_check_state(check, merge, app_id, status, conclusion):
++    require(isinstance(check, dict) and check.get("name") == CHECK_NAME and _exact_check_author(check, merge, app_id)
++            and check.get("status") == status and check.get("conclusion") == conclusion,
++            "GitHub returned a stale, failed, or wrong-source review check")
++
++
+ def verify_issued_check(check, merge, app_id, external_id, status, conclusion=None):
+-    require(check.get("name") == CHECK_NAME and check.get("head_sha") == merge
+-            and check.get("status") == status and check.get("conclusion") == conclusion
+-            and check.get("external_id") == external_id and (check.get("app") or {}).get("id") == app_id,
++    _verify_check_state(check, merge, app_id, status, conclusion)
++    require(check.get("external_id") == external_id,
              "GitHub returned a stale, failed, or wrong-source review check")
  
  
@@ -3565,7 +3616,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..9ce5b3ee92f2e2a2b21ffef5264d7117
                        headers={"Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json",
                                 "Content-Type": "application/json", "User-Agent": "Software-Commons-Review-Gate",
                                 "X-GitHub-Api-Version": "2022-11-28"})
-@@ -179,8 +241,9 @@ def write_check(token, payload, *, check_id=None):
+@@ -179,8 +246,9 @@ def write_check(token, payload, *, check_id=None):
          raise DataError(f"GitHub check API failed: {error.reason}") from None
  
  
@@ -3577,7 +3628,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..9ce5b3ee92f2e2a2b21ffef5264d7117
      require(isinstance(rules, list) and len(rules) < 100 and all(isinstance(item, dict) for item in rules),
              "GitHub did not return a complete active branch rules view")
      by_type = {}
-@@ -188,6 +251,9 @@ def require_queue_rules(github, app_id):
+@@ -188,6 +256,9 @@ def require_queue_rules(github, app_id):
          by_type.setdefault(item.get("type"), []).append(item)
      require({"pull_request", "deletion", "non_fast_forward"} <= by_type.keys(),
              "mandatory pull requests, branch deletion protection and force-push protection are required")
@@ -3587,7 +3638,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..9ce5b3ee92f2e2a2b21ffef5264d7117
      queue = by_type.get("merge_queue", [])
      require(len(queue) == 1, "App issuance requires a mandatory merge queue")
      parameters = queue[0].get("parameters")
-@@ -212,17 +278,29 @@ def require_queue_rules(github, app_id):
+@@ -212,17 +283,29 @@ def require_queue_rules(github, app_id):
                  bindings[name].append(integration if strict and type(integration) is int else None)
      require(all(bindings[name] == [source] for name, source in expected.items()),
              "required review and CI contexts must each bind their exact integration and enforce strict checks")
@@ -3618,7 +3669,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..9ce5b3ee92f2e2a2b21ffef5264d7117
      pending = publisher(token, {"name": CHECK_NAME, "head_sha": target,
                                  "status": "in_progress", "external_id": decision_digest})
      verify_issued_check(pending, target, app_id, decision_digest, "in_progress")
-@@ -236,7 +314,7 @@ def create_check(snapshot, app_id, token, decision, publisher, verify_fresh, *,
+@@ -236,7 +319,7 @@ def create_check(snapshot, app_id, token, decision, publisher, verify_fresh, *,
              "summary": (
                  f"PR #{snapshot.number}\n\nHead: `{snapshot.head}`\n\nBase: `{snapshot.base}`\n\n"
                  f"Reviewed merge: `{snapshot.merge}`\n\nExecution: `{decision['execution']}`\n\n"
@@ -3627,7 +3678,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..9ce5b3ee92f2e2a2b21ffef5264d7117
              ),
          },
      }, check_id=check_id)
-@@ -245,7 +323,84 @@ def create_check(snapshot, app_id, token, decision, publisher, verify_fresh, *,
+@@ -245,7 +328,84 @@ def create_check(snapshot, app_id, token, decision, publisher, verify_fresh, *,
      return result
  
  
@@ -3695,17 +3746,17 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..9ce5b3ee92f2e2a2b21ffef5264d7117
 +    require(successful_checks(github, snapshot, target, app_id) == previous,
 +            "prior review changes during the supersession preflight")
 +    for check in previous:
-+        digest = check.get("external_id")
-+        require(isinstance(digest, str) and re.fullmatch(r"[0-9a-f]{64}", digest), "invalid prior review digest")
-+        verify_issued_check(check, target, app_id, digest, "completed", "success")
++        # GitHub can accept a legacy success without a decision digest. Its authenticated identity is enough to deny it.
++        _verify_check_state(check, target, app_id, "completed", "success")
++        require(type(check.get("id")) is int and check["id"] > 0, "invalid prior review check ID")
 +    for check in previous:
 +        verify_fresh()
 +        result = publisher(token, {"status": "completed", "conclusion": "failure", "output": {
 +            "title": "Superseded by a new independent Codex review",
 +            "summary": "A new exact review has started. This older decision no longer authorizes queue progress.",
 +        }}, check_id=check["id"])
-+        verify_issued_check(result, target, app_id, check["external_id"], "completed", "failure")
-+        require(result.get("id") == check["id"], "GitHub superseded a different review check")
++        _verify_check_state(result, target, app_id, "completed", "failure")
++        require(type(result.get("id")) is int and result["id"] == check["id"], "GitHub superseded a different review check")
 +    require(not successful_checks(github, snapshot, target, app_id), "a superseded success remains visible on GitHub")
 +
 +
@@ -3713,7 +3764,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..9ce5b3ee92f2e2a2b21ffef5264d7117
      state = args.state_dir.resolve()
      require(state.is_dir(), "configure an existing issuer-owned state directory")
      reviewer = getattr(args, "reviewer", None)
-@@ -253,46 +408,177 @@ def run(args, github, *, token_input=None, publisher=write_check):
+@@ -253,46 +413,177 @@ def run(args, github, *, token_input=None, publisher=write_check):
      rehearsal = reviewer is not None and args.app_id is None
      admission = getattr(args, "queue_admission", False)
      run_id = getattr(args, "queue_run", None)
@@ -3906,7 +3957,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..9ce5b3ee92f2e2a2b21ffef5264d7117
      decision = {"binding": binding, "execution": execution, "model": args.model,
                  "started_at": started_at, "completed_at": completed_at,
                  "trace_sha256": sha256(trace).hexdigest(), "decision": verdict["decision"],
-@@ -307,19 +593,13 @@ def run(args, github, *, token_input=None, publisher=write_check):
+@@ -307,19 +598,13 @@ def run(args, github, *, token_input=None, publisher=write_check):
          result["rehearsal"] = True
      if verdict["decision"] != "approve":
          return {**result, "status": verdict["decision"], "findings": verdict["findings"], "rationale": verdict["rationale"]}
@@ -3928,7 +3979,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..9ce5b3ee92f2e2a2b21ffef5264d7117
          check = create_check(snapshot, args.app_id, installation_token, decision, publisher, verify_fresh,
                               admission=admission)
          save(audit / "issued-check.json", encode(check))
-@@ -373,18 +653,41 @@ def trusted_executable(path):
+@@ -373,18 +658,41 @@ def trusted_executable(path):
      trusted_parents(path)
  
  
@@ -3973,7 +4024,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..9ce5b3ee92f2e2a2b21ffef5264d7117
      audit = Path(settings["audit_dir"])
      protected_path(audit, directory=True)
      reviewer = load_reviewer(settings)
-@@ -393,7 +696,7 @@ def load_issuer(path, *, rehearsal=False):
+@@ -393,7 +701,7 @@ def load_issuer(path, *, rehearsal=False):
      with codex.open("rb") as executable:
          require(file_digest(executable, "sha256").hexdigest() == settings["codex_sha256"],
                  "Codex executable differs from the protected issuer pin")
@@ -3982,7 +4033,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..9ce5b3ee92f2e2a2b21ffef5264d7117
  
  
  def load_reviewer(settings):
-@@ -413,6 +716,23 @@ def load_reviewer(settings):
+@@ -413,6 +721,23 @@ def load_reviewer(settings):
      return Reviewer(uid, gid, home)
  
  
@@ -4006,7 +4057,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..9ce5b3ee92f2e2a2b21ffef5264d7117
  def main(argv=None):
      parser = argparse.ArgumentParser(description=__doc__)
      parser.add_argument("mode", choices=("inspect", "review"))
-@@ -423,27 +743,47 @@ def main(argv=None):
+@@ -423,27 +748,47 @@ def main(argv=None):
      phase = parser.add_mutually_exclusive_group()
      phase.add_argument("--queue-admission", action="store_true", help="review the test merge for queue admission")
      phase.add_argument("--queue-run", type=int, help="review the exact candidate for a GitHub merge-group Actions run")
