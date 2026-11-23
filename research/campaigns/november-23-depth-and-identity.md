@@ -19,7 +19,7 @@ The selected statements preserve the restrictions on nested calls, nil callees, 
 
 | Rows examined | Observed boundary |
 | --- | --- |
-| Pascal and Delphi language | The pinned file classifier groups Delphi and Object Pascal under Pascal. ISO/IEC 7185 supports the standardized Pascal identity. Borland's manuals support a Delphi Object Pascal dialect in their own scope. The Athens lead needs a reviewed publisher bridge, and the recorded Delphi 7 member-visibility citation stated the wrong subsection heading. |
+| Pascal and Delphi language | The pinned file classifier groups Delphi and Object Pascal under Pascal. ISO/IEC 7185 supports the standardized Pascal identity. Borland's manuals support a Delphi Object Pascal dialect in their own scope. The Athens lead needs a reviewed publisher bridge. The first recorded Delphi 7 visibility citation used the wrong subsection heading. |
 | Rocq Prover and Rocq Gallina | The original classifier groups files under the prover's name. The pinned README describes a formal language without naming it. The Coq and Rocq references identify Gallina as the specification language, and the project release notes concern the prover rename. Preserve these distinct scopes. |
 | Wolfram Language | The language documentation, lineage account and product history serve different claims. The file classifier also covers notebook and document suffixes and a Mathematica label. Its scope cannot establish a language synonym. |
 | ABAP and ABAP CDS | The versioned SAP documents separate ABAP, CDS DDL and DCL. The original Cloud documentation capture was a portal shell. The initial generalization about CDS definitions and the initial view-entity claim required narrower scopes for abstract entities and SAP HANA. Retain those initial review outcomes. |
@@ -28,3 +28,9 @@ The selected statements preserve the restrictions on nested calls, nil callees, 
 | Informix 4GL | The IBM catalog is for the 7.50.xC5 product and points to an older 7.32 reference. The HCL 7.51 documentation has its own language and environment scope. |
 
 Keep outcomes whose exact required bindings are pending out of the active selection. The validation report and frozen SCES records identify the selected claim revisions. A catalog ambiguity or an inaccessible locator remains an open disposition.
+
+## Delphi 7 visibility follow-up
+
+Two separate executions reacquired the exact Borland developer guide and inspected the class member declarations on printed pages 4-6 and 4-7, physical PDF pages 58 and 59. The revised member claim cites the actual subsection. Separate claims cover the protected access of descendant methods outside the defining unit and the public visibility and runtime type information of eligible published members in the documented `TPersistent` case. [Borland guide source record](../../sces/records/source/identity-borland-delphi7-guide--1.json) · [Research receipts](../../sces/artifacts/delphi-visibility-proof-research.jsonl) · [Independent review receipts](../../sces/artifacts/delphi-visibility-proof-review.jsonl)
+
+The review checked private storage used by public properties, unrelated callers in a different unit, and inherited properties that stay unpublished. The reviewed interpretation applies to Delphi 7. The original inconclusive record and the separate Athens and Pascal classifier holds remain in the research record. [Original claim revision](../../sces/records/claim/delphi-7-members--1.json) · [Corrected claim revision](../../sces/records/claim/delphi-7-members--2.json)
