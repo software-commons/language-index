@@ -23,6 +23,8 @@ For bulk intake, supply a JSON array of objects containing exactly `name` and `o
 
 For a repository with an active publication, add `--policy /path/to/pinned/.github` before the command. Install the pinned policy checkout's `tools/sces/requirements.txt`. The CLI verifies its Git revision and calls the pinned validation tool before reading any qualified projections.
 
+Git for Windows may report `Filename too long` when validating exact evidence paths from a deeply nested checkout. Use a shorter checkout path or enable `core.longpaths` in the affected local Git repository.
+
 ## Storage
 
 - `registry/entities/<first-two-id-characters>/<id>.json` stores one accepted identity per file. IDs are 32 lowercase hexadecimal characters generated independently of the entity's metadata. Kind and display name live inside the record. Changing either preserves the path.
