@@ -1,0 +1,9 @@
+# CPL, BCPL and B language records
+
+Two separate research executions supported three language identities, three exact lead links and 12 source-scoped claims. The registry links BCPL to CPL and B to BCPL. The original CPL paper credits ALGOL 60 influence. A structural ALGOL 60 relation awaits its own qualified local identity. [Lead decisions](../../sces/artifacts/bcpl-b-cpl-origins/independent-lead-decisions.json) · [Exact source witnesses](../../sces/artifacts/bcpl-b-cpl-origins/exact-source-witnesses.json)
+
+The CPL lead originates in a museum section that also lists compiler and draft material. Its language-level identity is anchored to the joint designers’ 1963 paper. Their block account and the separate January 1966 Cambridge syntax manual retain their own scopes. The separately described CPL1 subset and compiler remain distinct.
+
+The BCPL original discovery locator returned Richards’ June 24, 2026 Cintsys and Cintpos guide. The lead links to the language described by that guide, while the 1967 Project MAC manual controls the original design and lineage claims. The current guide supplies the separate tagged section bracket statement.
+
+The B link binds the exact Linguist row, detection rules and three sample blobs to the language. GitHub’s rendered wrappers returned different bytes across acquisitions. The exact Git objects reproduced. Thompson’s 1972 PDP-11 manual and Johnson’s MH-TSS reference describe 16-bit and 36-bit representations for their respective platforms. The edition-specific claims leave original specimen platforms and cross-system conformance open. [Research receipts](../../sces/artifacts/bcpl-b-cpl-proof-research.jsonl) · [Independent review receipts](../../sces/artifacts/bcpl-b-cpl-proof-review.jsonl) · [Research gaps](../../sces/artifacts/bcpl-b-cpl-origins/research-gaps.json)

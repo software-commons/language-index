@@ -1,0 +1,1 @@
+{"aliases":[],"id":"30eb15e1e9574160ae88179dd72f318b","identity_claim":{"id":"bcpl-cintsys-guide-language-identity","kind":"claim","revision":1},"kind":"language","name":"BCPL","relations":[{"claim":{"id":"bcpl-m352-derived-from-cpl","kind":"claim","revision":1},"target":{"id":"7376d20cda0548f5b9e601d1f25725a7"},"type":"derived-from"}],"state":"active"}

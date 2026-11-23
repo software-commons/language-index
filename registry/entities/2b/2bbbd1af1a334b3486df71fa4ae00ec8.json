@@ -1,0 +1,1 @@
+{"aliases":[],"id":"2bbbd1af1a334b3486df71fa4ae00ec8","identity_claim":{"id":"b-1972-language-identity","kind":"claim","revision":1},"kind":"language","name":"B","relations":[{"claim":{"id":"b-1972-derived-from-bcpl","kind":"claim","revision":1},"target":{"id":"30eb15e1e9574160ae88179dd72f318b"},"type":"derived-from"}],"state":"active"}
