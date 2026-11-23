@@ -1,0 +1,1 @@
+{"aliases":[],"id":"4663b93146b64b7d9400a615ce946296","identity_claim":{"id":"quickbasic-microsoft-45-language-identity","kind":"claim","revision":1},"kind":"dialect","name":"QuickBASIC","relations":[{"claim":{"id":"quickbasic-microsoft-45-dialect-of-basic","kind":"claim","revision":1},"target":{"id":"7dc701d5f81048729c50e0833eb52424"},"type":"dialect-of"}],"state":"active"}
