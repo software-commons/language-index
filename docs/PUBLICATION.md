@@ -12,6 +12,8 @@ Canonical publication uses the exact selected SCES artifacts and an authorized r
 
 The repository keeps evidence and domain gate configuration, review requirements, and publication records on protected paths. Administrator changes to the controls remain governance decisions and require a recorded rationale.
 
+The [trusted Codex review deployment](TRUSTED_REVIEW.md) describes how to commission an authenticated technical review while preserving the current checks and Code Owner requirement during verification. Its adoption and the exact release decision are separately authorized.
+
 Research-only notes and candidate catalogs carry provisional status. Empty registries and incomplete qualification provide no release. Follow SCES advisory and supersession procedures if an existing release loses active status.
 
 ## Licensing

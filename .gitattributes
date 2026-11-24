@@ -1,2 +1,3 @@
 sces/** -text
 registry/** text eol=lf
+research/review/shared-issuer.patch -text
