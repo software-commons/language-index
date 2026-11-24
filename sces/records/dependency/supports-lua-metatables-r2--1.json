@@ -1,0 +1,1 @@
+{"basis":{"id":"lua54-manual","kind":"source","revision":1},"citation":{"locator":"§2.4 Metatables and Metamethods, opening paragraphs and __add entry, lines 432–455 and 486–506","modality":"descriptive"},"claim":{"id":"lua-metatables","kind":"claim","revision":2},"id":"supports-lua-metatables-r2","kind":"dependency","relation":"support","revision":1}

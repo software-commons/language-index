@@ -1,0 +1,1 @@
+{"basis":{"id":"ecma262-15-2024","kind":"source","revision":1},"citation":{"locator":"§6.1.4 The String Type (#sec-ecmascript-language-types-string-type)","modality":"required"},"claim":{"id":"ecma262-15-string-length-code-units","kind":"claim","revision":1},"id":"supports-ecma262-15-string-length-code-units","kind":"dependency","relation":"support","revision":1}

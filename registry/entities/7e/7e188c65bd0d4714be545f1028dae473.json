@@ -1,0 +1,1 @@
+{"aliases":[],"id":"7e188c65bd0d4714be545f1028dae473","identity_claim":{"id":"snyder-tr490-setl2-language-identity","kind":"claim","revision":1},"kind":"language","name":"SETL2","relations":[{"claim":{"id":"snyder-tr490-setl2-derived-from-setl","kind":"claim","revision":1},"target":{"id":"55c408d7384c4724ac4bcffe59af17c8"},"type":"derived-from"}],"state":"active"}

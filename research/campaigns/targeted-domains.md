@@ -13,6 +13,8 @@ Cutoff: 2026-11-22 (America/Chicago). This provisional pass supplements the broa
 
 The discovery pass produced **97 name–origin pairs** across **96 distinct candidate labels**. The inputs comprise 38 commit-pinned public repository file locators, 44 publisher/manual/research locators, and 15 entries from the Chinese catalog. These are discovery leads. Identity disposition, governing authority, and release-eligible claim validation are pending.
 
+The [subsequent locator review](locator-corrections-2026-11-22.md) corrected five transcribed labels in the machine records and checked the Nadeshiko and VDM locator boundaries.
+
 The [2023 PLOC blue book](https://www.ploc.org.cn/ploc/CNPL-2023.pdf) is a self-submission inventory that admits language and tool projects. The document's printed page labels identify each individual section:
 
 | Candidate | Section | Printed page |

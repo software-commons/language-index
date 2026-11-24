@@ -1,0 +1,128 @@
+{
+  "cgi_spec_present": false,
+  "local_gil_enabled": true,
+  "observations": {
+    "assignment_order": [
+      "value",
+      "target",
+      "index",
+      "aug-target",
+      "aug-index",
+      "aug-value"
+    ],
+    "blocks_and_frames": [
+      "<module>",
+      "Probe",
+      "worker"
+    ],
+    "collection": [
+      true,
+      true,
+      true
+    ],
+    "context_manager": [
+      "enter",
+      "ValueError",
+      "enter"
+    ],
+    "coroutine": [
+      "pause",
+      7
+    ],
+    "generator": [
+      17,
+      22,
+      "start"
+    ],
+    "grouped_exceptions": [
+      [
+        "ValueError"
+      ],
+      [
+        "LookupError"
+      ]
+    ],
+    "import_finder": [
+      [
+        "declines",
+        "sces_meta_path_probe"
+      ],
+      [
+        "accepts",
+        "sces_meta_path_probe"
+      ],
+      "cached-none",
+      [
+        "declines",
+        "sces_unavailable_probe"
+      ],
+      [
+        "accepts",
+        "sces_unavailable_probe"
+      ],
+      [
+        "after",
+        "sces_unavailable_probe"
+      ],
+      "missing-parent",
+      [
+        "declines",
+        "sces_meta_path_probe"
+      ],
+      [
+        "also-declines",
+        "sces_meta_path_probe"
+      ],
+      "exhausted"
+    ],
+    "indentation": [
+      [
+        "INDENT",
+        2
+      ],
+      [
+        "INDENT",
+        8
+      ],
+      [
+        "DEDENT",
+        9
+      ],
+      [
+        "DEDENT",
+        9
+      ]
+    ],
+    "metaclass": [
+      "DemoMeta",
+      "TypeError"
+    ],
+    "object_models": {
+      "equal_lists_identical": false,
+      "tuple_referent_value": [
+        1,
+        2
+      ]
+    },
+    "package_kinds": [
+      2,
+      0,
+      1,
+      2
+    ],
+    "short_circuit": [
+      false,
+      true,
+      true,
+      "right",
+      false,
+      "right"
+    ],
+    "type_parameter_defaults": [
+      "evaluated"
+    ]
+  },
+  "python_h_present": true,
+  "runtime": "CPython 3.13.5",
+  "stdlib_cgi_file": false
+}

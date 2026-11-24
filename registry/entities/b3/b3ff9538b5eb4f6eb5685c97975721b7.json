@@ -1,0 +1,1 @@
+{"aliases":[],"id":"b3ff9538b5eb4f6eb5685c97975721b7","identity_claim":{"id":"york-ycs257-isetl-linda-dialect-identity","kind":"claim","revision":1},"kind":"dialect","name":"ISETL-LINDA","relations":[{"claim":{"id":"york-ycs257-isetl-linda-dialect-of-isetl","kind":"claim","revision":1},"target":{"id":"17bcd658dd4749d0bf8713d895ce9164"},"type":"dialect-of"}],"state":"active"}

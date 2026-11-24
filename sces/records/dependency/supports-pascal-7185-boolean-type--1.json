@@ -1,0 +1,1 @@
+{"basis":{"id":"identity-pascal-iso-1990","kind":"source","revision":1},"citation":{"locator":"§6.4.2.2(c) Required simple-types, PDF page 22","modality":"required"},"claim":{"id":"pascal-7185-boolean-type","kind":"claim","revision":1},"id":"supports-pascal-7185-boolean-type","kind":"dependency","relation":"support","revision":1}

@@ -1,0 +1,49 @@
+{
+  "observations": {
+    "a local intermediate declaration restores eligibility": {
+      "result": "middle",
+      "stage": "execute"
+    },
+    "class attribute only": {
+      "error": "SyntaxError",
+      "message": "no binding for nonlocal 'place' found",
+      "stage": "compile"
+    },
+    "class body declares nonlocal for an outer local": {
+      "result": "changed",
+      "stage": "execute"
+    },
+    "generic parameter blocks a same-named outer local": {
+      "error": "SyntaxError",
+      "message": "nonlocal binding not allowed for type parameter 'T'",
+      "stage": "compile"
+    },
+    "implicit class-reference cell only": {
+      "result": "Holder",
+      "stage": "execute"
+    },
+    "implicit class-reference cell versus outer local": {
+      "result": "Holder",
+      "stage": "execute"
+    },
+    "intervening function global": {
+      "error": "SyntaxError",
+      "message": "no binding for nonlocal 'place' found",
+      "stage": "compile"
+    },
+    "late outer assignment after the declaration": {
+      "result": "late",
+      "stage": "execute"
+    },
+    "nearest of two function bindings": {
+      "result": "middle",
+      "stage": "execute"
+    },
+    "outer local read before assignment": {
+      "error": "NameError",
+      "message": "cannot access free variable 'place' where it is not associated with a value in enclosing scope",
+      "stage": "execute"
+    }
+  },
+  "runtime": "CPython 3.13.5"
+}

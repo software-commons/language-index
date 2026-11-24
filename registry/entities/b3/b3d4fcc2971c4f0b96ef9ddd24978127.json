@@ -1,0 +1,1 @@
+{"aliases":[],"id":"b3d4fcc2971c4f0b96ef9ddd24978127","identity_claim":{"id":"cobol-language-identity","kind":"claim","revision":1},"kind":"language","name":"COBOL","relations":[{"claim":{"id":"cobol-implemented-by-ibm-enterprise-zos-64","kind":"claim","revision":1},"target":{"id":"8a190d87273a45869486869a5ee6aecf"},"type":"implemented-by"}],"state":"active"}

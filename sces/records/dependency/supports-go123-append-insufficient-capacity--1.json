@@ -1,0 +1,1 @@
+{"basis":{"id":"go-123-spec","kind":"source","revision":1},"citation":{"locator":"Appending to and copying slices (#Appending_and_copying_slices), lines 7336–7345","modality":"required"},"claim":{"id":"go123-append-insufficient-capacity","kind":"claim","revision":1},"id":"supports-go123-append-insufficient-capacity","kind":"dependency","relation":"support","revision":1}

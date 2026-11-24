@@ -1,12 +1,12 @@
 # Core language profiles
 
-This is provisional research. Source captures and exact claims await a separate verification execution. None of the following establishes an accepted entity or qualified publication.
+This document records provisional research from the initial core-editions pass. The [Python qualification pilot](../reviews/python-pilot.md) identifies the two revised claims selected for a later qualification and preserves the remaining limitation.
 
 ## Python 3.13.0
 
 - **Identity.** The Introduction and Alternate Implementations sections identify Python as the programming language and CPython as one implementation. The source is a language reference distributed with CPython. Implementation notes do not extend the language claim to every compiler or runtime. [Introduction, lines 4–53](https://github.com/python/cpython/blob/60403a5409ff2c3f3b07dd2ca91a7a3e096839c7/Doc/reference/introduction.rst#L4-L53)
 - **Local name binding.** A function-scope reference to an as-yet unbound local produces `UnboundLocalError`. An unresolved name that is outside that condition can follow a different path. [Execution model, lines 119–134](https://github.com/python/cpython/blob/60403a5409ff2c3f3b07dd2ca91a7a3e096839c7/Doc/reference/executionmodel.rst#L119-L134)
-- **Enclosing bindings.** `nonlocal` resolves to the nearest enclosing function scope with a prior binding. The documented no-binding case is a syntax error. This does not describe module globals or a particular runtime's compilation strategy. [Simple statements, lines 1008–1023](https://github.com/python/cpython/blob/60403a5409ff2c3f3b07dd2ca91a7a3e096839c7/Doc/reference/simple_stmts.rst#L1008-L1023)
+- **Enclosing bindings.** The original claim about `nonlocal` remains insufficient. The controlling passage describes the nearest enclosing binding and a syntax error when no such binding exists. Independent verification found that the claim needs an explicit lexical-visibility condition. [Simple statements, lines 1008–1023](https://github.com/python/cpython/blob/60403a5409ff2c3f3b07dd2ca91a7a3e096839c7/Doc/reference/simple_stmts.rst#L1008-L1023) · [Review finding](../reviews/python-pilot.md)
 
 ## ECMAScript 2024
 

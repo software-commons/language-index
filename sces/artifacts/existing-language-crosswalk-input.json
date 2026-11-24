@@ -1,0 +1,194 @@
+{
+  "base_pr_head": "ed4c0ff6bff72b567377a5c02dc85821d0ca1d99",
+  "candidates": [
+    {
+      "candidate_id": "ab569e010556421f8f7be123d11099e3",
+      "candidate_sha256": "3c64f750a2bb51fcc6ca5439f38c7b4157be8f93d8b2bd648aa7af9eedb7d262",
+      "discovery_label": "CLU",
+      "selected_identity_claim": {
+        "id": "clu-language-identity",
+        "kind": "claim",
+        "revision": 1
+      },
+      "sources": [
+        {
+          "locator": "https://publications.csail.mit.edu/lcs/pubs/pdf/MIT-LCS-TR-561.pdf",
+          "primary_representation_sha256": "1b1897dd7456ec4ab37e5b93e8d2552f4d4338f3ae32a78b9d02a40ca14189be",
+          "role": "original"
+        }
+      ],
+      "target_entity": "c553566fa2654ba3a6d26caa3e4ecac5",
+      "target_name": "CLU"
+    },
+    {
+      "candidate_id": "d13e46580d2a41e9866e7674028167ce",
+      "candidate_sha256": "deead333276ffb11436e203a0780a61e1438d4c977caeaa90724abe4a73aab50",
+      "discovery_label": "Modula-3",
+      "selected_identity_claim": {
+        "id": "modula-3-language-identity",
+        "kind": "claim",
+        "revision": 1
+      },
+      "sources": [
+        {
+          "locator": "https://softwarepreservation.computerhistory.org/modula3/",
+          "primary_representation_sha256": "b8bf8c79e9dfba466c0a31df7e3a1585afd94d317c373a0e7e0f1b4748cd5062",
+          "role": "original"
+        },
+        {
+          "locator": "https://softwarepreservation.computerhistory.org/modula3/doc/SRC-RR-52.pdf",
+          "primary_representation_sha256": "d022f91be1a904dd1ed3ea76a04744eec89ff4e278fc0588f279c9b39714f73a",
+          "role": "supplemental"
+        }
+      ],
+      "target_entity": "b35f9c380ac7490f8d34702a1b9543c9",
+      "target_name": "Modula-3"
+    },
+    {
+      "candidate_id": "de573c6b30d046aca2d0cbd032e83dd4",
+      "candidate_sha256": "cdf90ee43700228332d6d1a62a515ed06b4bdffb5d424f3518ab87901529a776",
+      "discovery_label": "Icon",
+      "selected_identity_claim": {
+        "id": "icon-language-identity",
+        "kind": "claim",
+        "revision": 1
+      },
+      "sources": [
+        {
+          "locator": "https://www2.cs.arizona.edu/icon/lb3.htm",
+          "primary_representation_sha256": "b4761973f6bed8a8ccb5738d49626c60fe0e27e08657300faa0fe130400a8263",
+          "role": "original"
+        },
+        {
+          "locator": "https://www2.cs.arizona.edu/icon/ftp/doc/lb1up.pdf",
+          "primary_representation_sha256": "8f7d5110f33e9339790dffa72150bb5a15ac3c7a78015c41f12c61f27b33669b",
+          "role": "supplemental"
+        },
+        {
+          "locator": "https://www2.cs.arizona.edu/icon/docs/ipd266.htm",
+          "primary_representation_sha256": "f8d3c2651f19092cbf74a05499eaf2612eb85e8aa38e0d633d0005626153522c",
+          "role": "supplemental"
+        }
+      ],
+      "target_entity": "ef5e04e8604f4519a6879f76e5ee3eea",
+      "target_name": "Icon"
+    },
+    {
+      "candidate_id": "2aedea965e2244a1b1a2cacec3025a41",
+      "candidate_sha256": "c4e1e7bb37ade957301bcca9ed91389ad655dfefc3596eb45a3853a57e66e4ab",
+      "discovery_label": "Rocq Gallina",
+      "selected_identity_claim": {
+        "id": "gallina-language-identity",
+        "kind": "claim",
+        "revision": 1
+      },
+      "sources": [
+        {
+          "locator": "https://github.com/rocq-prover/rocq/blob/21891774bf0131945f6cf454e56121d6a4fda02e/README.md",
+          "primary_representation_sha256": "3c1ce156f42afb2a6f004847a1dc9d5e87896ffb013f74ee385025a8f62122cb",
+          "representation_note": "Hash of captured GitHub HTML. Re-evaluate via the identical committed raw document.",
+          "role": "original"
+        },
+        {
+          "locator": "https://raw.githubusercontent.com/rocq-prover/rocq/21891774bf0131945f6cf454e56121d6a4fda02e/README.md",
+          "primary_representation_sha256": "5d8312220a3f61487f8b07fcddd5cc94f32a2641d112c15bc78fbdb6e0c4322e",
+          "role": "supplemental"
+        },
+        {
+          "locator": "https://raw.githubusercontent.com/rocq-prover/rocq/21891774bf0131945f6cf454e56121d6a4fda02e/doc/sphinx/proof-engine/ssreflect-proof-language.rst",
+          "primary_representation_sha256": "2320cb9f3e68dda9dcac36dd43565a48a35ef310914e787e8334d545e4df5b58",
+          "role": "supplemental"
+        }
+      ],
+      "target_entity": "574fe6265be158c98b3d60329ab94cda",
+      "target_name": "Gallina"
+    },
+    {
+      "candidate_id": "488cd40c9f6b42fc966ad03d8c0fd42b",
+      "candidate_sha256": "fc9a19ec4d395551a208e34c8270ef5581ec58b2b698a6895ca40b94b58e2b18",
+      "discovery_label": "Enterprise COBOL (IBM)",
+      "selected_identity_claim": {
+        "id": "cobol-language-identity",
+        "kind": "claim",
+        "revision": 1
+      },
+      "sources": [
+        {
+          "locator": "https://publibfp.dhe.ibm.com/epubs/pdf/igy6lr40.pdf",
+          "primary_representation_sha256": "eef69c81ab8bcd569eaa2a47f430ff70c5518d4929cff26e7ab1ed6170f5c0bc",
+          "role": "original"
+        }
+      ],
+      "target_entity": "b3d4fcc2971c4f0b96ef9ddd24978127",
+      "target_name": "COBOL"
+    },
+    {
+      "candidate_id": "55aaef7ee78849f8967dce3a3d1b5ec0",
+      "candidate_sha256": "2a37f33983f3d796c799a8ac90dc619ada602255290e90b7f640a3626b1ec0ff",
+      "discovery_label": "MUMPS",
+      "selected_identity_claim": {
+        "id": "mumps-language-identity",
+        "kind": "claim",
+        "revision": 1
+      },
+      "sources": [
+        {
+          "locator": "https://www.bitsavers.org/pdf/mumps/NBS_Handbook_118_MUMPS_Language_Standard_Jan1976.pdf",
+          "primary_representation_sha256": "ed60a71b77cb98a49267334b38fc334a7fcf4365dd593a8e467ac83ba363b780",
+          "role": "original"
+        },
+        {
+          "locator": "https://nvlpubs.nist.gov/nistpubs/Legacy/hb/nbshandbook118.pdf",
+          "primary_representation_sha256": "ed60a71b77cb98a49267334b38fc334a7fcf4365dd593a8e467ac83ba363b780",
+          "role": "supplemental"
+        }
+      ],
+      "target_entity": "1f875913670f478ba7baf5d30780d315",
+      "target_name": "MUMPS"
+    },
+    {
+      "candidate_id": "82d03bf9cc3b4c5e9d12345f9a9b0269",
+      "candidate_sha256": "63d54bbc8ee9ae79ed920ecccf76248635e27ccb729921fdf232f8981ab13ddf",
+      "discovery_label": "RPG IV",
+      "selected_identity_claim": {
+        "id": "rpg-iv-language-identity",
+        "kind": "claim",
+        "revision": 1
+      },
+      "sources": [
+        {
+          "locator": "https://www.ibm.com/docs/en/i/7.5.0?topic=rpg-ile-reference",
+          "role": "original"
+        }
+      ],
+      "target_entity": "3f8ce68fb2a8483f85da6c18a0b40526",
+      "target_name": "RPG IV"
+    },
+    {
+      "candidate_id": "970020a867134299961281a7b3bc7eea",
+      "candidate_sha256": "c75ceaef9a486dd5a47e4e0876913cd7837929dd34b8383dbdf4252812f0844a",
+      "discovery_label": "REXX",
+      "selected_identity_claim": {
+        "id": "classic-rexx-language-identity",
+        "kind": "claim",
+        "revision": 1
+      },
+      "sources": [
+        {
+          "locator": "https://www.ibm.com/docs/en/zos/2.5.0?topic=introduction-highlights-tsoe#:~:text=REXX%20is%20a%20high%2Dlevel",
+          "role": "original"
+        }
+      ],
+      "target_entity": "adba285f093355408731c6b026ad74c6",
+      "target_name": "REXX"
+    }
+  ],
+  "policy": {
+    "sces_bundle_sha256": "14da3f31f697ab828d4a4560f060dbe511861020db54bea7bc531e20ea0855ce",
+    "sces_revision": "ab26f278422772f2d9e5d4dd016407d14372a710",
+    "scirs_revision": "f23ffb93c5ad8d6b96d8652186ba20befee3bca8"
+  },
+  "qualified_source_commit": "c4790500be5ec799058055558e9774113b9545a6",
+  "selection": "0.1.0-rc.4",
+  "work": "Reacquire the original and applicable supplemental sources, then independently distinguish language-level linkage from an edition, dialect, implementation, product, collection, ambiguous title, or unavailable original. Judge each exact discovery lead separately and record scope, actual capture digests, and required holds. Do not reuse primary conclusions."
+}

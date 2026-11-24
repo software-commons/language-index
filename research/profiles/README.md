@@ -9,4 +9,6 @@ These profiles record provisional findings and applicability limits from direct 
 
 The [first independent review](../reviews/core-provenance.json) preserves the real research and verification run descriptors. Seven independent review records bind the exact frozen claim and source revisions. The original research did not complete all required challenge checks and did not establish the full Python identity state encoded in revision 1, so that first set remains provisional.
 
+The [Python qualification pilot](../reviews/python-pilot.md) records the subsequent independent review, the two selected claims, and the scope defect that keeps `nonlocal` provisional.
+
 No profile here establishes full design, ecosystem, or historical coverage. Use precise edition and facility boundaries when extending it.

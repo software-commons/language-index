@@ -1,0 +1,1 @@
+{"basis":{"id":"pg-170-sql-conformance","kind":"source","revision":1},"citation":{"locator":"SQL Conformance, lines 6–29 and 89–99","modality":"descriptive"},"claim":{"id":"postgresql-sql-parent","kind":"claim","revision":1},"id":"supports-postgresql-sql-parent","kind":"dependency","relation":"support","revision":1}

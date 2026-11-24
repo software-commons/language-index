@@ -1,0 +1,90 @@
+{
+  "argus-guardians-and-actions": {
+    "effective_url": "https://pdos.csail.mit.edu/archive/6.824-2007/papers/liskov-argus.pdf",
+    "pdf": true,
+    "sha256": "6c29a29efafc3abcbef6af8df27f270cd1f936150be1b4da067ee77165630ae0",
+    "size": 1657125,
+    "timestamp": "2026-11-23T05:16:33Z",
+    "url": "https://pdos.csail.mit.edu/archive/6.824-2007/papers/liskov-argus.pdf"
+  },
+  "argus-mit-tr-400": {
+    "effective_url": "https://dspace.mit.edu/entities/publication/9c3ffb1f-5047-459b-b628-150206b2450b",
+    "pdf": false,
+    "sha256": "da467e82208b651a5e1a622f548d8ebc762dff9dd09e4888c995aa22d439b927",
+    "size": 549702,
+    "timestamp": "2026-11-23T05:16:34Z",
+    "url": "https://hdl.handle.net/1721.1/149664"
+  },
+  "clu-mit-tr-561": {
+    "effective_url": "https://publications.csail.mit.edu/lcs/pubs/pdf/MIT-LCS-TR-561.pdf",
+    "pdf": true,
+    "sha256": "1b1897dd7456ec4ab37e5b93e8d2552f4d4338f3ae32a78b9d02a40ca14189be",
+    "size": 73751,
+    "timestamp": "2026-11-23T05:16:33Z",
+    "url": "https://publications.csail.mit.edu/lcs/pubs/pdf/MIT-LCS-TR-561.pdf"
+  },
+  "cobol-zos-64-reference": {
+    "error": "HTTP Error 403: Forbidden",
+    "url": "https://www.ibm.com/docs/es/SS6SG3_6.4.0/pdf/lrmvs.pdf"
+  },
+  "icon-ipd266": {
+    "effective_url": "https://www2.cs.arizona.edu/icon/docs/ipd266.htm",
+    "pdf": false,
+    "sha256": "f8d3c2651f19092cbf74a05499eaf2612eb85e8aa38e0d633d0005626153522c",
+    "size": 22277,
+    "timestamp": "2026-11-23T05:16:34Z",
+    "url": "https://www2.cs.arizona.edu/icon/docs/ipd266.htm"
+  },
+  "modula3-src-52": {
+    "effective_url": "https://softwarepreservation.computerhistory.org/modula3/doc/SRC-RR-52.pdf",
+    "pdf": true,
+    "sha256": "d022f91be1a904dd1ed3ea76a04744eec89ff4e278fc0588f279c9b39714f73a",
+    "size": 2344668,
+    "timestamp": "2026-11-23T05:16:34Z",
+    "url": "https://softwarepreservation.computerhistory.org/modula3/doc/SRC-RR-52.pdf"
+  },
+  "mumps-nbs-handbook-118": {
+    "effective_url": "https://nvlpubs.nist.gov/nistpubs/Legacy/hb/nbshandbook118.pdf",
+    "pdf": true,
+    "sha256": "ed60a71b77cb98a49267334b38fc334a7fcf4365dd593a8e467ac83ba363b780",
+    "size": 6795659,
+    "timestamp": "2026-11-23T05:16:35Z",
+    "url": "https://nvlpubs.nist.gov/nistpubs/Legacy/hb/nbshandbook118.pdf"
+  },
+  "napier88-reference-221": {
+    "effective_url": "https://archive.cs.st-andrews.ac.uk/papers/download/MBC%2B96b.pdf",
+    "pdf": true,
+    "sha256": "778631b095108de6eed7f2e0aaa3aebe45f309978e3483acf96b98db7536f407",
+    "size": 238239,
+    "timestamp": "2026-11-23T05:16:34Z",
+    "url": "https://archive.cs.st-andrews.ac.uk/papers/download/MBC%2B96b.pdf"
+  },
+  "nesl-cmu-cs-93-129": {
+    "effective_url": "https://www.cs.cmu.edu/~scandal/papers/CMU-CS-93-129.html",
+    "pdf": false,
+    "sha256": "9bec9ed9923e037f43381fa236b48496fa6abf7418309533fad4820d2aa8270f",
+    "size": 2646,
+    "timestamp": "2026-11-23T05:16:33Z",
+    "url": "https://www.cs.cmu.edu/~scandal/papers/CMU-CS-93-129.html"
+  },
+  "peoplecode-860-reference": {
+    "effective_url": "https://docs.oracle.com/cd/G10811_01/psft/pdf/pt860tpcl-b072024.pdf",
+    "pdf": true,
+    "sha256": "58302e981349e42a6d4fd87b8ad285bd7cfad80c78dc444b13199513c781338f",
+    "size": 4430592,
+    "timestamp": "2026-11-23T05:16:33Z",
+    "url": "https://docs.oracle.com/cd/G10811_01/psft/pdf/pt860tpcl-b072024.pdf"
+  },
+  "rpg-ibm-i75-reference": {
+    "error": "HTTP Error 403: Forbidden",
+    "url": "https://www.ibm.com/docs/zh/ssw_ibm_i_75/pdf/sc092508.pdf"
+  },
+  "simula-standard-1986-chapter-0": {
+    "effective_url": "https://www.mn.uio.no/english/services/it/simula/versions/simula-1986/chap_0.htm",
+    "pdf": false,
+    "sha256": "e43866097fa429cccda9c04a1906ef18af767065e232ade6ac903b281236fc4b",
+    "size": 25177,
+    "timestamp": "2026-11-23T05:16:35Z",
+    "url": "https://www.mn.uio.no/english/services/it/simula/versions/simula-1986/chap_0.htm"
+  }
+}

@@ -1,0 +1,1 @@
+{"basis":{"id":"scala-213-spec-patterns","kind":"source","revision":1},"citation":{"locator":"Pattern Matching Expressions (#pattern-matching-expressions), opening paragraphs","modality":"descriptive"},"claim":{"id":"scala-match-variable-scope","kind":"claim","revision":1},"id":"supports-scala-match-variable-scope","kind":"dependency","relation":"support","revision":1}

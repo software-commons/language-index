@@ -1,0 +1,1 @@
+{"basis":{"id":"java-se21-jls-types","kind":"source","revision":1},"citation":{"locator":"Section 4.2.5, first paragraph under the Boolean type heading","modality":"required"},"claim":{"id":"java-se21-boolean-values","kind":"claim","revision":1},"id":"supports-java-se21-boolean-values","kind":"dependency","relation":"support","revision":1}
