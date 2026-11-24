@@ -207,10 +207,10 @@ index 1863d1130f1e65e59a85d98cf28dc0caea911682..1362af915de4c2d8ae94fbd49e8189e9
          for update in ({"integration_id": ACTIONS_APP_ID}, {"integration_id": None}):
 diff --git a/tests/test_review_evidence.py b/tests/test_review_evidence.py
 new file mode 100644
-index 0000000000000000000000000000000000000000..5d6bc3e4d7b260ab1b5c5bff7e41434dbeae4f7c
+index 0000000000000000000000000000000000000000..a3ab865bf88ed33971996a78ea7623ec4b600bc3
 --- /dev/null
 +++ b/tests/test_review_evidence.py
-@@ -0,0 +1,786 @@
+@@ -0,0 +1,866 @@
 +"""Synthetic Git-object fixtures for the protected SCES review inputs."""
 +
 +from base64 import b64encode
@@ -225,7 +225,9 @@ index 0000000000000000000000000000000000000000..5d6bc3e4d7b260ab1b5c5bff7e41434d
 +
 +from tools.qualification import POLICY_DIGEST, _blob_hash, _canonical
 +from tools.records import DataError, NoRedirects, decode, encode
-+from tools.review_evidence import _fetch_frozen_records, _inventory, _retrieve_frozen_records, capture_selected_evidence
++from tools.review_evidence import (
++    _RecordBudget, _fetch_frozen_records, _inventory, _record_blobs, _retrieve_frozen_records, capture_selected_evidence,
++)
 +from tools.review_snapshot import LANGUAGE, SnapshotError, _GIT_TIMEOUT, _git, _isolated_git_environment, remote_url
 +
 +
@@ -374,6 +376,10 @@ index 0000000000000000000000000000000000000000..5d6bc3e4d7b260ab1b5c5bff7e41434d
 +        candidate = self.commit({**publication, changed_path: unrelated[changed_path].replace(b"xxxx", b"yyyy", 1)},
 +                                "select the frozen closure and change an unrelated record")
 +        self.assertEqual(self.capture(candidate), {**inputs, **publication})
++        # The candidate fits this processing budget, but its additional frozen Git blob does not.
++        with patch("tools.review_evidence._MAX_REGISTRY_BYTES", 20 * 1024 * 1024):
++            with self.assertRaisesRegex(DataError, "cumulative processing byte limit"):
++                self.capture(candidate)
 +
 +    def test_selected_record_bytes_still_obey_the_staging_cap(self):
 +        inputs, publication = fixture()
@@ -766,6 +772,31 @@ index 0000000000000000000000000000000000000000..5d6bc3e4d7b260ab1b5c5bff7e41434d
 +        with self.assertRaisesRegex(DataError, "independent review started before the latest research execution completed"):
 +            self.capture(candidate)
 +
++    def test_reversed_or_future_execution_intervals_fail_for_selected_claims_and_premises(self):
++        baseline = self.commit({"sces/artifacts/fixture.txt": b"fixture\n"}, "prepare independent fixtures")
++        for name, phase, field, stamp in (
++            ("selected", "research", "started", "2026-10-01T00:01:59Z"),
++            ("premise", "review", "completed", "2026-10-01T00:00:59Z"),
++            ("premise", "review", "completed", "9999-01-01T00:00:00Z"),
++        ):
++            with self.subTest(name=name, phase=phase, field=field, stamp=stamp):
++                _git(self.root, "switch", "--quiet", "--detach", baseline)
++                inputs, publication = fixture()
++                path = f"sces/records/verification/{name}-{phase}--1.json"
++                row = decode(inputs[path])
++                row["run"][field] = stamp
++                inputs[path] = _canonical(row)
++                publication = pin_source(publication, self.commit(inputs, "freeze inconsistent execution chronology"))
++                report_path = RELEASE + "qualification.json"
++                report = decode(publication[report_path])
++                report["inputs_sha256"] = digest(_canonical({name: digest(blob) for name, blob in inputs.items()}))
++                for summary in report["verifications"]:
++                    if summary["record"]["id"] == row["id"]:
++                        summary["record_sha256"] = digest(inputs[path])
++                candidate = self.commit({**publication, report_path: _canonical(report)}, "attempt to qualify invalid chronology")
++                with self.assertRaisesRegex(DataError, "SCES verification interval starts after it completes or completes after"):
++                    self.capture(candidate)
++
 +    def test_unreferenced_uppercase_file_is_allowed_but_uppercase_descriptor_is_not(self):
 +        inputs, publication = fixture()
 +        readme = "sces/artifacts/candidate-history/README.md"
@@ -915,9 +946,10 @@ index 0000000000000000000000000000000000000000..5d6bc3e4d7b260ab1b5c5bff7e41434d
 +                config = (*config, "protocol.file.allow=always")
 +            return _git(directory, operation, *args, config=config, **options)
 +
-+        def obtain_missing(repository, commit, paths, limit):
++        def obtain_missing(repository, commit, paths, limit, *, timeout):
 +            self.assertEqual((repository, commit, paths), (REPOSITORY, baseline, {UNSELECTED: unrelated_oid}))
 +            self.assertGreaterEqual(limit, len(unrelated))
++            self.assertGreater(timeout, 0)
 +            with self.assertRaises(SnapshotError):
 +                _git(shallow, "cat-file", "-t", unrelated_oid)
 +            return {UNSELECTED: unrelated}
@@ -943,6 +975,54 @@ index 0000000000000000000000000000000000000000..5d6bc3e4d7b260ab1b5c5bff7e41434d
 +
 +
 +class FrozenRecordTransportTests(unittest.TestCase):
++    def test_frozen_retrieval_cumulative_budgets_stop_later_batches(self):
++        bodies = {f"sces/records/claim/missing-{i}--1.json": b"{}" for i in range(6)}
++        paths = {path: "a" * 40 for path in bodies}
++        frozen = (REPOSITORY, "b" * 40)
++
++        def fetch(_repository, _commit, wanted, limit, *, timeout):
++            self.assertGreater(timeout, 0)
++            result = {path: bodies[path] for path in wanted}
++            self.assertLessEqual(sum(map(len, result.values())), limit)
++            return result
++
++        for setting, value, diagnostic in (
++            ("_MAX_FROZEN_REQUESTS", 5, "cumulative retrieval request limit"),
++            ("_MAX_FROZEN_BYTES", 8, "cumulative retrieval byte limit"),
++        ):
++            with (self.subTest(setting=setting), patch(f"tools.review_evidence.{setting}", value),
++                  patch("tools.review_evidence._record_sizes", return_value=dict.fromkeys(paths)),
++                  patch("tools.review_evidence._fetch_frozen_records", side_effect=fetch) as captured):
++                budget = _RecordBudget()
++                with self.assertRaisesRegex(DataError, diagnostic):
++                    list(_record_blobs(Path("unused"), paths, list(paths), budget, frozen_source=frozen))
++                self.assertEqual(len(captured.call_args.args[2]), 4)
++                captured.assert_called_once()
++
++    def test_frozen_worker_receives_remaining_elapsed_budget(self):
++        raw = b"{}\n"
++        result = CompletedProcess([], 0, encode({UNSELECTED: b64encode(raw).decode("ascii")}))
++        with patch("tools.review_evidence.subprocess.run", return_value=result) as worker:
++            _fetch_frozen_records(REPOSITORY, "b" * 40, {UNSELECTED: _blob_hash(raw, "sha1")}, len(raw), timeout=1.5)
++        self.assertEqual(worker.call_args.kwargs["timeout"], 1.5)
++
++    def test_elapsed_registry_deadline_rejects_a_late_frozen_batch(self):
++        paths = {UNSELECTED: "a" * 40}
++        now = [100.0]
++
++        def late(_repository, _commit, _wanted, _limit, *, timeout):
++            self.assertEqual(timeout, 2.0)
++            now[0] += 2.5
++            return {UNSELECTED: b"{}"}
++
++        with (patch("tools.review_evidence.monotonic", side_effect=lambda: now[0]),
++              patch("tools.review_evidence._REGISTRY_SECONDS", 2.0),
++              patch("tools.review_evidence._record_sizes", return_value=dict.fromkeys(paths)),
++              patch("tools.review_evidence._fetch_frozen_records", side_effect=late)):
++            with self.assertRaisesRegex(DataError, "registry traversal exceeded its elapsed-time limit"):
++                list(_record_blobs(Path("unused"), paths, list(paths), _RecordBudget(),
++                                   frozen_source=(REPOSITORY, "b" * 40)))
++
 +    def test_worker_reads_only_the_fixed_https_path_with_no_proxy_redirects_or_oversize(self):
 +        commit, raw = "b" * 40, b"{}\n"
 +        payload = encode({"repository": REPOSITORY, "commit": commit, "paths": [UNSELECTED], "limit": len(raw)})
@@ -998,10 +1078,10 @@ index 0000000000000000000000000000000000000000..5d6bc3e4d7b260ab1b5c5bff7e41434d
 +            with self.assertRaisesRegex(DataError, "retrieval could not complete"):
 +                _fetch_frozen_records(REPOSITORY, commit, expected, len(raw))
 diff --git a/tests/test_review_gate.py b/tests/test_review_gate.py
-index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..bcda2f46dc6a0c0189dac705f5e1c554e8e48430 100644
+index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..ba5fc5e54445b671ad0b5557c83b07c2245677f0 100644
 --- a/tests/test_review_gate.py
 +++ b/tests/test_review_gate.py
-@@ -2,7 +2,7 @@
+@@ -2,45 +2,73 @@
  
  from dataclasses import replace
  from hashlib import sha256
@@ -1010,7 +1090,10 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..bcda2f46dc6a0c0189dac705f5e1c554
  import json
  import os
  from pathlib import Path
-@@ -11,36 +11,61 @@ import tomllib
++import subprocess
++import sys
+ from tempfile import TemporaryDirectory
+ import tomllib
  from types import SimpleNamespace
  import unittest
  from unittest.mock import Mock, patch
@@ -1020,7 +1103,8 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..bcda2f46dc6a0c0189dac705f5e1c554
  from tools.review_gate import (
 -    ACTIONS_APP_ID, APP_TOKEN, CHECK_NAME, CI_CONTEXTS, Reviewer, create_check, launch_review, load_issuer, main,
 -    load_reviewer, protected_path, require_queue_rules, review_result, run, verify_issued_check,
-+    ACTIONS_APP_ID, APP_TOKEN, CHECK_NAME, CI_CONTEXTS, AuthorizationPaths, Reviewer, create_check, launch_review, load_issuer, main,
++    ACTIONS_APP_ID, APP_TOKEN, CHECK_NAME, CI_CONTEXTS, AuthorizationPaths, Reviewer, capture_reviewer_streams,
++    create_check, launch_review, load_issuer, main,
 +    load_reviewer, protected_path, require_queue_rules, review_result, run, successful_checks, supersede_checks,
 +    verify_issued_check, write_check,
  )
@@ -1082,7 +1166,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..bcda2f46dc6a0c0189dac705f5e1c554
          }})
      events.extend([{"type": "item.completed", "item": {"type": "agent_message", "text": json.dumps(output)}},
                     {"type": terminal}])
-@@ -51,14 +76,21 @@ def api_check(payload, app=123):
+@@ -51,14 +79,21 @@ def api_check(payload, app=123):
      return {**payload, "app": {"id": app}, "id": 42}
  
  
@@ -1108,7 +1192,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..bcda2f46dc6a0c0189dac705f5e1c554
              "required_status_checks": [*checks, {"context": CHECK_NAME, "integration_id": 123}],
              "strict_required_status_checks_policy": True,
              "do_not_enforce_on_create": False,
-@@ -66,7 +98,262 @@ def active_queue_rules():
+@@ -66,7 +101,262 @@ def active_queue_rules():
      ]
  
  
@@ -1371,7 +1455,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..bcda2f46dc6a0c0189dac705f5e1c554
      def test_accepts_only_complete_bound_verdicts(self):
          execution, verdict = review_result(make_trace(), BINDING, "abc", PATCH)
          self.assertEqual(execution, EXECUTION)
-@@ -79,6 +366,34 @@ class ReviewGateTests(unittest.TestCase):
+@@ -79,6 +369,34 @@ class ReviewGateTests(unittest.TestCase):
          _, verdict = review_result(make_trace(verdict={"decision": "inconclusive"}, inspect=False), BINDING, "abc", PATCH)
          self.assertEqual(verdict["decision"], "inconclusive")
  
@@ -1406,7 +1490,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..bcda2f46dc6a0c0189dac705f5e1c554
      def test_installation_token_accepts_supported_formats_without_header_delimiters(self):
          for token in (LEGACY_TOKEN, STATELESS_TOKEN):
              self.assertIsNotNone(APP_TOKEN.fullmatch(token))
-@@ -86,40 +401,303 @@ class ReviewGateTests(unittest.TestCase):
+@@ -86,40 +404,303 @@ class ReviewGateTests(unittest.TestCase):
              self.assertIsNone(APP_TOKEN.fullmatch(token))
  
      def test_issuer_refuses_unverified_repository_scope_before_writing(self):
@@ -1738,7 +1822,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..bcda2f46dc6a0c0189dac705f5e1c554
              def respond(_, payload, *, check_id=None):
                  return api_check({"name": CHECK_NAME, "head_sha": QUEUE["merge"],
                                    "external_id": publisher.call_args_list[-2].args[1]["external_id"],
-@@ -142,7 +720,7 @@ class ReviewGateTests(unittest.TestCase):
+@@ -142,7 +723,7 @@ class ReviewGateTests(unittest.TestCase):
                    patch("tools.review_gate.launch_review", side_effect=fake_launch)):
                  result = run(args, github, token_input=lambda: STATELESS_TOKEN, publisher=publisher)
                  self.assertEqual(result["status"], "check-issued")
@@ -1747,7 +1831,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..bcda2f46dc6a0c0189dac705f5e1c554
                  scope._get_json.assert_called_once_with(SCOPE_PATH)
                  first, last = publisher.call_args_list
                  self.assertEqual(first.args[0], STATELESS_TOKEN)
-@@ -186,49 +764,54 @@ class ReviewGateTests(unittest.TestCase):
+@@ -186,49 +767,54 @@ class ReviewGateTests(unittest.TestCase):
                  publisher.assert_not_called()
  
      def test_queue_admission_targets_only_the_head_and_records_its_purpose(self):
@@ -1829,7 +1913,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..bcda2f46dc6a0c0189dac705f5e1c554
  
      def test_wrong_source_and_stale_returned_checks_are_rejected(self):
          payload = {"name": CHECK_NAME, "head_sha": SNAPSHOT.merge,
-@@ -257,9 +840,9 @@ class ReviewGateTests(unittest.TestCase):
+@@ -257,9 +843,9 @@ class ReviewGateTests(unittest.TestCase):
              state = Path(directory)
              args = SimpleNamespace(state_dir=state, mode="review", pull=1, model="fixture", codex=Path("fixture"),
                                     app_id=123, reviewer=Reviewer(4001, 4002, state / "reviewer-home"),
@@ -1841,7 +1925,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..bcda2f46dc6a0c0189dac705f5e1c554
              github.get_pull.return_value = SNAPSHOT
              credential = Mock()
              publisher = Mock()
-@@ -277,10 +860,9 @@ class ReviewGateTests(unittest.TestCase):
+@@ -277,10 +863,9 @@ class ReviewGateTests(unittest.TestCase):
              state = Path(directory)
              args = SimpleNamespace(state_dir=state, mode="review", pull=1, model="fixture", codex=Path("fixture"),
                                     app_id=123, reviewer=Reviewer(4001, 4002, state / "reviewer-home"),
@@ -1855,7 +1939,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..bcda2f46dc6a0c0189dac705f5e1c554
              credential = Mock()
              publisher = Mock()
              for disposition in ("changes-required", "inconclusive"):
-@@ -305,6 +887,316 @@ class ReviewGateTests(unittest.TestCase):
+@@ -305,18 +890,328 @@ class ReviewGateTests(unittest.TestCase):
              credential.assert_not_called()
              publisher.assert_not_called()
  
@@ -2172,7 +2256,56 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..bcda2f46dc6a0c0189dac705f5e1c554
      def test_protected_launcher_uses_separate_identity_and_scoped_filesystem(self):
          with TemporaryDirectory() as directory:
              root = Path(directory)
-@@ -352,7 +1244,8 @@ class ReviewGateTests(unittest.TestCase):
+             reviewer = Reviewer(4001, 4002, root / "reviewer-home")
+             original = {"HOME": "issuer-home", "CODEX_HOME": "issuer-codex-home", "GH_TOKEN": "fixture"}
+ 
+-            def fake_run(*_args, **kwargs):
+-                kwargs["stdout"].write(b"fixture trace")
+-                return SimpleNamespace(returncode=0)
++            def fake_capture(_arguments, _prompt, stdout, _stderr, **_options):
++                stdout.write(b"fixture trace")
++                return 0
+ 
+             with (patch.dict(os.environ, original, clear=True),
+-                  patch("tools.review_gate.subprocess.run", side_effect=fake_run) as process):
++                  patch("tools.review_gate.capture_reviewer_streams", side_effect=fake_capture) as process):
+                 trace = launch_review(root / "codex", "fixture", root / "inputs", root / "schema.json", root,
+                                       reviewer=reviewer)
+             self.assertEqual(trace, b"fixture trace")
+@@ -336,6 +1231,32 @@ class ReviewGateTests(unittest.TestCase):
+                 "filesystem": {":minimal": "read", str(root / "inputs"): "read", str(root / "codex"): "read"},
+             })
+ 
++    def test_reviewer_output_caps_both_streams_while_the_process_is_running(self):
++        command = lambda stream: [sys.executable, "-c", "import sys,time; "
++                                  f"sys.{stream}.buffer.write(b'x' * 65536); sys.{stream}.flush(); time.sleep(30)"]
++        with (TemporaryDirectory() as directory, patch("tools.review_gate.MAX_TRACE_BYTES", 2048),
++              patch("tools.review_gate.MAX_REVIEW_STDERR_BYTES", 1024), patch("tools.review_gate.REVIEW_TIMEOUT", 5)):
++            for stream, message, maximum in (("stdout", "trace", 2048), ("stderr", "stderr", 1024)):
++                output, errors = BytesIO(), BytesIO()
++                with self.subTest(stream=stream), self.assertRaisesRegex(DataError, f"{message} exceeds .* capture limit"):
++                    capture_reviewer_streams(command(stream), b"prompt", output, errors, cwd=directory, env=os.environ)
++                limited, other = (output, errors) if stream == "stdout" else (errors, output)
++                self.assertEqual(len(limited.getvalue()), maximum)
++                self.assertEqual(other.getvalue(), b"")
++
++    def test_reviewer_output_keeps_complete_streams_and_preserves_timeout(self):
++        with TemporaryDirectory() as directory:
++            command = [sys.executable, "-c", "import sys; "
++                       "sys.stdout.buffer.write(sys.stdin.buffer.read()); sys.stderr.buffer.write(b'notice')"]
++            output, errors = BytesIO(), BytesIO()
++            self.assertEqual(capture_reviewer_streams(command, b"exact prompt", output, errors,
++                                                      cwd=directory, env=os.environ), 0)
++            self.assertEqual(output.getvalue(), b"exact prompt")
++            self.assertEqual(errors.getvalue(), b"notice")
++            with patch("tools.review_gate.REVIEW_TIMEOUT", 0.2), self.assertRaises(subprocess.TimeoutExpired):
++                capture_reviewer_streams([sys.executable, "-c", "import time; time.sleep(30)"], b"", BytesIO(),
++                                         BytesIO(), cwd=directory, env=os.environ)
++
+     def test_protected_rehearsal_records_a_review_without_reading_a_token_or_writing_a_check(self):
+         with TemporaryDirectory() as directory:
+             root = Path(directory)
+@@ -352,7 +1273,8 @@ class ReviewGateTests(unittest.TestCase):
                  token = json.loads((input_dir / "review-input.json").read_bytes())["inspection_token"]
                  return make_trace(token)
  
@@ -2182,7 +2315,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..bcda2f46dc6a0c0189dac705f5e1c554
                    patch("tools.review_gate.GitHub", return_value=github),
                    patch("tools.review_gate.capture_diff", return_value=("e" * 40, PATCH)) as capture,
                    patch("tools.review_gate.protected_staging", return_value=root),
-@@ -363,7 +1256,7 @@ class ReviewGateTests(unittest.TestCase):
+@@ -363,7 +1285,7 @@ class ReviewGateTests(unittest.TestCase):
                    patch("tools.review_gate.sys.stdin", stdin)):
                  self.assertEqual(main(["review", "1", "--rehearsal-config", str(config), "--queue-admission"]), 0)
  
@@ -2191,7 +2324,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..bcda2f46dc6a0c0189dac705f5e1c554
              self.assertTrue(capture.call_args.kwargs["linear_head"])
              self.assertEqual(share.call_args.args[1], reviewer.gid)
              self.assertEqual(launch.call_args.kwargs["reviewer"], reviewer)
-@@ -378,6 +1271,69 @@ class ReviewGateTests(unittest.TestCase):
+@@ -378,6 +1300,69 @@ class ReviewGateTests(unittest.TestCase):
              self.assertEqual(result["decision_sha256"], sha256(decision).hexdigest())
              self.assertFalse((Path(result["audit"]) / "issued-check.json").exists())
  
@@ -2261,7 +2394,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..bcda2f46dc6a0c0189dac705f5e1c554
      @unittest.skipUnless(os.name == "posix", "issuer deployment requires POSIX permissions")
      def test_protected_issuer_config_rejects_unpinned_runner_and_shared_permissions(self):
          with TemporaryDirectory() as directory:
-@@ -387,6 +1343,7 @@ class ReviewGateTests(unittest.TestCase):
+@@ -387,6 +1372,7 @@ class ReviewGateTests(unittest.TestCase):
              config = root / "review.json"
              settings = {
                  "app_id": 123, "audit_dir": str(root), "codex": str(codex), "model": "fixture",
@@ -2269,7 +2402,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..bcda2f46dc6a0c0189dac705f5e1c554
                  "codex_sha256": sha256(codex.read_bytes()).hexdigest(),
                  "reviewer_uid": 4001, "reviewer_gid": 4002, "reviewer_home": str(root / "reviewer-home"),
              }
-@@ -394,9 +1351,50 @@ class ReviewGateTests(unittest.TestCase):
+@@ -394,9 +1380,50 @@ class ReviewGateTests(unittest.TestCase):
              config.chmod(0o600)
              reviewer = Reviewer(4001, 4002, root / "reviewer-home")
              with patch("tools.review_gate.load_reviewer", return_value=reviewer):
@@ -2321,7 +2454,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..bcda2f46dc6a0c0189dac705f5e1c554
                  config.chmod(0o640)
                  with self.assertRaisesRegex(DataError, "must be private"):
                      load_issuer(config)
-@@ -410,8 +1408,10 @@ class ReviewGateTests(unittest.TestCase):
+@@ -410,8 +1437,10 @@ class ReviewGateTests(unittest.TestCase):
                      load_issuer(config)
                  codex.write_bytes(b"synthetic executable")
                  del settings["app_id"]
@@ -3044,10 +3177,10 @@ index d213d62143ea097a48f01697f606e7c61a21ee10..f4e6d504992e6e3dcee47ebfe9bdb873
  
 diff --git a/tools/review_evidence.py b/tools/review_evidence.py
 new file mode 100644
-index 0000000000000000000000000000000000000000..6f925f18de90660f1b4ec06932ea2e3f7fb157e8
+index 0000000000000000000000000000000000000000..d31da0a3ce58b516d065fc9af66ce2f642fb7765
 --- /dev/null
 +++ b/tools/review_evidence.py
-@@ -0,0 +1,708 @@
+@@ -0,0 +1,772 @@
 +"""Capture the active SCES publication inputs as inert bytes from a reviewed Git tree."""
 +
 +from base64 import b64decode, b64encode
@@ -3059,6 +3192,7 @@ index 0000000000000000000000000000000000000000..6f925f18de90660f1b4ec06932ea2e3f
 +import re
 +import subprocess
 +import sys
++from time import monotonic
 +from urllib.request import ProxyHandler, Request, build_opener
 +
 +from .qualification import POLICY_DIGEST, _blob_hash, _canonical
@@ -3079,6 +3213,11 @@ index 0000000000000000000000000000000000000000..6f925f18de90660f1b4ec06932ea2e3f
 +_FROZEN_BATCH_COUNT = 4
 +_MAX_FROZEN_BATCH = _FROZEN_BATCH_COUNT * _MAX_BLOB
 +_MAX_RECORD_BATCH = _FROZEN_BATCH_COUNT * (_MAX_BLOB + 64)
++# These per-candidate traversal and transport limits are separate from the 16 MiB staged evidence limit.
++_MAX_REGISTRY_BYTES = 256 * 1024 * 1024
++_MAX_FROZEN_BYTES = 64 * 1024 * 1024
++_MAX_FROZEN_REQUESTS = 256
++_REGISTRY_SECONDS = 300
 +_SELECTION = "sces/publication.json"
 +_BASE_SELECTION_REVIEW_PATH = "base:sces/publication.json"
 +_ADOPTION = "sces/adoption.json"
@@ -3125,32 +3264,40 @@ index 0000000000000000000000000000000000000000..6f925f18de90660f1b4ec06932ea2e3f
 +    return paths
 +
 +
-+def _forget_promisor_remotes(directory):
++def _forget_promisor_remotes(directory, budget):
 +    # A direct URL plus --filter still auto-registers a promisor. Older Git ignores
 +    # GIT_NO_LAZY_FETCH, so remove that local configuration in the bare capture.
++    budget.time_remaining()
 +    keys = _git(directory, "config", "--local", "--null", "--name-only", "--list").decode("utf-8").split("\0")
 +    sections = sorted({key.rsplit(".", 1)[0] for key in keys
 +                       if key.startswith("remote.") and key.endswith((".promisor", ".partialclonefilter"))})
 +    for section in sections:
++        budget.time_remaining()
 +        _git(directory, "config", "--local", "--remove-section", section)
 +    if "extensions.partialclone" in keys:
++        budget.time_remaining()
 +        _git(directory, "config", "--local", "--unset-all", "extensions.partialclone")
 +
 +
-+def _frozen_inputs(directory, commit, target):
++def _frozen_inputs(directory, commit, target, budget):
++    budget.time_remaining()
 +    try:
 +        object_type = _git(directory, "cat-file", "-t", commit).strip()
 +    except SnapshotError:
++        budget.time_remaining()
 +        _git(directory, "fetch", "--quiet", "--depth=1", "--filter=blob:none", "--no-tags",
 +             "--no-recurse-submodules", "--no-auto-maintenance", "--", remote_url(target), commit,
 +             config=("http.followRedirects=false", "fetch.fsckObjects=true",
 +                     "protocol.allow=never", "protocol.https.allow=always"))
-+        _forget_promisor_remotes(directory)
++        _forget_promisor_remotes(directory, budget)
++        budget.time_remaining()
 +        fetched = _git(directory, "rev-parse", "--verify", "FETCH_HEAD").strip()
 +        require(fetched == commit.encode("ascii"), "Git did not fetch the exact frozen SCES source commit")
++        budget.time_remaining()
 +        object_type = _git(directory, "cat-file", "-t", commit).strip()
 +    require(object_type == b"commit", "the frozen SCES source is not a commit object")
 +    # The pinned SCES validator separately checks source ancestry in CI.
++    budget.time_remaining()
 +    return _inventory(directory, commit, _ADOPTION, "sces/records", "sces/artifacts")
 +
 +
@@ -3197,6 +3344,7 @@ index 0000000000000000000000000000000000000000..6f925f18de90660f1b4ec06932ea2e3f
 +    request = decode(sys.stdin.buffer.read())
 +    repository, commit, paths, remaining = (request[key] for key in ("repository", "commit", "paths", "limit"))
 +    require(repository in TARGETS and re.fullmatch(r"[0-9a-f]{40}", commit)
++            and isinstance(paths, list) and 0 < len(paths) <= _FROZEN_BATCH_COUNT
 +            and type(remaining) is int and 0 < remaining <= _MAX_FROZEN_BATCH, "unapproved frozen record retrieval")
 +    opener = build_opener(ProxyHandler({}), NoRedirects())
 +    outputs = {}
@@ -3219,14 +3367,15 @@ index 0000000000000000000000000000000000000000..6f925f18de90660f1b4ec06932ea2e3f
 +    sys.stdout.buffer.write(encode(outputs))
 +
 +
-+def _fetch_frozen_records(repository, commit, paths, limit):
++def _fetch_frozen_records(repository, commit, paths, limit, *, timeout=_GIT_TIMEOUT):
 +    require(0 < limit <= _MAX_FROZEN_BATCH, "frozen SCES registry exceeds the review capture limit")
 +    package_root = Path(__file__).resolve().parents[1]
 +    request = encode({"repository": repository, "commit": commit, "paths": sorted(paths), "limit": limit})
 +    environment = {name.upper(): value for name, value in os.environ.items() if name.upper() in {"SYSTEMROOT", "WINDIR"}}
 +    try:
 +        fetched = subprocess.run([sys.executable, "-I", "-S", "-B", "-c", _READ_FROZEN_RECORDS, str(package_root)],
-+                                 input=request, capture_output=True, timeout=_GIT_TIMEOUT, check=False, env=environment)
++                                 input=request, capture_output=True, timeout=min(timeout, _GIT_TIMEOUT), check=False,
++                                 env=environment)
 +    except (OSError, subprocess.TimeoutExpired) as error:
 +        raise DataError("bounded frozen SCES record retrieval could not complete") from error
 +    require(fetched.returncode == 0, "frozen SCES record retrieval failed")
@@ -3240,9 +3389,40 @@ index 0000000000000000000000000000000000000000..6f925f18de90660f1b4ec06932ea2e3f
 +    return blobs
 +
 +
-+def _record_blobs(directory, paths, ordered, *, frozen_source=None):
++class _RecordBudget:
++    def __init__(self):
++        self.remaining = _MAX_REGISTRY_BYTES
++        self.frozen_bytes = _MAX_FROZEN_BYTES
++        self.frozen_requests = _MAX_FROZEN_REQUESTS
++        self.deadline = monotonic() + _REGISTRY_SECONDS
++
++    def time_remaining(self):
++        remaining = self.deadline - monotonic()
++        require(remaining > 0, "SCES registry traversal exceeded its elapsed-time limit")
++        return remaining
++
++    def charge(self, size):
++        self.time_remaining()
++        require(size <= self.remaining, "SCES registry exceeds its cumulative processing byte limit")
++        self.remaining -= size
++
++    def frozen_limit(self, count):
++        require(count <= self.frozen_requests, "SCES frozen registry exceeds its cumulative retrieval request limit")
++        require(self.frozen_bytes > 0, "SCES frozen registry exceeds its cumulative retrieval byte limit")
++        require(self.remaining > 0, "SCES registry exceeds its cumulative processing byte limit")
++        self.frozen_requests -= count
++        return min(count * _MAX_BLOB, self.frozen_bytes, self.remaining)
++
++    def charge_frozen(self, size):
++        require(size <= self.frozen_bytes, "SCES frozen registry exceeds its cumulative retrieval byte limit")
++        self.frozen_bytes -= size
++        self.charge(size)
++
++
++def _record_blobs(directory, paths, ordered, budget, *, frozen_source=None):
 +    """Read bounded Git batches and separately bound missing raw publisher blobs."""
 +    for offset in range(0, len(ordered), _RECORD_SCAN_PAGE):
++        budget.time_remaining()
 +        page = ordered[offset:offset + _RECORD_SCAN_PAGE]
 +        sizes = _record_sizes(directory, paths, page)
 +        local, missing, size = [], [], 0
@@ -3252,11 +3432,14 @@ index 0000000000000000000000000000000000000000..6f925f18de90660f1b4ec06932ea2e3f
 +                continue
 +            weight = sizes[path] + 64
 +            if size + weight > _MAX_RECORD_BATCH:
++                budget.charge(size - 64 * len(local))
 +                yield from _blobs(directory, paths, local, limit=size).items()
 +                local, size = [], 0
 +            local.append(path)
 +            size += weight
-+        yield from _blobs(directory, paths, local, limit=size).items()
++        if local:
++            budget.charge(size - 64 * len(local))
++            yield from _blobs(directory, paths, local, limit=size).items()
 +        if missing:
 +            require(frozen_source is not None, "an exact candidate SCES record is missing")
 +            repository, commit = frozen_source
@@ -3264,7 +3447,11 @@ index 0000000000000000000000000000000000000000..6f925f18de90660f1b4ec06932ea2e3f
 +                group = missing[start:start + _FROZEN_BATCH_COUNT]
 +                wanted = {path: paths[path] for path in group}
 +                # Fetch only inventoried frozen records. No upstream tree is checked out.
-+                yield from _fetch_frozen_records(repository, commit, wanted, len(group) * _MAX_BLOB).items()
++                limit = budget.frozen_limit(len(group))
++                blobs = _fetch_frozen_records(repository, commit, wanted, limit, timeout=budget.time_remaining())
++                budget.charge_frozen(sum(map(len, blobs.values())))
++                yield from blobs.items()
++        budget.time_remaining()
 +
 +
 +def _reverse_record(blob):
@@ -3284,10 +3471,10 @@ index 0000000000000000000000000000000000000000..6f925f18de90660f1b4ec06932ea2e3f
 +    return identity, reverse
 +
 +
-+def _registry(directory, paths, reverse_cache, *, frozen_source=None):
++def _registry(directory, paths, reverse_cache, budget, *, frozen_source=None):
 +    registry = sorted(path for path in paths if path.startswith("sces/records/"))
 +    uncached = [path for path in registry if paths[path] not in reverse_cache]
-+    for path, blob in _record_blobs(directory, paths, uncached, frozen_source=frozen_source):
++    for path, blob in _record_blobs(directory, paths, uncached, budget, frozen_source=frozen_source):
 +        reverse_cache[paths[path]] = _reverse_record(blob)
 +    edges = defaultdict(list)
 +    reviews = {}
@@ -3319,8 +3506,9 @@ index 0000000000000000000000000000000000000000..6f925f18de90660f1b4ec06932ea2e3f
 +
 +
 +class _SelectedRecords:
-+    def __init__(self, directory, paths, *, limit, frozen_source=None, reuse=None):
++    def __init__(self, directory, paths, budget, *, limit, frozen_source=None, reuse=None):
 +        self.directory, self.paths = directory, paths
++        self.budget = budget
 +        self.remaining, self.frozen_source = limit, frozen_source
 +        self.reuse = {} if reuse is None else reuse
 +        self.raw, self.rows = {}, {}
@@ -3333,8 +3521,9 @@ index 0000000000000000000000000000000000000000..6f925f18de90660f1b4ec06932ea2e3f
 +            if existing is None:
 +                missing.append(path)
 +            else:
++                self.budget.charge(len(existing))
 +                self._store(path, existing)
-+        for path, blob in _record_blobs(self.directory, self.paths, missing, frozen_source=self.frozen_source):
++        for path, blob in _record_blobs(self.directory, self.paths, missing, self.budget, frozen_source=self.frozen_source):
 +            self._store(path, blob)
 +
 +    def _store(self, path, blob):
@@ -3347,14 +3536,18 @@ index 0000000000000000000000000000000000000000..6f925f18de90660f1b4ec06932ea2e3f
 +        self.rows[identity] = row
 +
 +
-+def _check_review_pair(claim_digest, research, review):
++def _check_review_pair(claim_digest, research, review, now):
 +    require(research["claim_sha256"] == review["claim_sha256"] == claim_digest,
 +            "SCES verification pair does not bind the exact claim revision bytes")
 +    first, second = research["run"], review["run"]
 +    executions = (first["execution"], second["execution"])
 +    require(all(isinstance(value, str) and value and value == value.strip() for value in executions)
 +            and executions[0] != executions[1], "selected SCES claim requires distinct nonempty research and review executions")
-+    require(_timestamp(first["completed"], "verification") <= _timestamp(second["started"], "verification"),
++    research_start, research_end = (_timestamp(first[field], "verification") for field in ("started", "completed"))
++    review_start, review_end = (_timestamp(second[field], "verification") for field in ("started", "completed"))
++    require(research_start <= research_end <= now and review_start <= review_end <= now,
++            "SCES verification interval starts after it completes or completes after the current UTC time")
++    require(research_end <= review_start,
 +            "SCES independent review started before the latest research execution completed")
 +    first_trace, second_trace = first["trace"], second["trace"]
 +    require(first_trace["path"] != second_trace["path"] and first_trace["sha256"] != second_trace["sha256"],
@@ -3363,7 +3556,7 @@ index 0000000000000000000000000000000000000000..6f925f18de90660f1b4ec06932ea2e3f
 +            "SCES research and independent review share an acquisition capture")
 +
 +
-+def _active_reviews(selected, captured, edges, reviews, dispositions):
++def _active_reviews(selected, captured, edges, reviews, dispositions, now):
 +    active = {}
 +    pending = set(selected)
 +    while pending:
@@ -3390,7 +3583,7 @@ index 0000000000000000000000000000000000000000..6f925f18de90660f1b4ec06932ea2e3f
 +            research, review = (captured.rows[key] for key in active[identity])
 +            require(research["conclusion"] == review["conclusion"] == "supported",
 +                    "selected SCES claim lacks current independent verification")
-+            _check_review_pair(_digest(captured.raw[_record_path(identity)]), research, review)
++            _check_review_pair(_digest(captured.raw[_record_path(identity)]), research, review, now)
 +            for dependency in edges[identity]:
 +                row = captured.rows[dependency]
 +                if row["relation"] in _SUPPORT:
@@ -3432,11 +3625,11 @@ index 0000000000000000000000000000000000000000..6f925f18de90660f1b4ec06932ea2e3f
 +    return used, artifacts
 +
 +
-+def _selected_registry(selected, captured, reverse_cache):
++def _selected_registry(selected, captured, reverse_cache, now):
 +    edges, reviews, dispositions, conflicts = _registry(
-+        captured.directory, captured.paths, reverse_cache, frozen_source=captured.frozen_source,
++        captured.directory, captured.paths, reverse_cache, captured.budget, frozen_source=captured.frozen_source,
 +    )
-+    active = _active_reviews(selected, captured, edges, reviews, dispositions)
++    active = _active_reviews(selected, captured, edges, reviews, dispositions, now)
 +    used, artifacts = _closure(selected, captured, edges, active, dispositions, conflicts)
 +    return edges, active, used, artifacts
 +
@@ -3696,9 +3889,11 @@ index 0000000000000000000000000000000000000000..6f925f18de90660f1b4ec06932ea2e3f
 +            and [_key(ref, "claim") for ref in report["claims"]] == sorted(selected),
 +            "SCES publication claim selection does not match the report")
 +    reverse_cache = {}
++    budget = _RecordBudget()
++    now = datetime.now(timezone.utc)
 +    record_limit = _MAX_EVIDENCE - sum(map(len, metadata.values()))
-+    captured = _SelectedRecords(directory, paths, limit=record_limit)
-+    edges, active, used, artifacts = _selected_registry(selected, captured, reverse_cache)
++    captured = _SelectedRecords(directory, paths, budget, limit=record_limit)
++    edges, active, used, artifacts = _selected_registry(selected, captured, reverse_cache, now)
 +    records, record_blobs = captured.rows, captured.raw
 +    expected_claims = [{"claim": records[identity],
 +                        "dependencies": [records[edge] for edge in sorted(edges[identity])]}
@@ -3713,6 +3908,7 @@ index 0000000000000000000000000000000000000000..6f925f18de90660f1b4ec06932ea2e3f
 +                                     "result": row["conclusion"], "record_sha256": _digest(record_blobs[_record_path(key)])})
 +    require(report["verifications"] == expected_reviews, "SCES report omits or changes selected verification records")
 +
++    budget.time_remaining()
 +    evidence = {**{_record_path(key): record_blobs[_record_path(key)] for key in used},
 +                **_blobs(directory, paths, sorted(artifacts), limit=captured.remaining + 64 * len(artifacts))}
 +    require(all(_digest(evidence[path]) == checksum for path, checksum in artifacts.items()),
@@ -3720,13 +3916,14 @@ index 0000000000000000000000000000000000000000..6f925f18de90660f1b4ec06932ea2e3f
 +    inputs = {path: _digest(blob) for path, blob in evidence.items()}
 +    inputs[_ADOPTION] = _digest(metadata[_ADOPTION])
 +    require(report["inputs_sha256"] == _digest(_canonical(inputs)), "SCES selected input digest mismatch")
-+    frozen = _frozen_inputs(directory, selection["source_commit"], target)
++    frozen = _frozen_inputs(directory, selection["source_commit"], target, budget)
 +    # The same selected roots must reach the same records when reverse links come from the frozen tree.
 +    frozen_records = _SelectedRecords(
-+        directory, frozen, limit=record_limit, frozen_source=(target.repository, selection["source_commit"]),
++        directory, frozen, budget, limit=record_limit, frozen_source=(target.repository, selection["source_commit"]),
 +        reuse={paths[path]: blob for path, blob in record_blobs.items()},
 +    )
-+    *_, frozen_used, frozen_artifacts = _selected_registry(selected, frozen_records, reverse_cache)
++    *_, frozen_used, frozen_artifacts = _selected_registry(selected, frozen_records, reverse_cache, now)
++    budget.time_remaining()
 +    require(used == frozen_used, "SCES selected record membership differs from the frozen source commit")
 +    require(artifacts == frozen_artifacts, "SCES selected artifact descriptors differ from the frozen source commit")
 +    for path in sorted(inputs):
@@ -3757,20 +3954,32 @@ index 0000000000000000000000000000000000000000..6f925f18de90660f1b4ec06932ea2e3f
 +            raise
 +        raise DataError(f"could not capture the SCES publication evidence: {error}") from error
 diff --git a/tools/review_gate.py b/tools/review_gate.py
-index 46c36046f0bc7015d9fef4bb287659a424941a21..1ff028e18b46af47d45f6f04f9839bbabd47e0af 100644
+index 46c36046f0bc7015d9fef4bb287659a424941a21..7c855ebb09eefc8a96e2dee0a6e2bc29a4dfac43 100644
 --- a/tools/review_gate.py
 +++ b/tools/review_gate.py
-@@ -5,6 +5,7 @@ from __future__ import annotations
+@@ -3,25 +3,39 @@
+ from __future__ import annotations
+ 
  import argparse
++from contextlib import suppress
  from dataclasses import asdict, dataclass, replace
  from datetime import datetime, timezone
 +from functools import partial
  from hashlib import file_digest, sha256
  import json
  import os
-@@ -16,12 +17,20 @@ import subprocess
+ from pathlib import Path
++from queue import SimpleQueue
+ import re
+ import secrets
++import signal
+ import stat
+ import subprocess
  import sys
- from tempfile import TemporaryDirectory
+-from tempfile import TemporaryDirectory
++from tempfile import TemporaryDirectory, TemporaryFile
++from threading import Thread
++from time import monotonic
  from urllib.error import URLError
 +from urllib.parse import urlencode
  from urllib.request import Request, build_opener
@@ -3791,15 +4000,17 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..1ff028e18b46af47d45f6f04f9839bba
  
  CHECK_NAME = "Software Commons / Codex technical review"
  ACTIONS_APP_ID = 15368
-@@ -46,6 +55,7 @@ REVIEWER_ENV = {
+@@ -46,6 +60,9 @@ REVIEWER_ENV = {
      "SYSTEMROOT", "TEMP", "TMP", "TMPDIR", "USERPROFILE", "WINDIR",
  }
  MAX_TRACE_BYTES = 32 * 1024 * 1024
++MAX_REVIEW_STDERR_BYTES = 1024 * 1024
++REVIEW_TIMEOUT = 1800
 +EVIDENCE_PROOF_BATCH = 128
  APP_TOKEN = re.compile(r"ghs_[A-Za-z0-9._-]{36,}")
  RUNTIME_KEYS = {"audit_dir", "codex", "codex_sha256", "model", "reviewer_uid", "reviewer_gid", "reviewer_home"}
  
-@@ -57,6 +67,12 @@ class Reviewer:
+@@ -57,6 +74,12 @@ class Reviewer:
      home: Path
  
  
@@ -3812,7 +4023,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..1ff028e18b46af47d45f6f04f9839bba
  def save(path, data):
      with path.open("xb") as file:
          file.write(data)
-@@ -69,7 +85,38 @@ def valid_execution(value):
+@@ -69,7 +92,38 @@ def valid_execution(value):
          return False
  
  
@@ -3852,7 +4063,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..1ff028e18b46af47d45f6f04f9839bba
      """Accept a verdict only from one complete captured Codex execution."""
      require(len(trace) <= MAX_TRACE_BYTES, "review trace exceeds the configured limit")
      events = [decode(line) for line in trace.splitlines() if line.strip()]
-@@ -85,10 +132,13 @@ def review_result(trace, binding, inspection_token, diff):
+@@ -85,10 +139,13 @@ def review_result(trace, binding, inspection_token, diff):
      require(messages, "Codex review did not return a verdict")
      final_position = messages[-1]
      verdict = decode(items[final_position]["text"].encode("utf-8"))
@@ -3868,7 +4079,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..1ff028e18b46af47d45f6f04f9839bba
              "review verdict does not bind the exact inspected inputs")
      require(verdict["decision"] in {"approve", "changes-required", "inconclusive"}
              and isinstance(verdict["findings"], list)
-@@ -96,18 +146,19 @@ def review_result(trace, binding, inspection_token, diff):
+@@ -96,22 +153,76 @@ def review_result(trace, binding, inspection_token, diff):
              and isinstance(verdict["rationale"], str) and verdict["rationale"].strip(), "invalid review verdict")
      if verdict["decision"] == "inconclusive":
          return execution, verdict
@@ -3896,7 +4107,64 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..1ff028e18b46af47d45f6f04f9839bba
      require(verdict["decision"] != "approve" or not verdict["findings"], "approval contains material findings")
      return execution, verdict
  
-@@ -139,13 +190,23 @@ def launch_review(codex, model, input_dir, schema, audit_dir, *, reviewer=None):
+ 
++def capture_reviewer_streams(arguments, prompt, stdout, stderr, *, cwd, env, **process_options):
++    """Bound both audit streams as bytes arrive, and abort the reviewer on overflow."""
++    separate_group = os.name == "posix"
++    if separate_group:
++        process_options["start_new_session"] = True
++    errors = SimpleQueue()
++    with TemporaryFile() as source:
++        source.write(prompt)
++        source.seek(0)
++        process = subprocess.Popen(arguments, cwd=cwd, env=env, stdin=source,
++                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0, **process_options)
++
++        def stop():
++            with suppress(ProcessLookupError):
++                if separate_group:
++                    os.killpg(process.pid, signal.SIGKILL)
++                elif process.poll() is None:
++                    process.kill()
++
++        def drain(pipe, destination, remaining, label):
++            try:
++                with pipe:
++                    while data := pipe.read(min(65536, remaining + 1)):
++                        destination.write(data[:remaining])
++                        require(len(data) <= remaining, f"review {label} exceeds the configured capture limit")
++                        remaining -= len(data)
++            except (OSError, ValueError) as error:
++                errors.put(error)
++                stop()
++
++        workers = [Thread(target=drain, args=(pipe, output, limit, label), daemon=True)
++                   for pipe, output, limit, label in (
++                       (process.stdout, stdout, MAX_TRACE_BYTES, "trace"),
++                       (process.stderr, stderr, MAX_REVIEW_STDERR_BYTES, "stderr"),
++                   )]
++        deadline = monotonic() + REVIEW_TIMEOUT
++        try:
++            for worker in workers:
++                worker.start()
++            result = process.wait(timeout=REVIEW_TIMEOUT)
++            for worker in workers:
++                worker.join(max(0, deadline - monotonic()))
++            if any(worker.is_alive() for worker in workers):
++                raise subprocess.TimeoutExpired(arguments, REVIEW_TIMEOUT)
++            if not errors.empty():
++                raise errors.get()
++            return result
++        finally:
++            if process.poll() is None or any(worker.is_alive() for worker in workers):
++                stop()
++                process.wait(timeout=5)
++
++
+ def launch_review(codex, model, input_dir, schema, audit_dir, *, reviewer=None):
+     arguments = [str(codex), "exec", "--ignore-user-config", "--ignore-rules", "--skip-git-repo-check",
+                  "--json", "--color", "never", "--model", model,
+@@ -139,36 +250,51 @@ def launch_review(codex, model, input_dir, schema, audit_dir, *, reviewer=None):
          "Open review-input.json and inspect the exact patch through read-only tools. "
          "In a successful command mentioning review.diff, read its exact bytes and print the lowercase SHA-256 "
          "of the ASCII inspection_token concatenated with the complete review.diff bytes. "
@@ -3922,7 +4190,16 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..1ff028e18b46af47d45f6f04f9839bba
          "in the rationale. This is technical review only. You have no authority to verify scientific claims or "
          "authorize a release."
      )
-@@ -158,17 +219,23 @@ def launch_review(codex, model, input_dir, schema, audit_dir, *, reviewer=None):
+-    with (audit_dir / "codex-events.jsonl").open("xb") as stdout, (audit_dir / "codex-stderr.txt").open("xb") as stderr:
+-        result = subprocess.run(arguments, cwd=input_dir, env=environment, input=prompt.encode("utf-8"),
+-                                stdout=stdout, stderr=stderr, timeout=1800, check=False, **process_options)
+-    require(result.returncode == 0, f"Codex process failed with exit code {result.returncode}")
+     path = audit_dir / "codex-events.jsonl"
+-    require(path.stat().st_size <= MAX_TRACE_BYTES, "review trace exceeds the configured limit")
++    with path.open("xb") as stdout, (audit_dir / "codex-stderr.txt").open("xb") as stderr:
++        result = capture_reviewer_streams(arguments, prompt.encode("utf-8"), stdout, stderr,
++                                          cwd=input_dir, env=environment, **process_options)
++    require(result == 0, f"Codex process failed with exit code {result}")
      return path.read_bytes()
  
  
@@ -3951,7 +4228,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..1ff028e18b46af47d45f6f04f9839bba
                        headers={"Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json",
                                 "Content-Type": "application/json", "User-Agent": "Software-Commons-Review-Gate",
                                 "X-GitHub-Api-Version": "2022-11-28"})
-@@ -179,8 +246,9 @@ def write_check(token, payload, *, check_id=None):
+@@ -179,8 +305,9 @@ def write_check(token, payload, *, check_id=None):
          raise DataError(f"GitHub check API failed: {error.reason}") from None
  
  
@@ -3963,7 +4240,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..1ff028e18b46af47d45f6f04f9839bba
      require(isinstance(rules, list) and len(rules) < 100 and all(isinstance(item, dict) for item in rules),
              "GitHub did not return a complete active branch rules view")
      by_type = {}
-@@ -188,6 +256,9 @@ def require_queue_rules(github, app_id):
+@@ -188,6 +315,9 @@ def require_queue_rules(github, app_id):
          by_type.setdefault(item.get("type"), []).append(item)
      require({"pull_request", "deletion", "non_fast_forward"} <= by_type.keys(),
              "mandatory pull requests, branch deletion protection and force-push protection are required")
@@ -3973,7 +4250,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..1ff028e18b46af47d45f6f04f9839bba
      queue = by_type.get("merge_queue", [])
      require(len(queue) == 1, "App issuance requires a mandatory merge queue")
      parameters = queue[0].get("parameters")
-@@ -212,17 +283,29 @@ def require_queue_rules(github, app_id):
+@@ -212,17 +342,29 @@ def require_queue_rules(github, app_id):
                  bindings[name].append(integration if strict and type(integration) is int else None)
      require(all(bindings[name] == [source] for name, source in expected.items()),
              "required review and CI contexts must each bind their exact integration and enforce strict checks")
@@ -4004,7 +4281,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..1ff028e18b46af47d45f6f04f9839bba
      pending = publisher(token, {"name": CHECK_NAME, "head_sha": target,
                                  "status": "in_progress", "external_id": decision_digest})
      verify_issued_check(pending, target, app_id, decision_digest, "in_progress")
-@@ -236,7 +319,7 @@ def create_check(snapshot, app_id, token, decision, publisher, verify_fresh, *,
+@@ -236,7 +378,7 @@ def create_check(snapshot, app_id, token, decision, publisher, verify_fresh, *,
              "summary": (
                  f"PR #{snapshot.number}\n\nHead: `{snapshot.head}`\n\nBase: `{snapshot.base}`\n\n"
                  f"Reviewed merge: `{snapshot.merge}`\n\nExecution: `{decision['execution']}`\n\n"
@@ -4013,7 +4290,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..1ff028e18b46af47d45f6f04f9839bba
              ),
          },
      }, check_id=check_id)
-@@ -245,7 +328,84 @@ def create_check(snapshot, app_id, token, decision, publisher, verify_fresh, *,
+@@ -245,7 +387,84 @@ def create_check(snapshot, app_id, token, decision, publisher, verify_fresh, *,
      return result
  
  
@@ -4099,7 +4376,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..1ff028e18b46af47d45f6f04f9839bba
      state = args.state_dir.resolve()
      require(state.is_dir(), "configure an existing issuer-owned state directory")
      reviewer = getattr(args, "reviewer", None)
-@@ -253,46 +413,218 @@ def run(args, github, *, token_input=None, publisher=write_check):
+@@ -253,46 +472,218 @@ def run(args, github, *, token_input=None, publisher=write_check):
      rehearsal = reviewer is not None and args.app_id is None
      admission = getattr(args, "queue_admission", False)
      run_id = getattr(args, "queue_run", None)
@@ -4331,7 +4608,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..1ff028e18b46af47d45f6f04f9839bba
      decision = {"binding": binding, "execution": execution, "model": args.model,
                  "started_at": started_at, "completed_at": completed_at,
                  "trace_sha256": sha256(trace).hexdigest(), "decision": verdict["decision"],
-@@ -307,19 +639,13 @@ def run(args, github, *, token_input=None, publisher=write_check):
+@@ -307,19 +698,13 @@ def run(args, github, *, token_input=None, publisher=write_check):
          result["rehearsal"] = True
      if verdict["decision"] != "approve":
          return {**result, "status": verdict["decision"], "findings": verdict["findings"], "rationale": verdict["rationale"]}
@@ -4353,7 +4630,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..1ff028e18b46af47d45f6f04f9839bba
          check = create_check(snapshot, args.app_id, installation_token, decision, publisher, verify_fresh,
                               admission=admission)
          save(audit / "issued-check.json", encode(check))
-@@ -373,18 +699,41 @@ def trusted_executable(path):
+@@ -373,18 +758,41 @@ def trusted_executable(path):
      trusted_parents(path)
  
  
@@ -4398,7 +4675,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..1ff028e18b46af47d45f6f04f9839bba
      audit = Path(settings["audit_dir"])
      protected_path(audit, directory=True)
      reviewer = load_reviewer(settings)
-@@ -393,7 +742,7 @@ def load_issuer(path, *, rehearsal=False):
+@@ -393,7 +801,7 @@ def load_issuer(path, *, rehearsal=False):
      with codex.open("rb") as executable:
          require(file_digest(executable, "sha256").hexdigest() == settings["codex_sha256"],
                  "Codex executable differs from the protected issuer pin")
@@ -4407,7 +4684,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..1ff028e18b46af47d45f6f04f9839bba
  
  
  def load_reviewer(settings):
-@@ -413,6 +762,23 @@ def load_reviewer(settings):
+@@ -413,6 +821,23 @@ def load_reviewer(settings):
      return Reviewer(uid, gid, home)
  
  
@@ -4431,7 +4708,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..1ff028e18b46af47d45f6f04f9839bba
  def main(argv=None):
      parser = argparse.ArgumentParser(description=__doc__)
      parser.add_argument("mode", choices=("inspect", "review"))
-@@ -423,27 +789,51 @@ def main(argv=None):
+@@ -423,27 +848,51 @@ def main(argv=None):
      phase = parser.add_mutually_exclusive_group()
      phase.add_argument("--queue-admission", action="store_true", help="review the test merge for queue admission")
      phase.add_argument("--queue-run", type=int, help="review the exact candidate for a GitHub merge-group Actions run")
