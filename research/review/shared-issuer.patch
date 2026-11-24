@@ -161,7 +161,7 @@ index 0000000000000000000000000000000000000000..422d9c97ea8efde769f45a2a4b5e98ca
 +if __name__ == "__main__":
 +    unittest.main()
 diff --git a/tests/test_review_commission.py b/tests/test_review_commission.py
-index 1863d1130f1e65e59a85d98cf28dc0caea911682..1362af915de4c2d8ae94fbd49e8189e9f2da861c 100644
+index 1863d1130f1e65e59a85d98cf28dc0caea911682..30f42f024b5498acb5b7d26844cbe3488610fb71 100644
 --- a/tests/test_review_commission.py
 +++ b/tests/test_review_commission.py
 @@ -12,7 +12,7 @@ from tools.review_commission import (
@@ -182,7 +182,33 @@ index 1863d1130f1e65e59a85d98cf28dc0caea911682..1362af915de4c2d8ae94fbd49e8189e9
          return preflight(github, pull=1, **options)
  
      def test_match_reports_observations_only_and_distinguishes_head_and_merge(self):
-@@ -171,13 +171,18 @@ class CommissionTests(unittest.TestCase):
+@@ -118,8 +118,10 @@ class CommissionTests(unittest.TestCase):
+         ])
+         values[f"{REPO_PATH}/commits/{candidate}/status?per_page=100"] = rows("statuses", [])
+         options = {"queue_run": 321, "admission": admission}
++        workflow = ".github/workflows/domain.yml"
++        queue = {"merge": candidate, "workflows": {workflow: {"run_attempt": 1}}}
+         with (patch("tools.review_commission.require_queue_rules"),
+-              patch("tools.review_commission.capture_queue_observation", return_value={"merge": candidate})):
++              patch("tools.review_commission.capture_queue_observation", return_value=queue) as capture):
+             result = self.inspect(values, **options)
+             self.assertEqual(result["status"], "matching-observations")
+             self.assertEqual(result["mode"], "mandatory-merge-queue")
+@@ -128,6 +130,13 @@ class CommissionTests(unittest.TestCase):
+             result = self.inspect(values, **options)
+             self.assertEqual(result["status"], "blocked")
+             self.assertEqual(result["checks"]["queue"]["contexts"][CHECK_NAME]["classification"], "wrong-decision")
++            values[candidate_checks]["check_runs"][0]["external_id"] = DECISION
++            for replacement in ({**queue, "merge": "e" * 40},
++                                {**queue, "workflows": {workflow: {"run_attempt": 2}}}):
++                with self.subTest(replacement=replacement):
++                    capture.side_effect = (queue, replacement)
++                    with self.assertRaisesRegex(SnapshotError, "live merge queue or CI changed during commissioning"):
++                        self.inspect(values, **options)
+ 
+     def test_no_unprovisioned_or_misconfigured_installation_counts_as_verified(self):
+         empty = responses()
+@@ -171,13 +180,18 @@ class CommissionTests(unittest.TestCase):
                      del values[RULESET_PATH]["bypass_actors"]
                  result = self.inspect(values)
                  self.assertFalse(result["protection"]["active_rulesets_explicitly_without_bypass"])
@@ -1084,10 +1110,10 @@ index 0000000000000000000000000000000000000000..a5a78023e5cb4306e1a5008d59c6f21c
 +            with self.assertRaisesRegex(DataError, "retrieval could not complete"):
 +                _fetch_frozen_records(REPOSITORY, commit, expected, len(raw))
 diff --git a/tests/test_review_gate.py b/tests/test_review_gate.py
-index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..1816be0ebc0f5caa12d55a515901015e73204caa 100644
+index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..10a82aaad707fb28810ec41bedcdb7e18305e458 100644
 --- a/tests/test_review_gate.py
 +++ b/tests/test_review_gate.py
-@@ -2,45 +2,74 @@
+@@ -2,45 +2,75 @@
  
  from dataclasses import replace
  from hashlib import sha256
@@ -1117,6 +1143,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..1816be0ebc0f5caa12d55a515901015e
 -from tools.review_snapshot import PullSnapshot, REPOSITORY, SnapshotError
 +from tools.review_protection import commissioning_policy
 +from tools.review_queue import capture_queue_target
++from tools.review_snapshot import capture_candidate_tree
 +from tools.review_snapshot import AdmissionHead, GitHub, LANGUAGE, LICENSE, TARGETS, PullSnapshot, QueuePull, SnapshotError
  
  EXECUTION = "90c3284d-c009-4e34-bc00-beb41319adad"
@@ -1173,7 +1200,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..1816be0ebc0f5caa12d55a515901015e
          }})
      events.extend([{"type": "item.completed", "item": {"type": "agent_message", "text": json.dumps(output)}},
                     {"type": terminal}])
-@@ -51,14 +80,21 @@ def api_check(payload, app=123):
+@@ -51,14 +81,21 @@ def api_check(payload, app=123):
      return {**payload, "app": {"id": app}, "id": 42}
  
  
@@ -1199,7 +1226,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..1816be0ebc0f5caa12d55a515901015e
              "required_status_checks": [*checks, {"context": CHECK_NAME, "integration_id": 123}],
              "strict_required_status_checks_policy": True,
              "do_not_enforce_on_create": False,
-@@ -66,7 +102,283 @@ def active_queue_rules():
+@@ -66,7 +103,288 @@ def active_queue_rules():
      ]
  
  
@@ -1363,6 +1390,11 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..1816be0ebc0f5caa12d55a515901015e
 +        queue_target = patch("tools.review_gate.capture_queue_target", return_value=QUEUE_TARGET)
 +        self.queue_target = queue_target.start()
 +        self.addCleanup(queue_target.stop)
++        for capture, result in (("capture_admission_head", "e" * 40), ("capture_candidate_tree", "e" * 40),
++                                ("capture_candidate_patch", PATCH)):
++            operation = patch("tools.review_gate." + capture, return_value=result)
++            operation.start()
++            self.addCleanup(operation.stop)
 +        controls = patch("tools.review_gate.capture_control_paths", return_value=[])
 +        controls.start()
 +        self.addCleanup(controls.stop)
@@ -1483,7 +1515,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..1816be0ebc0f5caa12d55a515901015e
      def test_accepts_only_complete_bound_verdicts(self):
          execution, verdict = review_result(make_trace(), BINDING, "abc", PATCH)
          self.assertEqual(execution, EXECUTION)
-@@ -79,6 +391,56 @@ class ReviewGateTests(unittest.TestCase):
+@@ -79,6 +397,56 @@ class ReviewGateTests(unittest.TestCase):
          _, verdict = review_result(make_trace(verdict={"decision": "inconclusive"}, inspect=False), BINDING, "abc", PATCH)
          self.assertEqual(verdict["decision"], "inconclusive")
  
@@ -1540,7 +1572,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..1816be0ebc0f5caa12d55a515901015e
      def test_installation_token_accepts_supported_formats_without_header_delimiters(self):
          for token in (LEGACY_TOKEN, STATELESS_TOKEN):
              self.assertIsNotNone(APP_TOKEN.fullmatch(token))
-@@ -86,40 +448,302 @@ class ReviewGateTests(unittest.TestCase):
+@@ -86,40 +454,302 @@ class ReviewGateTests(unittest.TestCase):
              self.assertIsNone(APP_TOKEN.fullmatch(token))
  
      def test_issuer_refuses_unverified_repository_scope_before_writing(self):
@@ -1872,7 +1904,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..1816be0ebc0f5caa12d55a515901015e
              def respond(_, payload, *, check_id=None):
                  return api_check({"name": CHECK_NAME, "head_sha": QUEUE["merge"],
                                    "external_id": publisher.call_args_list[-2].args[1]["external_id"],
-@@ -128,7 +752,6 @@ class ReviewGateTests(unittest.TestCase):
+@@ -128,7 +758,6 @@ class ReviewGateTests(unittest.TestCase):
              publisher = Mock(side_effect=respond)
              scope = Mock()
              scope._get_json.return_value = {"total_count": 1, "repositories": [TOKEN_REPOSITORY]}
@@ -1880,7 +1912,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..1816be0ebc0f5caa12d55a515901015e
  
              def fake_launch(_codex, _model, input_dir, _schema, _audit, *, reviewer):
                  bound = json.loads((input_dir / "review-input.json").read_bytes())
-@@ -142,7 +765,7 @@ class ReviewGateTests(unittest.TestCase):
+@@ -142,7 +771,7 @@ class ReviewGateTests(unittest.TestCase):
                    patch("tools.review_gate.launch_review", side_effect=fake_launch)):
                  result = run(args, github, token_input=lambda: STATELESS_TOKEN, publisher=publisher)
                  self.assertEqual(result["status"], "check-issued")
@@ -1889,7 +1921,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..1816be0ebc0f5caa12d55a515901015e
                  scope._get_json.assert_called_once_with(SCOPE_PATH)
                  first, last = publisher.call_args_list
                  self.assertEqual(first.args[0], STATELESS_TOKEN)
-@@ -186,49 +809,54 @@ class ReviewGateTests(unittest.TestCase):
+@@ -186,49 +815,54 @@ class ReviewGateTests(unittest.TestCase):
                  publisher.assert_not_called()
  
      def test_queue_admission_targets_only_the_head_and_records_its_purpose(self):
@@ -1971,19 +2003,32 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..1816be0ebc0f5caa12d55a515901015e
  
      def test_wrong_source_and_stale_returned_checks_are_rejected(self):
          payload = {"name": CHECK_NAME, "head_sha": SNAPSHOT.merge,
-@@ -257,9 +885,9 @@ class ReviewGateTests(unittest.TestCase):
+@@ -257,18 +891,18 @@ class ReviewGateTests(unittest.TestCase):
              state = Path(directory)
              args = SimpleNamespace(state_dir=state, mode="review", pull=1, model="fixture", codex=Path("fixture"),
                                     app_id=123, reviewer=Reviewer(4001, 4002, state / "reviewer-home"),
 -                                   queue_admission=True)
-+                                   queue_admission=True, commissioning_policy=LICENSE_POLICY)
-             github = Mock()
+-            github = Mock()
 -            github._get_json.return_value = active_queue_rules()
+-            github.get_pull.return_value = SNAPSHOT
++                                   queue_admission=True, commissioning_policy=LICENSE_POLICY)
++            github = mock_review_pull()
 +            use_queue_rules(github)
-             github.get_pull.return_value = SNAPSHOT
              credential = Mock()
              publisher = Mock()
-@@ -277,10 +905,9 @@ class ReviewGateTests(unittest.TestCase):
+             with (patch("tools.review_gate.capture_diff", return_value=("e" * 40, PATCH)),
+                   patch("tools.review_gate.protected_staging", return_value=state),
+                   patch("tools.review_gate.share_reviewer_inputs"),
+-                  patch("tools.review_gate.launch_review", return_value=b"")):
+-                with self.assertRaises(DataError):
++                  patch("tools.review_gate.launch_review", return_value=b"") as launch):
++                with self.assertRaisesRegex(DataError, "missing, failed or ambiguous Codex execution"):
+                     run(args, github, token_input=credential, publisher=publisher)
++            launch.assert_called_once()
+             credential.assert_not_called()
+             publisher.assert_not_called()
+ 
+@@ -277,10 +911,9 @@ class ReviewGateTests(unittest.TestCase):
              state = Path(directory)
              args = SimpleNamespace(state_dir=state, mode="review", pull=1, model="fixture", codex=Path("fixture"),
                                     app_id=123, reviewer=Reviewer(4001, 4002, state / "reviewer-home"),
@@ -1997,10 +2042,64 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..1816be0ebc0f5caa12d55a515901015e
              credential = Mock()
              publisher = Mock()
              for disposition in ("changes-required", "inconclusive"):
-@@ -305,18 +932,496 @@ class ReviewGateTests(unittest.TestCase):
+@@ -305,18 +938,582 @@ class ReviewGateTests(unittest.TestCase):
              credential.assert_not_called()
              publisher.assert_not_called()
  
++    def test_pinned_admission_requires_live_git_ref_and_tree_before_app_writes(self):
++        cases = ((1, "ref", 0), (2, "ref", 0), (3, "ref", 1), (2, "tree", 0))
++        for drift_at, drift, pending in cases:
++            with self.subTest(drift_at=drift_at, drift=drift), TemporaryDirectory() as directory:
++                state = Path(directory)
++                args = SimpleNamespace(state_dir=state, mode="review", pull=1, model="fixture", codex=Path("fixture"),
++                                       app_id=123, reviewer=Reviewer(4001, 4002, state / "reviewer-home"),
++                                       queue_admission=True, commissioning_policy=LICENSE_POLICY,
++                                       expected_merge=SNAPSHOT.merge, expected_head=SNAPSHOT.head)
++                github = mock_review_pull()
++                use_queue_rules(github)
++                publisher = Mock(side_effect=lambda _token, payload: api_check(payload))
++                post_review_fetches = 0
++                reviewed = False
++
++                def approve(_codex, _model, input_dir, _schema, _audit, *, reviewer):
++                    nonlocal reviewed
++                    reviewed = True
++                    bound = json.loads((input_dir / "review-input.json").read_bytes())
++                    return make_trace(bound["inspection_token"])
++
++                def fetch(_directory, _target, ref):
++                    nonlocal post_review_fetches
++                    self.assertEqual(ref, f"refs/pull/{SNAPSHOT.number}/merge")
++                    if reviewed:
++                        post_review_fetches += 1
++                    if reviewed and post_review_fetches == drift_at and drift == "ref":
++                        return b"f" * 40
++                    return SNAPSHOT.merge.encode("ascii")
++
++                def merge_tree(_directory, _snapshot):
++                    return ("f" if reviewed and post_review_fetches == drift_at and drift == "tree" else "e") * 40
++
++                expected = "merge candidate changed" if drift == "ref" else "test merge tree changed"
++                with (patch("tools.review_gate.capture_diff", return_value=("e" * 40, PATCH)),
++                      patch("tools.review_gate.capture_admission_head", return_value="e" * 40),
++                      patch("tools.review_gate.capture_candidate_tree", wraps=capture_candidate_tree),
++                      patch("tools.review_gate.capture_candidate_patch", return_value=PATCH),
++                      patch("tools.review_snapshot._fetch_ref", side_effect=fetch),
++                      patch("tools.review_snapshot._merge_tree", side_effect=merge_tree),
++                      patch("tools.review_snapshot._commit_headers", return_value=[]),
++                      patch("tools.review_snapshot._require_linear_head"),
++                      patch("tools.review_gate.protected_staging", return_value=state),
++                      patch("tools.review_gate.share_reviewer_inputs"),
++                      patch("tools.review_gate.token_is_target_only", return_value=True),
++                      patch("tools.review_gate.launch_review", side_effect=approve)):
++                    with self.assertRaisesRegex((DataError, SnapshotError), expected):
++                        run(args, github, token_input=lambda: LEGACY_TOKEN, publisher=publisher)
++                self.assertEqual(post_review_fetches, drift_at)
++                self.assertEqual(publisher.call_count, pending)
++                if pending:
++                    self.assertEqual(publisher.call_args.args[1]["status"], "in_progress")
++                self.assertEqual(github.get_pull.return_value, SNAPSHOT)
++
 +    def test_same_head_adverse_review_revokes_old_success_before_launch(self):
 +        with TemporaryDirectory() as directory:
 +            state = Path(directory)
@@ -2441,6 +2540,38 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..1816be0ebc0f5caa12d55a515901015e
 +                rules.assert_not_called()
 +                launch.assert_not_called()
 +
++    def test_ordinary_review_rechecks_initially_empty_app_history_before_continuing(self):
++        for admission in (True, False):
++            with self.subTest(admission=admission), TemporaryDirectory() as directory:
++                state = Path(directory)
++                checked = SNAPSHOT.head if admission else QUEUE["merge"]
++                args = SimpleNamespace(state_dir=state, mode="review", pull=1, app_id=123, queue_admission=admission,
++                                       queue_run=None if admission else 321, reviewer=Reviewer(4001, 4002, state))
++                github = mock_review_pull()
++                credential, publisher = Mock(), Mock()
++                target = github.get_admission_head if admission else github.get_queue_pull
++                with patch("tools.review_gate.launch_review") as launch:
++                    self.successful_checks.side_effect = [[], []]
++                    with self.assertRaisesRegex(DataError, "requires a protected commissioning policy"):
++                        run(args, github, token_input=credential, publisher=publisher)
++                    audit, = state.iterdir()
++                    proof = json.loads((audit / "revocation-target.json").read_bytes())
++                    self.assertEqual((proof["checked_sha"], proof["tree"]), (checked, "e" * 40))
++                    self.assertEqual(json.loads((audit / "revocation-result.json").read_bytes()),
++                                     {"checked_sha": checked, "revoked_check_ids": []})
++                    self.assertEqual(target.call_count, 2)
++
++                    target.reset_mock()
++                    self.successful_checks.reset_mock()
++                    self.successful_checks.side_effect = [[], [{"conclusion": "success"}]]
++                    with self.assertRaisesRegex(DataError, "passing check appeared during no-write revocation"):
++                        run(args, github, token_input=credential, publisher=publisher)
++                    self.assertEqual(target.call_count, 2)
++                    self.assertEqual([call.args[2] for call in self.successful_checks.call_args_list], [checked, checked])
++                credential.assert_not_called()
++                publisher.assert_not_called()
++                launch.assert_not_called()
++
 +    def test_explicit_revocation_proves_target_and_rechecks_empty_history_without_token(self):
 +        for admission in (True, False):
 +            with self.subTest(admission=admission), TemporaryDirectory() as directory:
@@ -2498,7 +2629,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..1816be0ebc0f5caa12d55a515901015e
                  trace = launch_review(root / "codex", "fixture", root / "inputs", root / "schema.json", root,
                                        reviewer=reviewer)
              self.assertEqual(trace, b"fixture trace")
-@@ -336,6 +1441,32 @@ class ReviewGateTests(unittest.TestCase):
+@@ -336,6 +1533,32 @@ class ReviewGateTests(unittest.TestCase):
                  "filesystem": {":minimal": "read", str(root / "inputs"): "read", str(root / "codex"): "read"},
              })
  
@@ -2531,7 +2662,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..1816be0ebc0f5caa12d55a515901015e
      def test_protected_rehearsal_records_a_review_without_reading_a_token_or_writing_a_check(self):
          with TemporaryDirectory() as directory:
              root = Path(directory)
-@@ -352,7 +1483,8 @@ class ReviewGateTests(unittest.TestCase):
+@@ -352,7 +1575,8 @@ class ReviewGateTests(unittest.TestCase):
                  token = json.loads((input_dir / "review-input.json").read_bytes())["inspection_token"]
                  return make_trace(token)
  
@@ -2541,7 +2672,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..1816be0ebc0f5caa12d55a515901015e
                    patch("tools.review_gate.GitHub", return_value=github),
                    patch("tools.review_gate.capture_diff", return_value=("e" * 40, PATCH)) as capture,
                    patch("tools.review_gate.protected_staging", return_value=root),
-@@ -363,7 +1495,7 @@ class ReviewGateTests(unittest.TestCase):
+@@ -363,7 +1587,7 @@ class ReviewGateTests(unittest.TestCase):
                    patch("tools.review_gate.sys.stdin", stdin)):
                  self.assertEqual(main(["review", "1", "--rehearsal-config", str(config), "--queue-admission"]), 0)
  
@@ -2550,7 +2681,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..1816be0ebc0f5caa12d55a515901015e
              self.assertTrue(capture.call_args.kwargs["linear_head"])
              self.assertEqual(share.call_args.args[1], reviewer.gid)
              self.assertEqual(launch.call_args.kwargs["reviewer"], reviewer)
-@@ -378,6 +1510,69 @@ class ReviewGateTests(unittest.TestCase):
+@@ -378,6 +1602,69 @@ class ReviewGateTests(unittest.TestCase):
              self.assertEqual(result["decision_sha256"], sha256(decision).hexdigest())
              self.assertFalse((Path(result["audit"]) / "issued-check.json").exists())
  
@@ -2620,7 +2751,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..1816be0ebc0f5caa12d55a515901015e
      @unittest.skipUnless(os.name == "posix", "issuer deployment requires POSIX permissions")
      def test_protected_issuer_config_rejects_unpinned_runner_and_shared_permissions(self):
          with TemporaryDirectory() as directory:
-@@ -387,6 +1582,7 @@ class ReviewGateTests(unittest.TestCase):
+@@ -387,6 +1674,7 @@ class ReviewGateTests(unittest.TestCase):
              config = root / "review.json"
              settings = {
                  "app_id": 123, "audit_dir": str(root), "codex": str(codex), "model": "fixture",
@@ -2628,7 +2759,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..1816be0ebc0f5caa12d55a515901015e
                  "codex_sha256": sha256(codex.read_bytes()).hexdigest(),
                  "reviewer_uid": 4001, "reviewer_gid": 4002, "reviewer_home": str(root / "reviewer-home"),
              }
-@@ -394,9 +1590,50 @@ class ReviewGateTests(unittest.TestCase):
+@@ -394,9 +1682,50 @@ class ReviewGateTests(unittest.TestCase):
              config.chmod(0o600)
              reviewer = Reviewer(4001, 4002, root / "reviewer-home")
              with patch("tools.review_gate.load_reviewer", return_value=reviewer):
@@ -2680,7 +2811,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..1816be0ebc0f5caa12d55a515901015e
                  config.chmod(0o640)
                  with self.assertRaisesRegex(DataError, "must be private"):
                      load_issuer(config)
-@@ -410,8 +1647,10 @@ class ReviewGateTests(unittest.TestCase):
+@@ -410,8 +1739,10 @@ class ReviewGateTests(unittest.TestCase):
                      load_issuer(config)
                  codex.write_bytes(b"synthetic executable")
                  del settings["app_id"]
@@ -3193,7 +3324,7 @@ index 0000000000000000000000000000000000000000..dd88e24ce3bb432397feb821356c0712
 +    return {"grant_commit": state["commit"], "grant_sha256": state["sha256"],
 +            "record_sha256": record_digest, "state_sha256": state_digest}
 diff --git a/tools/review_commission.py b/tools/review_commission.py
-index d213d62143ea097a48f01697f606e7c61a21ee10..f4e6d504992e6e3dcee47ebfe9bdb8734730477d 100644
+index d213d62143ea097a48f01697f606e7c61a21ee10..a2808fdeec8e73cd5f4a4e070fd5c5a52665fae3 100644
 --- a/tools/review_commission.py
 +++ b/tools/review_commission.py
 @@ -11,14 +11,13 @@ import re
@@ -3306,7 +3437,7 @@ index d213d62143ea097a48f01697f606e7c61a21ee10..f4e6d504992e6e3dcee47ebfe9bdb873
      if app_id is not None and (type(app_id) is not int or app_id <= 0 or app_id == ACTIONS_APP_ID):
          raise SnapshotError("Supply the numeric ID of a dedicated App, separate from GitHub Actions")
      if decision is not None and not DECISION_SHA.fullmatch(decision):
-@@ -244,16 +238,20 @@ def preflight(github, *, pull, app_id=None, decision=None, owner_session=False,
+@@ -244,16 +238,24 @@ def preflight(github, *, pull, app_id=None, decision=None, owner_session=False,
          raise SnapshotError("An admission decision requires a final queue run")
      now = now or datetime.now(timezone.utc)
      snapshot = github.get_pull(pull)
@@ -3327,10 +3458,14 @@ index d213d62143ea097a48f01697f606e7c61a21ee10..f4e6d504992e6e3dcee47ebfe9bdb873
          raise SnapshotError("The GitHub review target changed during commissioning")
 +    if read_protection(github, sources, target) != controls:
 +        raise SnapshotError("The live branch rules changed during commissioning")
++    if queue_run is not None:
++        current_queue = capture_queue_observation(github, snapshot, queue_run, actions_app_id=ACTIONS_APP_ID)
++        if current_queue != queue:
++            raise SnapshotError("The live merge queue or CI changed during commissioning")
  
      findings = [
          *[f"Branch control unconfirmed: {name}" for name, confirmed in controls.items()
-@@ -262,11 +260,14 @@ def preflight(github, *, pull, app_id=None, decision=None, owner_session=False,
+@@ -262,11 +264,14 @@ def preflight(github, *, pull, app_id=None, decision=None, owner_session=False,
            if not context["strict_source_bound"]],
          *install["problems"],
      ]
@@ -3348,7 +3483,7 @@ index d213d62143ea097a48f01697f606e7c61a21ee10..f4e6d504992e6e3dcee47ebfe9bdb873
      else:
          for context in CI_CONTEXTS:
              merged = checks["test_merge"]["contexts"][context]
-@@ -282,11 +283,12 @@ def preflight(github, *, pull, app_id=None, decision=None, owner_session=False,
+@@ -282,11 +287,12 @@ def preflight(github, *, pull, app_id=None, decision=None, owner_session=False,
          if head_review["check_run_ids"] or head_review["classic_status_present"]:
              findings.append("A review check or same-name status exists on the raw PR head")
      return {
@@ -3363,7 +3498,7 @@ index d213d62143ea097a48f01697f606e7c61a21ee10..f4e6d504992e6e3dcee47ebfe9bdb873
          "queue_ci": queue,
          "status": "blocked" if findings else "matching-observations",
          "live_branch_enforcement_proven": False,
-@@ -306,6 +308,9 @@ def preflight(github, *, pull, app_id=None, decision=None, owner_session=False,
+@@ -306,6 +312,9 @@ def preflight(github, *, pull, app_id=None, decision=None, owner_session=False,
  def main(argv=None):
      parser = argparse.ArgumentParser(description=__doc__)
      parser.add_argument("--pull", type=int, default=1)
@@ -3373,7 +3508,7 @@ index d213d62143ea097a48f01697f606e7c61a21ee10..f4e6d504992e6e3dcee47ebfe9bdb873
      parser.add_argument("--app-id", type=int, help="Expected dedicated GitHub App ID")
      parser.add_argument("--decision-sha256", help="SHA-256 of the protected review decision")
      parser.add_argument("--queue-run", type=int, help="GitHub Actions run ID on the live merge group")
-@@ -314,6 +319,7 @@ def main(argv=None):
+@@ -314,6 +323,7 @@ def main(argv=None):
      parser.add_argument("--installation-token-stdin", action="store_true",
                          help="Read a short-lived installation token over standard input for repository-scope inspection")
      args = parser.parse_args(argv)
@@ -3381,7 +3516,7 @@ index d213d62143ea097a48f01697f606e7c61a21ee10..f4e6d504992e6e3dcee47ebfe9bdb873
      try:
          scope = None
          if args.installation_token_stdin:
-@@ -322,13 +328,15 @@ def main(argv=None):
+@@ -322,13 +332,15 @@ def main(argv=None):
              token = sys.stdin.readline(4096).strip()
              if not APP_TOKEN.fullmatch(token):
                  raise SnapshotError("Expected a GitHub App installation token")
@@ -4185,7 +4320,7 @@ index 0000000000000000000000000000000000000000..2ba0cd0022e8dce50b7d96e471e4d0e3
 +            raise
 +        raise DataError(f"could not capture the SCES publication evidence: {error}") from error
 diff --git a/tools/review_gate.py b/tools/review_gate.py
-index 46c36046f0bc7015d9fef4bb287659a424941a21..bebaa8abb515dc526668cfd63a650cff50fc5d84 100644
+index 46c36046f0bc7015d9fef4bb287659a424941a21..16f38cec6ca3fad341ee39be4e62ba4d258d6706 100644
 --- a/tools/review_gate.py
 +++ b/tools/review_gate.py
 @@ -3,27 +3,42 @@
@@ -4615,7 +4750,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..bebaa8abb515dc526668cfd63a650cff
      state = args.state_dir.resolve()
      require(state.is_dir(), "configure an existing issuer-owned state directory")
      reviewer = getattr(args, "reviewer", None)
-@@ -253,46 +477,234 @@ def run(args, github, *, token_input=None, publisher=write_check):
+@@ -253,46 +477,236 @@ def run(args, github, *, token_input=None, publisher=write_check):
      rehearsal = reviewer is not None and args.app_id is None
      admission = getattr(args, "queue_admission", False)
      run_id = getattr(args, "queue_run", None)
@@ -4674,26 +4809,25 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..bebaa8abb515dc526668cfd63a650cff
 +            require(pinned_pull.head == admission_identity.head and pinned_pull.merge == expected_merge,
 +                    "live review target differs from the expected review merge")
 +        previous = successful_checks(github, admission_identity, admission_identity.head, args.app_id)
-+        if previous or revoke_only:
-+            with TemporaryDirectory(prefix="head-", dir=state) as directory:
-+                head_tree = capture_admission_head(admission_identity, Path(directory))
-+            proof = {"tree": head_tree, "phase": "queue-admission"}
++        with TemporaryDirectory(prefix="head-", dir=state) as directory:
++            head_tree = capture_admission_head(admission_identity, Path(directory))
++        proof = {"tree": head_tree, "phase": "queue-admission"}
++        if pinned_pull is not None:
++            with TemporaryDirectory(prefix="test-merge-", dir=state) as directory:
++                pinned_tree = capture_candidate_tree(pinned_pull, Path(directory), linear_head=True)
++            proof.update(base=pinned_pull.base, test_merge=pinned_pull.merge, test_merge_tree=pinned_tree)
++
++        def verify_admission_target():
++            require(github.get_admission_head(args.pull) == admission_identity,
++                    "live admission head changed before revocation")
 +            if pinned_pull is not None:
++                require(github.get_pull(args.pull) == pinned_pull, "live test merge changed before revocation")
 +                with TemporaryDirectory(prefix="test-merge-", dir=state) as directory:
-+                    pinned_tree = capture_candidate_tree(pinned_pull, Path(directory), linear_head=True)
-+                proof.update(base=pinned_pull.base, test_merge=pinned_pull.merge, test_merge_tree=pinned_tree)
++                    require(capture_candidate_tree(pinned_pull, Path(directory), linear_head=True) == pinned_tree,
++                            "live test merge tree changed before revocation")
 +
-+            def verify_admission_target():
-+                require(github.get_admission_head(args.pull) == admission_identity,
-+                        "live admission head changed before revocation")
-+                if pinned_pull is not None:
-+                    require(github.get_pull(args.pull) == pinned_pull, "live test merge changed before revocation")
-+                    with TemporaryDirectory(prefix="test-merge-", dir=state) as directory:
-+                        require(capture_candidate_tree(pinned_pull, Path(directory), linear_head=True) == pinned_tree,
-+                                "live test merge tree changed before revocation")
-+
-+            installation_token = retire_previous(admission_identity, admission_identity.head, previous, proof,
-+                                                 verify_admission_target)
++        installation_token = retire_previous(admission_identity, admission_identity.head, previous, proof,
++                                             verify_admission_target)
 +        if revoke_only:
 +            return denial_result(admission_identity.head, previous)
 +
@@ -4735,11 +4869,10 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..bebaa8abb515dc526668cfd63a650cff
 +                publisher = partial(write_check, target=snapshot.target)
 +            if not admission:
 +                previous = successful_checks(github, snapshot, snapshot.merge, args.app_id)
-+                if previous or revoke_only:
-+                    tree = capture_candidate_tree(snapshot, checkout, **capture_options)
-+                    installation_token = retire_previous(snapshot, snapshot.merge, previous,
-+                                                         {"tree": tree, "queue_target": queue_target, "phase": "queue-merge"},
-+                                                         verify_revocation_target)
++                tree = capture_candidate_tree(snapshot, checkout, **capture_options)
++                installation_token = retire_previous(snapshot, snapshot.merge, previous,
++                                                     {"tree": tree, "queue_target": queue_target, "phase": "queue-merge"},
++                                                     verify_revocation_target)
 +                if revoke_only:
 +                    return denial_result(snapshot.merge, previous)
 +                pull = github.get_pull(args.pull)
@@ -4828,6 +4961,10 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..bebaa8abb515dc526668cfd63a650cff
 +        if observation is not None:
 +            current = capture_queue_observation(github, pull, run_id, actions_app_id=ACTIONS_APP_ID)
 +            require(current == observation, "merge queue candidate or CI evidence changed after review")
++        if pinned_pull is not None:
++            with TemporaryDirectory(prefix="test-merge-", dir=state) as directory:
++                require(capture_candidate_tree(pinned_pull, Path(directory), linear_head=True) == tree,
++                        "live test merge tree changed before issuance")
 +
      token = secrets.token_hex(32)
 +    verdict_schema = VERDICT_SCHEMA
@@ -4863,7 +5000,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..bebaa8abb515dc526668cfd63a650cff
      decision = {"binding": binding, "execution": execution, "model": args.model,
                  "started_at": started_at, "completed_at": completed_at,
                  "trace_sha256": sha256(trace).hexdigest(), "decision": verdict["decision"],
-@@ -307,19 +719,13 @@ def run(args, github, *, token_input=None, publisher=write_check):
+@@ -307,19 +721,13 @@ def run(args, github, *, token_input=None, publisher=write_check):
          result["rehearsal"] = True
      if verdict["decision"] != "approve":
          return {**result, "status": verdict["decision"], "findings": verdict["findings"], "rationale": verdict["rationale"]}
@@ -4885,7 +5022,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..bebaa8abb515dc526668cfd63a650cff
          check = create_check(snapshot, args.app_id, installation_token, decision, publisher, verify_fresh,
                               admission=admission)
          save(audit / "issued-check.json", encode(check))
-@@ -373,18 +779,41 @@ def trusted_executable(path):
+@@ -373,18 +781,41 @@ def trusted_executable(path):
      trusted_parents(path)
  
  
@@ -4930,7 +5067,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..bebaa8abb515dc526668cfd63a650cff
      audit = Path(settings["audit_dir"])
      protected_path(audit, directory=True)
      reviewer = load_reviewer(settings)
-@@ -393,7 +822,7 @@ def load_issuer(path, *, rehearsal=False):
+@@ -393,7 +824,7 @@ def load_issuer(path, *, rehearsal=False):
      with codex.open("rb") as executable:
          require(file_digest(executable, "sha256").hexdigest() == settings["codex_sha256"],
                  "Codex executable differs from the protected issuer pin")
@@ -4939,7 +5076,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..bebaa8abb515dc526668cfd63a650cff
  
  
  def load_reviewer(settings):
-@@ -413,6 +842,23 @@ def load_reviewer(settings):
+@@ -413,6 +844,23 @@ def load_reviewer(settings):
      return Reviewer(uid, gid, home)
  
  
@@ -4963,7 +5100,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..bebaa8abb515dc526668cfd63a650cff
  def main(argv=None):
      parser = argparse.ArgumentParser(description=__doc__)
      parser.add_argument("mode", choices=("inspect", "review"))
-@@ -423,27 +869,51 @@ def main(argv=None):
+@@ -423,27 +871,51 @@ def main(argv=None):
      phase = parser.add_mutually_exclusive_group()
      phase.add_argument("--queue-admission", action="store_true", help="review the test merge for queue admission")
      phase.add_argument("--queue-run", type=int, help="review the exact candidate for a GitHub merge-group Actions run")
