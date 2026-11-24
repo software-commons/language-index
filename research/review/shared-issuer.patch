@@ -161,7 +161,7 @@ index 0000000000000000000000000000000000000000..422d9c97ea8efde769f45a2a4b5e98ca
 +if __name__ == "__main__":
 +    unittest.main()
 diff --git a/tests/test_review_commission.py b/tests/test_review_commission.py
-index 1863d1130f1e65e59a85d98cf28dc0caea911682..30f42f024b5498acb5b7d26844cbe3488610fb71 100644
+index 1863d1130f1e65e59a85d98cf28dc0caea911682..abbb70414c4cb47c8a14810fd302508a9478773c 100644
 --- a/tests/test_review_commission.py
 +++ b/tests/test_review_commission.py
 @@ -12,7 +12,7 @@ from tools.review_commission import (
@@ -194,7 +194,7 @@ index 1863d1130f1e65e59a85d98cf28dc0caea911682..30f42f024b5498acb5b7d26844cbe348
              result = self.inspect(values, **options)
              self.assertEqual(result["status"], "matching-observations")
              self.assertEqual(result["mode"], "mandatory-merge-queue")
-@@ -128,6 +130,13 @@ class CommissionTests(unittest.TestCase):
+@@ -128,6 +130,34 @@ class CommissionTests(unittest.TestCase):
              result = self.inspect(values, **options)
              self.assertEqual(result["status"], "blocked")
              self.assertEqual(result["checks"]["queue"]["contexts"][CHECK_NAME]["classification"], "wrong-decision")
@@ -205,10 +205,31 @@ index 1863d1130f1e65e59a85d98cf28dc0caea911682..30f42f024b5498acb5b7d26844cbe348
 +                    capture.side_effect = (queue, replacement)
 +                    with self.assertRaisesRegex(SnapshotError, "live merge queue or CI changed during commissioning"):
 +                        self.inspect(values, **options)
++            head_check = values[CHECKS_HEAD]["check_runs"][-1]
++            final_check = values[candidate_checks]["check_runs"][0]
++            for check, change in ((head_check, {"conclusion": "failure"}),
++                                  (final_check, {"conclusion": "failure"}),
++                                  (final_check, {"external_id": admission}),
++                                  (final_check, {"id": final_check["id"] + 1})):
++                with self.subTest(target=check["head_sha"], change=change):
++                    original = check.copy()
++                    capture.reset_mock()
++
++                    def unchanged_queue(*args, **kwargs):
++                        if capture.call_count == 2:
++                            check.update(change)
++                        return queue
++
++                    capture.side_effect = unchanged_queue
++                    try:
++                        with self.assertRaisesRegex(SnapshotError, "live check evidence changed during commissioning"):
++                            self.inspect(values, **options)
++                    finally:
++                        check.update(original)
  
      def test_no_unprovisioned_or_misconfigured_installation_counts_as_verified(self):
          empty = responses()
-@@ -171,13 +180,18 @@ class CommissionTests(unittest.TestCase):
+@@ -171,13 +201,18 @@ class CommissionTests(unittest.TestCase):
                      del values[RULESET_PATH]["bypass_actors"]
                  result = self.inspect(values)
                  self.assertFalse(result["protection"]["active_rulesets_explicitly_without_bypass"])
@@ -3613,7 +3634,7 @@ index 0000000000000000000000000000000000000000..dd88e24ce3bb432397feb821356c0712
 +    return {"grant_commit": state["commit"], "grant_sha256": state["sha256"],
 +            "record_sha256": record_digest, "state_sha256": state_digest}
 diff --git a/tools/review_commission.py b/tools/review_commission.py
-index d213d62143ea097a48f01697f606e7c61a21ee10..a2808fdeec8e73cd5f4a4e070fd5c5a52665fae3 100644
+index d213d62143ea097a48f01697f606e7c61a21ee10..9706c38d6a4c9fc39a8f2ad6d3c1c972525b5b5a 100644
 --- a/tools/review_commission.py
 +++ b/tools/review_commission.py
 @@ -11,14 +11,13 @@ import re
@@ -3708,7 +3729,19 @@ index d213d62143ea097a48f01697f606e7c61a21ee10..a2808fdeec8e73cd5f4a4e070fd5c5a5
      return result
  
  
-@@ -215,7 +209,7 @@ def read_checks(github, snapshot, sources, now, decision, *, admission=None, que
+@@ -205,7 +199,10 @@ def observe_check(rows, classic, commit, name, app_id, now, *, decision=None, de
+         classification = "matching-check-with-classic-status"
+     else:
+         classification = "matching-success"
+-    observation.update(classification=classification, completed_at=check.get("completed_at"), id=check.get("id"))
++    observation.update(classification=classification, completed_at=check.get("completed_at"), id=check.get("id"),
++                       status=check.get("status"), conclusion=check.get("conclusion"))
++    if decision_required:
++        observation["external_id"] = check.get("external_id")
+     return observation
+ 
+ 
+@@ -215,7 +212,7 @@ def read_checks(github, snapshot, sources, now, decision, *, admission=None, que
      if queue:
          targets["queue"] = (queue["merge"], decision)
      for name, (commit, digest) in targets.items():
@@ -3717,7 +3750,7 @@ index d213d62143ea097a48f01697f606e7c61a21ee10..a2808fdeec8e73cd5f4a4e070fd5c5a5
          runs = complete_rows(github._get_json(path + LATEST_CHECKS), "check_runs")
          statuses = complete_rows(github._get_json(path + "/status?per_page=100"), "statuses")
          results[name] = {
-@@ -232,7 +226,7 @@ def read_checks(github, snapshot, sources, now, decision, *, admission=None, que
+@@ -232,7 +229,7 @@ def read_checks(github, snapshot, sources, now, decision, *, admission=None, que
  
  
  def preflight(github, *, pull, app_id=None, decision=None, owner_session=False, scope_github=None,
@@ -3726,7 +3759,7 @@ index d213d62143ea097a48f01697f606e7c61a21ee10..a2808fdeec8e73cd5f4a4e070fd5c5a5
      if app_id is not None and (type(app_id) is not int or app_id <= 0 or app_id == ACTIONS_APP_ID):
          raise SnapshotError("Supply the numeric ID of a dedicated App, separate from GitHub Actions")
      if decision is not None and not DECISION_SHA.fullmatch(decision):
-@@ -244,16 +238,24 @@ def preflight(github, *, pull, app_id=None, decision=None, owner_session=False,
+@@ -244,16 +241,27 @@ def preflight(github, *, pull, app_id=None, decision=None, owner_session=False,
          raise SnapshotError("An admission decision requires a final queue run")
      now = now or datetime.now(timezone.utc)
      snapshot = github.get_pull(pull)
@@ -3751,10 +3784,13 @@ index d213d62143ea097a48f01697f606e7c61a21ee10..a2808fdeec8e73cd5f4a4e070fd5c5a5
 +        current_queue = capture_queue_observation(github, snapshot, queue_run, actions_app_id=ACTIONS_APP_ID)
 +        if current_queue != queue:
 +            raise SnapshotError("The live merge queue or CI changed during commissioning")
++    current_checks = read_checks(github, snapshot, sources, now, decision, admission=admission, queue=queue)
++    if current_checks != checks:
++        raise SnapshotError("The live check evidence changed during commissioning")
  
      findings = [
          *[f"Branch control unconfirmed: {name}" for name, confirmed in controls.items()
-@@ -262,11 +264,14 @@ def preflight(github, *, pull, app_id=None, decision=None, owner_session=False,
+@@ -262,11 +270,14 @@ def preflight(github, *, pull, app_id=None, decision=None, owner_session=False,
            if not context["strict_source_bound"]],
          *install["problems"],
      ]
@@ -3772,7 +3808,7 @@ index d213d62143ea097a48f01697f606e7c61a21ee10..a2808fdeec8e73cd5f4a4e070fd5c5a5
      else:
          for context in CI_CONTEXTS:
              merged = checks["test_merge"]["contexts"][context]
-@@ -282,11 +287,12 @@ def preflight(github, *, pull, app_id=None, decision=None, owner_session=False,
+@@ -282,11 +293,12 @@ def preflight(github, *, pull, app_id=None, decision=None, owner_session=False,
          if head_review["check_run_ids"] or head_review["classic_status_present"]:
              findings.append("A review check or same-name status exists on the raw PR head")
      return {
@@ -3787,7 +3823,7 @@ index d213d62143ea097a48f01697f606e7c61a21ee10..a2808fdeec8e73cd5f4a4e070fd5c5a5
          "queue_ci": queue,
          "status": "blocked" if findings else "matching-observations",
          "live_branch_enforcement_proven": False,
-@@ -306,6 +312,9 @@ def preflight(github, *, pull, app_id=None, decision=None, owner_session=False,
+@@ -306,6 +318,9 @@ def preflight(github, *, pull, app_id=None, decision=None, owner_session=False,
  def main(argv=None):
      parser = argparse.ArgumentParser(description=__doc__)
      parser.add_argument("--pull", type=int, default=1)
@@ -3797,7 +3833,7 @@ index d213d62143ea097a48f01697f606e7c61a21ee10..a2808fdeec8e73cd5f4a4e070fd5c5a5
      parser.add_argument("--app-id", type=int, help="Expected dedicated GitHub App ID")
      parser.add_argument("--decision-sha256", help="SHA-256 of the protected review decision")
      parser.add_argument("--queue-run", type=int, help="GitHub Actions run ID on the live merge group")
-@@ -314,6 +323,7 @@ def main(argv=None):
+@@ -314,6 +329,7 @@ def main(argv=None):
      parser.add_argument("--installation-token-stdin", action="store_true",
                          help="Read a short-lived installation token over standard input for repository-scope inspection")
      args = parser.parse_args(argv)
@@ -3805,7 +3841,7 @@ index d213d62143ea097a48f01697f606e7c61a21ee10..a2808fdeec8e73cd5f4a4e070fd5c5a5
      try:
          scope = None
          if args.installation_token_stdin:
-@@ -322,13 +332,15 @@ def main(argv=None):
+@@ -322,13 +338,15 @@ def main(argv=None):
              token = sys.stdin.readline(4096).strip()
              if not APP_TOKEN.fullmatch(token):
                  raise SnapshotError("Expected a GitHub App installation token")
