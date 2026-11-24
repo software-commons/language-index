@@ -1,1 +1,0 @@
-{"aliases":[],"id":"9823c3eb8e4149149ac845167c2d00a1","identity_claim":{"id":"prolog-preliminary-historical-identity","kind":"claim","revision":1},"kind":"edition","name":"Preliminary Prolog","relations":[{"claim":{"id":"prolog-preliminary-edition-of-prolog","kind":"claim","revision":1},"target":{"id":"65697a2cdfb84857a14a634f3398a4b0"},"type":"edition-of"}],"state":"active"}
