@@ -207,10 +207,10 @@ index 1863d1130f1e65e59a85d98cf28dc0caea911682..1362af915de4c2d8ae94fbd49e8189e9
          for update in ({"integration_id": ACTIONS_APP_ID}, {"integration_id": None}):
 diff --git a/tests/test_review_evidence.py b/tests/test_review_evidence.py
 new file mode 100644
-index 0000000000000000000000000000000000000000..a4786ae97e13d1285b44bb64706f734ecd2ecaf6
+index 0000000000000000000000000000000000000000..5d6bc3e4d7b260ab1b5c5bff7e41434dbeae4f7c
 --- /dev/null
 +++ b/tests/test_review_evidence.py
-@@ -0,0 +1,756 @@
+@@ -0,0 +1,786 @@
 +"""Synthetic Git-object fixtures for the protected SCES review inputs."""
 +
 +from base64 import b64encode
@@ -359,6 +359,36 @@ index 0000000000000000000000000000000000000000..a4786ae97e13d1285b44bb64706f734e
 +        staged = self.capture(candidate)
 +        self.assertEqual(staged, {**inputs, **publication})
 +        self.assertNotIn(UNSELECTED, staged)
++
++    def test_large_candidate_and_frozen_registries_stage_only_the_small_selected_closure(self):
++        inputs, publication = fixture()
++        unrelated = {}
++        for serial in range(6):
++            name = f"unrelated-{serial}"
++            path = f"sces/records/claim/{name}--1.json"
++            unrelated[path] = _canonical({**ref("claim", name), "fixture": "x" * (3 * 1024 * 1024)})
++        self.assertGreater(sum(map(len, unrelated.values())), 16 * 1024 * 1024)
++        source = self.commit({**inputs, **unrelated}, "freeze small selected evidence in a large registry")
++        publication = pin_source(publication, source)
++        changed_path = "sces/records/claim/unrelated-0--1.json"
++        candidate = self.commit({**publication, changed_path: unrelated[changed_path].replace(b"xxxx", b"yyyy", 1)},
++                                "select the frozen closure and change an unrelated record")
++        self.assertEqual(self.capture(candidate), {**inputs, **publication})
++
++    def test_selected_record_bytes_still_obey_the_staging_cap(self):
++        inputs, publication = fixture()
++        source_path = "sces/records/source/original--1.json"
++        inputs[source_path] = _canonical({**decode(inputs[source_path]), "fixture": "x" * 32768})
++        source = self.commit(inputs, "freeze a large selected source in a small registry")
++        publication = pin_source(publication, source)
++        report_path = RELEASE + "qualification.json"
++        report = decode(publication[report_path])
++        report["inputs_sha256"] = digest(_canonical({path: digest(raw) for path, raw in inputs.items()}))
++        candidate = self.commit({**publication, report_path: _canonical(report)}, "select the verified large source")
++        self.assertEqual(self.capture(candidate)[source_path], inputs[source_path])
++        with patch("tools.review_evidence._MAX_EVIDENCE", 16384):
++            with self.assertRaisesRegex(DataError, "SCES selected evidence exceeds the review capture limit"):
++                self.capture(candidate)
 +
 +    def test_successor_requires_the_direct_base_report_at_its_unchanged_bytes(self):
 +        inputs, publication = fixture()
@@ -2304,7 +2334,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..bcda2f46dc6a0c0189dac705f5e1c554
                      load_issuer(config)
  
 diff --git a/tests/test_review_queue.py b/tests/test_review_queue.py
-index c9398d9c4d4c41121b70db6ebc4af50e93b9f95e..e0f0850e1d9c2aa4a19197b999e60633cd0ade00 100644
+index c9398d9c4d4c41121b70db6ebc4af50e93b9f95e..0a26eaedd7b197cd0afaa04ec05d1e5cf4046143 100644
 --- a/tests/test_review_queue.py
 +++ b/tests/test_review_queue.py
 @@ -5,8 +5,8 @@ from json import dumps
@@ -2318,10 +2348,51 @@ index c9398d9c4d4c41121b70db6ebc4af50e93b9f95e..e0f0850e1d9c2aa4a19197b999e60633
  
  
  PULL = PullSnapshot(REPOSITORY_ID, 17, "a" * 40, "b" * 40, "c" * 40)
-@@ -100,6 +100,48 @@ class QueueObservationTests(unittest.TestCase):
-         self.assertEqual(github.calls, [SCES_RUN, REF_API, RUN_LIST, CHECKS, DOMAIN_JOBS, SCES_JOBS, RUN_LIST, REF_API])
+@@ -27,6 +27,10 @@ SCES_JOBS = f"{SCES_RUN}/attempts/1/jobs?per_page=100"
+ CHECKS = f"{ROOT}/commits/{QUEUE_SHA}/check-runs?filter=all&per_page=100"
+ 
+ 
++def _check_path(identifier):
++    return f"{ROOT}/check-runs/{identifier}"
++
++
+ def _rows(key, values):
+     return {key: values, "total_count": len(values)}
+ 
+@@ -64,7 +68,7 @@ def _responses():
+     return {DOMAIN_RUN: deepcopy(domain), SCES_RUN: deepcopy(sces),
+             REF_API: {"ref": REF, "object": {"type": "commit", "sha": QUEUE_SHA}},
+             RUN_LIST: _rows("workflow_runs", [domain, sces]), DOMAIN_JOBS: _rows("jobs", domain_jobs),
+-            SCES_JOBS: _rows("jobs", [sces_job]), CHECKS: _rows("check_runs", checks)}
++            SCES_JOBS: _rows("jobs", [sces_job]), **{_check_path(check["id"]): check for check in checks}}
+ 
+ 
+ class FixtureGitHub:
+@@ -97,9 +101,67 @@ class QueueObservationTests(unittest.TestCase):
+         self.assertEqual(result["workflows"][SCES_PATH]["jobs"], {
+             "Evidence / SCES validation": {"job_id": 301, "check_run_id": 301},
+         })
+-        self.assertEqual(github.calls, [SCES_RUN, REF_API, RUN_LIST, CHECKS, DOMAIN_JOBS, SCES_JOBS, RUN_LIST, REF_API])
++        self.assertEqual(github.calls, [SCES_RUN, REF_API, RUN_LIST, DOMAIN_JOBS,
++                                        *(_check_path(number) for number in range(201, 205)),
++                                        SCES_JOBS, _check_path(301), RUN_LIST, REF_API])
          self.assertIsInstance(dumps(result), str)
  
++    def test_fetches_the_linked_named_check_even_off_the_first_100_commit_checks(self):
++        responses = _responses()
++        linked = 950001
++        responses[DOMAIN_JOBS]["jobs"][0]["check_run_url"] = f"https://api.github.com{_check_path(linked)}"
++        responses[_check_path(linked)] = {**responses.pop(_check_path(201)), "id": linked}
++        decoy = responses[_check_path(991)]
++        responses[CHECKS] = {"check_runs": [{**decoy, "id": number} for number in range(1000, 1100)],
++                             "total_count": 101}
++        github = FixtureGitHub(responses)
++        result = capture_queue_observation(github, PULL, 12, actions_app_id=APP)
++        self.assertEqual(result["workflows"][DOMAIN_PATH]["jobs"]["Registry validation"],
++                         {"job_id": 201, "check_run_id": linked})
++        self.assertNotIn(CHECKS, github.calls)
++        self.assertIn(_check_path(linked), github.calls)
++
 +    def test_language_requires_its_own_repository_and_known_domain_layouts(self):
 +        pull = PullSnapshot(LANGUAGE.repository_id, PULL.number, PULL.base, PULL.head, PULL.merge, LANGUAGE)
 +        language_path = f"/repos/{LANGUAGE.repository}"
@@ -2337,8 +2408,7 @@ index c9398d9c4d4c41121b70db6ebc4af50e93b9f95e..e0f0850e1d9c2aa4a19197b999e60633
 +                if registry_tests:
 +                    domain_jobs.append({**values[DOMAIN_JOBS]["jobs"][1], "name": "Registry tests"})
 +                values[DOMAIN_JOBS] = _rows("jobs", domain_jobs)
-+                values[CHECKS] = _rows("check_runs", [*(_check(job, 1001) for job in domain_jobs),
-+                                                       *values[CHECKS]["check_runs"][4:5]])
++                values.update({_check_path(job["id"]): _check(job, 1001) for job in domain_jobs})
 +                responses = {path.replace(ROOT, language_path): value for path, value in values.items()}
 +                responses[workflow] = {"path": DOMAIN_PATH, "type": "file", "sha": blob}
 +                for run in [responses[DOMAIN_RUN.replace(ROOT, language_path)],
@@ -2367,7 +2437,7 @@ index c9398d9c4d4c41121b70db6ebc4af50e93b9f95e..e0f0850e1d9c2aa4a19197b999e60633
      def test_rejects_bad_anchor(self):
          for changes in ({"id": 19}, {"event": "push"}, {"path": ".github/workflows/other.yml"},
                          {"path": DOMAIN_PATH + "@main"}, {"head_branch": BRANCH.replace("pr-17-", "pr-18-")},
-@@ -112,6 +154,22 @@ class QueueObservationTests(unittest.TestCase):
+@@ -112,6 +174,22 @@ class QueueObservationTests(unittest.TestCase):
                  responses[DOMAIN_RUN].update(changes)
                  with self.assertRaises(SnapshotError):
                      self.capture(responses)
@@ -2390,6 +2460,29 @@ index c9398d9c4d4c41121b70db6ebc4af50e93b9f95e..e0f0850e1d9c2aa4a19197b999e60633
  
      def test_rejects_missing_or_wrong_live_ref_and_end_of_collection_drift(self):
          responses = _responses()
+@@ -172,10 +250,19 @@ class QueueObservationTests(unittest.TestCase):
+             self.capture(responses)
+ 
+     def test_rejects_wrong_or_failed_linked_check_despite_other_contexts(self):
+-        for changes in ({"id": 801}, {"head_sha": PULL.merge}, {"app": {"id": 18}}, {"app": None},
+-                        {"check_suite": {"id": 1002}}, {"conclusion": "skipped"}, {"conclusion": "failure"},
++        for changes in ({"id": 801}, {"id": 201.0}, {"head_sha": PULL.merge}, {"app": {"id": 18}}, {"app": None},
++                        {"app": {"id": float(APP)}}, {"check_suite": {"id": 1002}}, {"check_suite": {"id": 1001.0}},
++                        {"conclusion": "skipped"}, {"conclusion": "failure"},
+                         {"status": "in_progress"}, {"name": "Tests on ubuntu-24.04"}):
+             with self.subTest(changes=changes), self.assertRaises(SnapshotError):
+                 responses = _responses()
+-                responses[CHECKS]["check_runs"][0].update(changes)
++                responses[_check_path(201)].update(changes)
+                 self.capture(responses)
++
++    def test_rejects_a_check_run_linked_to_multiple_required_jobs(self):
++        for job_path, index in ((DOMAIN_JOBS, 1), (SCES_JOBS, 0)):
++            with self.subTest(job_path=job_path):
++                responses = _responses()
++                responses[job_path]["jobs"][index]["check_run_url"] = responses[DOMAIN_JOBS]["jobs"][0]["check_run_url"]
++                with self.assertRaisesRegex(SnapshotError, "same check run to multiple required jobs"):
++                    self.capture(responses)
 diff --git a/tests/test_review_snapshot.py b/tests/test_review_snapshot.py
 index 90a3be09910e0a7e0ef142602fefe7aeb1379c89..2b6ebbc5d3ed2e19d05e2e8f324c02d58d0fe50a 100644
 --- a/tests/test_review_snapshot.py
@@ -2951,10 +3044,10 @@ index d213d62143ea097a48f01697f606e7c61a21ee10..f4e6d504992e6e3dcee47ebfe9bdb873
  
 diff --git a/tools/review_evidence.py b/tools/review_evidence.py
 new file mode 100644
-index 0000000000000000000000000000000000000000..3769ba069014c0e1aa09dd2f950f26bb70aef855
+index 0000000000000000000000000000000000000000..6f925f18de90660f1b4ec06932ea2e3f7fb157e8
 --- /dev/null
 +++ b/tools/review_evidence.py
-@@ -0,0 +1,634 @@
+@@ -0,0 +1,708 @@
 +"""Capture the active SCES publication inputs as inert bytes from a reviewed Git tree."""
 +
 +from base64 import b64decode, b64encode
@@ -2980,9 +3073,12 @@ index 0000000000000000000000000000000000000000..3769ba069014c0e1aa09dd2f950f26bb
 +_ARTIFACT_PATH = re.compile(r"sces/(?:[a-z0-9][a-z0-9._-]*/)*[a-z0-9][a-z0-9._-]*")
 +_TREE_PATH = re.compile(r"sces/(?:[A-Za-z0-9][A-Za-z0-9._-]*/)*[A-Za-z0-9][A-Za-z0-9._-]*")
 +_MAX_INVENTORY = 2 * 1024 * 1024
-+_MAX_RECORDS = 16 * 1024 * 1024
 +_MAX_EVIDENCE = 16 * 1024 * 1024
 +_MAX_BLOB = 4 * 1024 * 1024
++_RECORD_SCAN_PAGE = 256
++_FROZEN_BATCH_COUNT = 4
++_MAX_FROZEN_BATCH = _FROZEN_BATCH_COUNT * _MAX_BLOB
++_MAX_RECORD_BATCH = _FROZEN_BATCH_COUNT * (_MAX_BLOB + 64)
 +_SELECTION = "sces/publication.json"
 +_BASE_SELECTION_REVIEW_PATH = "base:sces/publication.json"
 +_ADOPTION = "sces/adoption.json"
@@ -3079,20 +3175,21 @@ index 0000000000000000000000000000000000000000..3769ba069014c0e1aa09dd2f950f26bb
 +    return result
 +
 +
-+def _missing_record_oids(directory, oids):
-+    if not oids:
-+        return set()
-+    ordered = sorted(oids)
-+    rows = _git(directory, "cat-file", "--batch-check=%(objectname) %(objecttype)",
-+                input_data=("\n".join(ordered) + "\n").encode("ascii"), limit=60 * len(ordered)).splitlines()
-+    require(len(rows) == len(ordered), "incomplete local frozen SCES object inventory")
-+    missing = set()
-+    for oid, row in zip(ordered, rows, strict=True):
-+        expected = oid.encode("ascii") + b" "
-+        require(row in (expected + b"blob", expected + b"missing"), "invalid local frozen SCES object inventory")
-+        if row.endswith(b" missing"):
-+            missing.add(oid)
-+    return missing
++def _record_sizes(directory, paths, ordered):
++    oids = [paths[path].encode("ascii") for path in ordered]
++    rows = _git(directory, "cat-file", "--batch-check=%(objectname) %(objecttype) %(objectsize)",
++                input_data=b"\n".join(oids) + b"\n", limit=64 * len(ordered)).splitlines()
++    require(len(rows) == len(ordered), "incomplete local SCES record inventory")
++    sizes = {}
++    for path, oid, row in zip(ordered, oids, rows, strict=True):
++        if row == oid + b" missing":
++            sizes[path] = None
++            continue
++        match = re.fullmatch(rb"([0-9a-f]{40}) blob ([0-9]{1,10})", row)
++        require(match is not None and match[1] == oid and 0 < int(match[2]) <= _MAX_BLOB,
++                f"invalid or oversized local SCES record: {path}")
++        sizes[path] = int(match[2])
++    return sizes
 +
 +
 +def _retrieve_frozen_records():
@@ -3100,7 +3197,7 @@ index 0000000000000000000000000000000000000000..3769ba069014c0e1aa09dd2f950f26bb
 +    request = decode(sys.stdin.buffer.read())
 +    repository, commit, paths, remaining = (request[key] for key in ("repository", "commit", "paths", "limit"))
 +    require(repository in TARGETS and re.fullmatch(r"[0-9a-f]{40}", commit)
-+            and type(remaining) is int and 0 < remaining <= _MAX_RECORDS, "unapproved frozen record retrieval")
++            and type(remaining) is int and 0 < remaining <= _MAX_FROZEN_BATCH, "unapproved frozen record retrieval")
 +    opener = build_opener(ProxyHandler({}), NoRedirects())
 +    outputs = {}
 +    for path in paths:
@@ -3123,7 +3220,7 @@ index 0000000000000000000000000000000000000000..3769ba069014c0e1aa09dd2f950f26bb
 +
 +
 +def _fetch_frozen_records(repository, commit, paths, limit):
-+    require(0 < limit <= _MAX_RECORDS, "frozen SCES registry exceeds the review capture limit")
++    require(0 < limit <= _MAX_FROZEN_BATCH, "frozen SCES registry exceeds the review capture limit")
 +    package_root = Path(__file__).resolve().parents[1]
 +    request = encode({"repository": repository, "commit": commit, "paths": sorted(paths), "limit": limit})
 +    environment = {name.upper(): value for name, value in os.environ.items() if name.upper() in {"SYSTEMROOT", "WINDIR"}}
@@ -3143,46 +3240,74 @@ index 0000000000000000000000000000000000000000..3769ba069014c0e1aa09dd2f950f26bb
 +    return blobs
 +
 +
-+def _record_blobs(directory, paths, cache, *, frozen_source=None):
-+    records = {path: oid for path, oid in paths.items() if path.startswith("sces/records/")}
-+    uncached = {oid: path for path, oid in records.items() if oid not in cache}
-+    missing = _missing_record_oids(directory, uncached) if frozen_source is not None else set()
-+    local = sorted(path for oid, path in uncached.items() if oid not in missing)
-+    for path, payload in _blobs(directory, paths, local, limit=_MAX_RECORDS).items():
-+        cache[records[path]] = payload
-+    if missing:
-+        remaining = _MAX_RECORDS - sum(len(cache[oid]) for oid in records.values() if oid in cache)
-+        # Fetch only inventoried missing records. The incoming data tree is never checked out.
-+        wanted = {uncached[oid]: oid for oid in missing}
-+        repository, commit = frozen_source
-+        for path, payload in _fetch_frozen_records(repository, commit, wanted, remaining).items():
-+            cache[records[path]] = payload
-+    blobs = {path: cache[oid] for path, oid in records.items()}
-+    require(sum(map(len, blobs.values())) <= _MAX_RECORDS, "SCES registry exceeds the review capture limit")
-+    return blobs
++def _record_blobs(directory, paths, ordered, *, frozen_source=None):
++    """Read bounded Git batches and separately bound missing raw publisher blobs."""
++    for offset in range(0, len(ordered), _RECORD_SCAN_PAGE):
++        page = ordered[offset:offset + _RECORD_SCAN_PAGE]
++        sizes = _record_sizes(directory, paths, page)
++        local, missing, size = [], [], 0
++        for path in page:
++            if sizes[path] is None:
++                missing.append(path)
++                continue
++            weight = sizes[path] + 64
++            if size + weight > _MAX_RECORD_BATCH:
++                yield from _blobs(directory, paths, local, limit=size).items()
++                local, size = [], 0
++            local.append(path)
++            size += weight
++        yield from _blobs(directory, paths, local, limit=size).items()
++        if missing:
++            require(frozen_source is not None, "an exact candidate SCES record is missing")
++            repository, commit = frozen_source
++            for start in range(0, len(missing), _FROZEN_BATCH_COUNT):
++                group = missing[start:start + _FROZEN_BATCH_COUNT]
++                wanted = {path: paths[path] for path in group}
++                # Fetch only inventoried frozen records. No upstream tree is checked out.
++                yield from _fetch_frozen_records(repository, commit, wanted, len(group) * _MAX_BLOB).items()
 +
 +
-+def _registry(blobs):
-+    records = {}
++def _reverse_record(blob):
++    row = decode(blob)
++    identity = _key(row)
++    reverse = None
++    if identity[0] in ("dependency", "conflict"):
++        reverse = _key(row["claim"], "claim")
++    elif identity[0] == "verification":
++        phase, completed = row["phase"], row["run"]["completed"]
++        require(phase in _PHASES and isinstance(completed, str)
++                and re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", completed),
++                "invalid SCES verification phase or completion timestamp")
++        reverse = (_key(row["claim"], "claim"), phase), completed
++    elif identity[0] == "disposition":
++        reverse = _key(row["target"], "claim", "source")
++    return identity, reverse
++
++
++def _registry(directory, paths, reverse_cache, *, frozen_source=None):
++    registry = sorted(path for path in paths if path.startswith("sces/records/"))
++    uncached = [path for path in registry if paths[path] not in reverse_cache]
++    for path, blob in _record_blobs(directory, paths, uncached, frozen_source=frozen_source):
++        reverse_cache[paths[path]] = _reverse_record(blob)
 +    edges = defaultdict(list)
-+    reviews = defaultdict(list)
-+    dispositions = {}
-+    conflicts = {}
-+    for path, blob in blobs.items():
-+        row = decode(blob)
-+        identity = _key(row)
-+        require(path == _record_path(identity) and identity not in records, "invalid SCES record path")
-+        records[identity] = row
++    reviews = {}
++    dispositions, conflicts = {}, {}
++    for path in registry:
++        identity, reverse = reverse_cache[paths[path]]
++        require(path == _record_path(identity), "invalid SCES record path")
 +        kind = identity[0]
 +        if kind == "dependency":
-+            edges[_key(row["claim"], "claim")].append(identity)
++            edges[reverse].append(identity)
 +        if kind == "verification":
-+            require(row["phase"] in _PHASES, "invalid SCES verification phase")
-+            reviews[_key(row["claim"], "claim"), row["phase"]].append(identity)
-+        if kind in {"disposition", "conflict"}:
++            key, completed = reverse
++            prior = reviews.get(key)
++            if prior is None or completed > prior[0]:
++                reviews[key] = (completed, identity, True)
++            elif completed == prior[0]:
++                reviews[key] = (completed, identity, False)
++        if kind in ("disposition", "conflict"):
 +            latest = dispositions if kind == "disposition" else conflicts
-+            target = (_key(row["target"], "claim", "source") if kind == "disposition"
-+                      else (_key(row["claim"], "claim"), identity[1]))
++            target = reverse if kind == "disposition" else (reverse, identity[1])
 +            prior = latest.get(target)
 +            require(prior is None or prior[2] != identity[2], "ambiguous SCES record revision")
 +            if prior is None or prior[2] < identity[2]:
@@ -3190,7 +3315,36 @@ index 0000000000000000000000000000000000000000..3769ba069014c0e1aa09dd2f950f26bb
 +    conflicts_by_claim = defaultdict(list)
 +    for (claim, _), identity in conflicts.items():
 +        conflicts_by_claim[claim].append(identity)
-+    return records, edges, reviews, dispositions, conflicts_by_claim
++    return edges, reviews, dispositions, conflicts_by_claim
++
++
++class _SelectedRecords:
++    def __init__(self, directory, paths, *, limit, frozen_source=None, reuse=None):
++        self.directory, self.paths = directory, paths
++        self.remaining, self.frozen_source = limit, frozen_source
++        self.reuse = {} if reuse is None else reuse
++        self.raw, self.rows = {}, {}
++
++    def load(self, keys):
++        missing = []
++        for identity in sorted(set(keys) - self.rows.keys()):
++            path = _record_path(identity)
++            existing = self.reuse.get(self.paths[path])
++            if existing is None:
++                missing.append(path)
++            else:
++                self._store(path, existing)
++        for path, blob in _record_blobs(self.directory, self.paths, missing, frozen_source=self.frozen_source):
++            self._store(path, blob)
++
++    def _store(self, path, blob):
++        self.remaining -= len(blob)
++        require(self.remaining >= 0, "SCES selected evidence exceeds the review capture limit")
++        row = decode(blob)
++        identity = _key(row)
++        require(path == _record_path(identity), "invalid SCES record path")
++        self.raw[path] = blob
++        self.rows[identity] = row
 +
 +
 +def _check_review_pair(claim_digest, research, review):
@@ -3209,73 +3363,82 @@ index 0000000000000000000000000000000000000000..3769ba069014c0e1aa09dd2f950f26bb
 +            "SCES research and independent review share an acquisition capture")
 +
 +
-+def _active_reviews(selected, records, edges, reviews, dispositions, blobs):
++def _active_reviews(selected, captured, edges, reviews, dispositions):
 +    active = {}
-+    pending = list(selected)
++    pending = set(selected)
 +    while pending:
-+        identity = pending.pop()
-+        if identity in active:
-+            continue
-+        disposition = records[dispositions[identity]]
-+        require(disposition["evidence"] == "supported" and disposition["verification"] == "independently-reviewed",
-+                "selected SCES claim or supporting premise is unqualified")
-+        current = []
-+        for phase, field in zip(_PHASES, ("research", "review"), strict=True):
-+            candidates = sorted(reviews[identity, phase], key=lambda key: records[key]["run"]["completed"])
-+            chosen = _key(disposition[field], "verification")
-+            require(candidates and candidates[-1] == chosen and records[chosen]["conclusion"] == "supported"
-+                    and (len(candidates) == 1
-+                         or records[candidates[-2]]["run"]["completed"] != records[chosen]["run"]["completed"]),
++        frontier = pending - active.keys()
++        pending = set()
++        captured.load(frontier | {dispositions[identity] for identity in frontier})
++        needed = set()
++        for identity in frontier:
++            disposition = captured.rows[dispositions[identity]]
++            require(disposition["evidence"] == "supported" and disposition["verification"] == "independently-reviewed",
++                    "selected SCES claim or supporting premise is unqualified")
++            current = []
++            for phase, field in zip(_PHASES, ("research", "review"), strict=True):
++                latest = reviews.get((identity, phase))
++                chosen = _key(disposition[field], "verification")
++                require(latest is not None and latest[1:] == (chosen, True),
++                        "selected SCES claim lacks current independent verification")
++                current.append(chosen)
++            active[identity] = current
++            needed.update(current)
++            needed.update(edges[identity])
++        captured.load(needed)
++        for identity in frontier:
++            research, review = (captured.rows[key] for key in active[identity])
++            require(research["conclusion"] == review["conclusion"] == "supported",
 +                    "selected SCES claim lacks current independent verification")
-+            current.append(chosen)
-+        research, review = (records[key] for key in current)
-+        _check_review_pair(_digest(blobs[_record_path(identity)]), research, review)
-+        active[identity] = current
-+        for dependency in edges[identity]:
-+            row = records[dependency]
-+            if row["relation"] in _SUPPORT:
-+                basis = _key(row["basis"], "claim", "source")
-+                if basis[0] == "claim":
-+                    pending.append(basis)
++            _check_review_pair(_digest(captured.raw[_record_path(identity)]), research, review)
++            for dependency in edges[identity]:
++                row = captured.rows[dependency]
++                if row["relation"] in _SUPPORT:
++                    basis = _key(row["basis"], "claim", "source")
++                    if basis[0] == "claim":
++                        pending.add(basis)
 +    return active
 +
 +
-+def _closure(selected, records, edges, active, dispositions, conflicts):
++def _closure(selected, captured, edges, active, dispositions, conflicts):
 +    used = set()
 +    artifacts = {}
-+    pending = list(selected)
++    pending = set(selected)
 +    while pending:
-+        identity = pending.pop()
-+        if identity in used:
-+            continue
-+        used.add(identity)
-+        row = records[identity]
-+        kind = identity[0]
-+        if identity in dispositions and (kind != "claim" or identity in active):
-+            pending.append(dispositions[identity])
-+        if identity in active:
-+            pending.extend(edges[identity] + active[identity] + conflicts[identity])
-+        if kind == "dependency":
-+            pending.append(_key(row["basis"], "claim", "source"))
-+        if kind == "source":
-+            pending.extend(_key(source, "source") for source in row["upstream"])
-+        for descriptor in (row.get("artifact"), row.get("method"), row.get("run", {}).get("trace"),
-+                           row.get("reproduction", {}).get("artifact")):
-+            if descriptor is not None:
-+                path, checksum = descriptor["path"], descriptor["sha256"]
-+                require(isinstance(path, str) and path.startswith("sces/artifacts/") and _ARTIFACT_PATH.fullmatch(path)
-+                        and artifacts.setdefault(path, checksum) == checksum, "invalid SCES artifact reference")
-+        for field in ("replaces", "previous"):
-+            if field in row:
-+                pending.append(_key(row[field], kind))
++        frontier = pending - used
++        captured.load(frontier)
++        used.update(frontier)
++        pending = set()
++        for identity in frontier:
++            row = captured.rows[identity]
++            kind = identity[0]
++            if identity in dispositions and (kind != "claim" or identity in active):
++                pending.add(dispositions[identity])
++            if identity in active:
++                pending.update(edges[identity] + active[identity] + conflicts[identity])
++            if kind == "dependency":
++                pending.add(_key(row["basis"], "claim", "source"))
++            if kind == "source":
++                pending.update(_key(source, "source") for source in row["upstream"])
++            for descriptor in (row.get("artifact"), row.get("method"), row.get("run", {}).get("trace"),
++                               row.get("reproduction", {}).get("artifact")):
++                if descriptor is not None:
++                    path, checksum = descriptor["path"], descriptor["sha256"]
++                    require(isinstance(path, str) and path.startswith("sces/artifacts/") and _ARTIFACT_PATH.fullmatch(path)
++                            and artifacts.setdefault(path, checksum) == checksum, "invalid SCES artifact reference")
++            for field in ("replaces", "previous"):
++                if field in row:
++                    pending.add(_key(row[field], kind))
 +    return used, artifacts
 +
 +
-+def _selected_registry(selected, blobs):
-+    records, edges, reviews, dispositions, conflicts = _registry(blobs)
-+    active = _active_reviews(selected, records, edges, reviews, dispositions, blobs)
-+    used, artifacts = _closure(selected, records, edges, active, dispositions, conflicts)
-+    return records, edges, active, used, artifacts
++def _selected_registry(selected, captured, reverse_cache):
++    edges, reviews, dispositions, conflicts = _registry(
++        captured.directory, captured.paths, reverse_cache, frozen_source=captured.frozen_source,
++    )
++    active = _active_reviews(selected, captured, edges, reviews, dispositions)
++    used, artifacts = _closure(selected, captured, edges, active, dispositions, conflicts)
++    return edges, active, used, artifacts
 +
 +
 +def _selection_tree(directory, commit):
@@ -3532,9 +3695,11 @@ index 0000000000000000000000000000000000000000..3769ba069014c0e1aa09dd2f950f26bb
 +    require(selected and len({identity[:2] for identity in selected}) == len(selected)
 +            and [_key(ref, "claim") for ref in report["claims"]] == sorted(selected),
 +            "SCES publication claim selection does not match the report")
-+    blob_cache = {}
-+    record_blobs = _record_blobs(directory, paths, blob_cache)
-+    records, edges, active, used, artifacts = _selected_registry(selected, record_blobs)
++    reverse_cache = {}
++    record_limit = _MAX_EVIDENCE - sum(map(len, metadata.values()))
++    captured = _SelectedRecords(directory, paths, limit=record_limit)
++    edges, active, used, artifacts = _selected_registry(selected, captured, reverse_cache)
++    records, record_blobs = captured.rows, captured.raw
 +    expected_claims = [{"claim": records[identity],
 +                        "dependencies": [records[edge] for edge in sorted(edges[identity])]}
 +                       for identity in sorted(selected)]
@@ -3549,7 +3714,7 @@ index 0000000000000000000000000000000000000000..3769ba069014c0e1aa09dd2f950f26bb
 +    require(report["verifications"] == expected_reviews, "SCES report omits or changes selected verification records")
 +
 +    evidence = {**{_record_path(key): record_blobs[_record_path(key)] for key in used},
-+                **_blobs(directory, paths, sorted(artifacts), limit=_MAX_EVIDENCE)}
++                **_blobs(directory, paths, sorted(artifacts), limit=captured.remaining + 64 * len(artifacts))}
 +    require(all(_digest(evidence[path]) == checksum for path, checksum in artifacts.items()),
 +            "SCES selected artifact digest mismatch")
 +    inputs = {path: _digest(blob) for path, blob in evidence.items()}
@@ -3557,9 +3722,11 @@ index 0000000000000000000000000000000000000000..3769ba069014c0e1aa09dd2f950f26bb
 +    require(report["inputs_sha256"] == _digest(_canonical(inputs)), "SCES selected input digest mismatch")
 +    frozen = _frozen_inputs(directory, selection["source_commit"], target)
 +    # The same selected roots must reach the same records when reverse links come from the frozen tree.
-+    frozen_records = _record_blobs(directory, frozen, blob_cache,
-+                                   frozen_source=(target.repository, selection["source_commit"]))
-+    *_, frozen_used, frozen_artifacts = _selected_registry(selected, frozen_records)
++    frozen_records = _SelectedRecords(
++        directory, frozen, limit=record_limit, frozen_source=(target.repository, selection["source_commit"]),
++        reuse={paths[path]: blob for path, blob in record_blobs.items()},
++    )
++    *_, frozen_used, frozen_artifacts = _selected_registry(selected, frozen_records, reverse_cache)
 +    require(used == frozen_used, "SCES selected record membership differs from the frozen source commit")
 +    require(artifacts == frozen_artifacts, "SCES selected artifact descriptors differ from the frozen source commit")
 +    for path in sorted(inputs):
@@ -4391,7 +4558,7 @@ index 0000000000000000000000000000000000000000..719b019820855a29252735672e6be563
 +        return None
 +    return ApprovalRule(source, owners, count)
 diff --git a/tools/review_queue.py b/tools/review_queue.py
-index 8b8292098eeac021263bb31bb106a71b3e036188..fdec76af3da861323154d3c4b24bfb1b4042ff25 100644
+index 8b8292098eeac021263bb31bb106a71b3e036188..69cbfa67646845062404fd80c0cb2eedf6495186 100644
 --- a/tools/review_queue.py
 +++ b/tools/review_queue.py
 @@ -5,18 +5,16 @@ from __future__ import annotations
@@ -4464,7 +4631,7 @@ index 8b8292098eeac021263bb31bb106a71b3e036188..fdec76af3da861323154d3c4b24bfb1b
      _require(isinstance(item, dict) and item.get("ref") == f"refs/heads/{branch}",
               "GitHub did not return the exact live merge-queue ref")
      target = item.get("object")
-@@ -98,23 +96,33 @@ def _verify_ref(github, branch, merge):
+@@ -98,66 +96,111 @@ def _verify_ref(github, branch, merge):
               "GitHub merge-queue ref no longer names the observed commit")
  
  
@@ -4479,7 +4646,7 @@ index 8b8292098eeac021263bb31bb106a71b3e036188..fdec76af3da861323154d3c4b24bfb1b
 +    return oid
 +
 +
-+def _jobs(github, repo_path, path, run, branch, merge, checks, actions_app_id, workflows):
++def _jobs(github, repo_path, path, run, branch, merge, selected_checks, actions_app_id, workflows):
 +    name, expected = workflows[path]
      run_id, attempt = run["id"], run["run_attempt"]
 -    listing = f"{_REPO_PATH}/actions/runs/{run_id}/attempts/{attempt}/jobs?per_page=100"
@@ -4503,8 +4670,21 @@ index 8b8292098eeac021263bb31bb106a71b3e036188..fdec76af3da861323154d3c4b24bfb1b
 +        link = check_path.fullmatch(check_url) if isinstance(check_url, str) else None
          _require(link is not None, f"GitHub {path} job has no exact repository check-run link")
          check_id = int(link[1])
-         check = checks.get(check_id, {})
-@@ -127,37 +135,68 @@ def _jobs(github, path, run, branch, merge, checks, actions_app_id):
+-        check = checks.get(check_id, {})
++        _require(check_id not in selected_checks, "GitHub linked the same check run to multiple required jobs")
++        # Fetch only the check ID from the validated repository-qualified Actions job link.
++        check = github._get_json(f"{repo_path}/check-runs/{check_id}")
++        _require(isinstance(check, dict) and _positive_id(check.get("id")) and check["id"] == check_id,
++                 f"GitHub {path} returned a different check run than the exact job link")
+         app, suite = check.get("app"), check.get("check_suite")
+         _require(check.get("name") == job["name"] and check.get("head_sha") == merge and _successful(check)
+-                 and isinstance(app, dict) and app.get("id") == actions_app_id
+-                 and isinstance(suite, dict) and suite.get("id") == run["check_suite_id"],
++                 and isinstance(app, dict) and _positive_id(app.get("id")) and app["id"] == actions_app_id
++                 and isinstance(suite, dict) and _positive_id(suite.get("id")) and suite["id"] == run["check_suite_id"],
+                  f"GitHub {path} job has no matching successful GitHub Actions check on the exact merge group")
++        selected_checks.add(check_id)
+         evidence[job["name"]] = {"job_id": job["id"], "check_run_id": check_id}
      return evidence
  
  
@@ -4570,12 +4750,12 @@ index 8b8292098eeac021263bb31bb106a71b3e036188..fdec76af3da861323154d3c4b24bfb1b
 +    runs = _selected_runs(github, listing, pull_snapshot, branch, merge, workflows)
      _require(runs[path] == verified_anchor, "The selected GitHub workflow run is no longer the latest exact run")
 -    check_path = f"{_REPO_PATH}/commits/{merge}/check-runs?filter=all&per_page=100"
-+    check_path = f"{repo_path}/commits/{merge}/check-runs?filter=all&per_page=100"
-     checks = {check["id"]: check for check in _rows(github._get_json(check_path), "check_runs")}
+-    checks = {check["id"]: check for check in _rows(github._get_json(check_path), "check_runs")}
 -    workflows = {path: {**run, "jobs": _jobs(github, path, run, branch, merge, checks, actions_app_id)}
 -                 for path, run in runs.items()}
++    selected_checks = set()
 +    observed = {path: {**run, "jobs": _jobs(github, repo_path, path, run, branch, merge,
-+                                           checks, actions_app_id, workflows)}
++                                           selected_checks, actions_app_id, workflows)}
 +                for path, run in runs.items()}
  
 -    _require(_selected_runs(github, listing, pull_snapshot, branch, merge) == runs,
