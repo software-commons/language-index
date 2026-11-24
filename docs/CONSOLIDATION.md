@@ -30,3 +30,7 @@ This checkpoint also carries forward the completed research assembler fixes and 
 - The final and withdrawn commissioning trial groups preserve their exact trial ancestry. [`a455d7d5a75c`](https://github.com/software-commons/language-index/commit/a455d7d5a75c87b4e55a2c339cfbf792e32578e4) · [`cb4318390670`](https://github.com/software-commons/language-index/commit/cb4318390670f12a354fe966e6ec155bf704d14b)
 
 The outstanding work includes passage-audit closure, requalification of any future active selection, publication authorization, and the broader discovery and profile research campaign. Resume those separately after an explicit instruction.
+
+## Verify archived history
+
+Fetch the repository with full history. For each exact head and frozen source above, run `git merge-base --is-ancestor <commit> origin/main`. Exit status zero means that Git retains the original commit through the protected merge. The ancestor check covers the recorded research history. Dataset publication still requires its own qualification and authorization.
