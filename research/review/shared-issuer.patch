@@ -1110,7 +1110,7 @@ index 0000000000000000000000000000000000000000..a5a78023e5cb4306e1a5008d59c6f21c
 +            with self.assertRaisesRegex(DataError, "retrieval could not complete"):
 +                _fetch_frozen_records(REPOSITORY, commit, expected, len(raw))
 diff --git a/tests/test_review_gate.py b/tests/test_review_gate.py
-index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..6432fe0d19b675f1c77fd6b4d901f7b01fe5d1d8 100644
+index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..7d92ccc492d38495ae5c1b17a31b9ad36eaf2527 100644
 --- a/tests/test_review_gate.py
 +++ b/tests/test_review_gate.py
 @@ -2,45 +2,75 @@
@@ -1515,10 +1515,36 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..6432fe0d19b675f1c77fd6b4d901f7b0
      def test_accepts_only_complete_bound_verdicts(self):
          execution, verdict = review_result(make_trace(), BINDING, "abc", PATCH)
          self.assertEqual(execution, EXECUTION)
-@@ -79,6 +397,56 @@ class ReviewGateTests(unittest.TestCase):
+@@ -79,6 +397,82 @@ class ReviewGateTests(unittest.TestCase):
          _, verdict = review_result(make_trace(verdict={"decision": "inconclusive"}, inspect=False), BINDING, "abc", PATCH)
          self.assertEqual(verdict["decision"], "inconclusive")
  
++    def test_protected_trace_accepts_only_expected_events_and_local_items(self):
++        rows = [json.loads(line) for line in make_trace().splitlines()]
++
++        def insert(*events):
++            return encode_lines([*rows[:2], *events, *rows[2:]])
++
++        def encode_lines(events):
++            return b"".join(json.dumps(event).encode() + b"\n" for event in events)
++
++        compatible = insert(
++            {"type": "item.started", "item": {"type": "command_execution"}},
++            {"type": "item.updated", "item": {"type": "todo_list"}},
++            {"type": "item.completed", "item": {"type": "reasoning", "text": "Fixture summary"}},
++        )
++        execution, verdict = review_result(compatible, BINDING, "abc", PATCH, protected=True)
++        self.assertEqual((execution, verdict["decision"]), (EXECUTION, "approve"))
++
++        for event in ([], {"type": []}, {"type": "unexpected.activity"}):
++            with self.subTest(event=event), self.assertRaisesRegex(DataError, "unsupported event"):
++                review_result(insert(event), BINDING, "abc", PATCH, protected=True)
++        for event_type in ("item.started", "item.updated", "item.completed"):
++            for item in (None, {"type": []}, *({"type": kind} for kind in
++                          ("mcp_tool_call", "collab_tool_call", "web_search", "file_change", "error", "unknown"))):
++                with self.subTest(event_type=event_type, item=item), self.assertRaisesRegex(DataError, "unsupported item"):
++                    review_result(insert({"type": event_type, "item": item}), BINDING, "abc", PATCH, protected=True)
++
 +    def test_short_patch_lines_qualify_but_text_headers_do_not(self):
 +        diff = (b"diff --git a/mode b/mode\nold mode 100644\nnew mode 100755\n"
 +                b"diff --git a/file b/file\nnew file mode 100644\n--- /dev/null\n+++ b/file\n"
@@ -1572,7 +1598,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..6432fe0d19b675f1c77fd6b4d901f7b0
      def test_installation_token_accepts_supported_formats_without_header_delimiters(self):
          for token in (LEGACY_TOKEN, STATELESS_TOKEN):
              self.assertIsNotNone(APP_TOKEN.fullmatch(token))
-@@ -86,40 +454,302 @@ class ReviewGateTests(unittest.TestCase):
+@@ -86,40 +480,302 @@ class ReviewGateTests(unittest.TestCase):
              self.assertIsNone(APP_TOKEN.fullmatch(token))
  
      def test_issuer_refuses_unverified_repository_scope_before_writing(self):
@@ -1904,7 +1930,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..6432fe0d19b675f1c77fd6b4d901f7b0
              def respond(_, payload, *, check_id=None):
                  return api_check({"name": CHECK_NAME, "head_sha": QUEUE["merge"],
                                    "external_id": publisher.call_args_list[-2].args[1]["external_id"],
-@@ -128,7 +758,6 @@ class ReviewGateTests(unittest.TestCase):
+@@ -128,7 +784,6 @@ class ReviewGateTests(unittest.TestCase):
              publisher = Mock(side_effect=respond)
              scope = Mock()
              scope._get_json.return_value = {"total_count": 1, "repositories": [TOKEN_REPOSITORY]}
@@ -1912,7 +1938,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..6432fe0d19b675f1c77fd6b4d901f7b0
  
              def fake_launch(_codex, _model, input_dir, _schema, _audit, *, reviewer):
                  bound = json.loads((input_dir / "review-input.json").read_bytes())
-@@ -142,7 +771,7 @@ class ReviewGateTests(unittest.TestCase):
+@@ -142,7 +797,7 @@ class ReviewGateTests(unittest.TestCase):
                    patch("tools.review_gate.launch_review", side_effect=fake_launch)):
                  result = run(args, github, token_input=lambda: STATELESS_TOKEN, publisher=publisher)
                  self.assertEqual(result["status"], "check-issued")
@@ -1921,7 +1947,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..6432fe0d19b675f1c77fd6b4d901f7b0
                  scope._get_json.assert_called_once_with(SCOPE_PATH)
                  first, last = publisher.call_args_list
                  self.assertEqual(first.args[0], STATELESS_TOKEN)
-@@ -186,49 +815,54 @@ class ReviewGateTests(unittest.TestCase):
+@@ -186,49 +841,54 @@ class ReviewGateTests(unittest.TestCase):
                  publisher.assert_not_called()
  
      def test_queue_admission_targets_only_the_head_and_records_its_purpose(self):
@@ -2003,7 +2029,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..6432fe0d19b675f1c77fd6b4d901f7b0
  
      def test_wrong_source_and_stale_returned_checks_are_rejected(self):
          payload = {"name": CHECK_NAME, "head_sha": SNAPSHOT.merge,
-@@ -239,6 +873,40 @@ class ReviewGateTests(unittest.TestCase):
+@@ -239,6 +899,40 @@ class ReviewGateTests(unittest.TestCase):
              with self.subTest(check=check), self.assertRaisesRegex(DataError, "wrong-source"):
                  verify_issued_check(check, SNAPSHOT.merge, 123, "expected", "completed", "success")
  
@@ -2044,7 +2070,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..6432fe0d19b675f1c77fd6b4d901f7b0
      def test_issuer_without_reviewer_fails_before_capture_or_credential_read(self):
          with TemporaryDirectory() as directory:
              args = SimpleNamespace(state_dir=Path(directory), mode="review", pull=1,
-@@ -257,18 +925,18 @@ class ReviewGateTests(unittest.TestCase):
+@@ -257,18 +951,18 @@ class ReviewGateTests(unittest.TestCase):
              state = Path(directory)
              args = SimpleNamespace(state_dir=state, mode="review", pull=1, model="fixture", codex=Path("fixture"),
                                     app_id=123, reviewer=Reviewer(4001, 4002, state / "reviewer-home"),
@@ -2069,7 +2095,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..6432fe0d19b675f1c77fd6b4d901f7b0
              credential.assert_not_called()
              publisher.assert_not_called()
  
-@@ -277,10 +945,9 @@ class ReviewGateTests(unittest.TestCase):
+@@ -277,10 +971,9 @@ class ReviewGateTests(unittest.TestCase):
              state = Path(directory)
              args = SimpleNamespace(state_dir=state, mode="review", pull=1, model="fixture", codex=Path("fixture"),
                                     app_id=123, reviewer=Reviewer(4001, 4002, state / "reviewer-home"),
@@ -2083,7 +2109,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..6432fe0d19b675f1c77fd6b4d901f7b0
              credential = Mock()
              publisher = Mock()
              for disposition in ("changes-required", "inconclusive"):
-@@ -305,18 +972,787 @@ class ReviewGateTests(unittest.TestCase):
+@@ -305,18 +998,787 @@ class ReviewGateTests(unittest.TestCase):
              credential.assert_not_called()
              publisher.assert_not_called()
  
@@ -2875,7 +2901,24 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..6432fe0d19b675f1c77fd6b4d901f7b0
                  trace = launch_review(root / "codex", "fixture", root / "inputs", root / "schema.json", root,
                                        reviewer=reviewer)
              self.assertEqual(trace, b"fixture trace")
-@@ -336,6 +1772,32 @@ class ReviewGateTests(unittest.TestCase):
+@@ -328,6 +1790,16 @@ class ReviewGateTests(unittest.TestCase):
+             self.assertEqual(invocation.kwargs["env"]["CODEX_HOME"], str(reviewer.home / ".codex"))
+             self.assertNotIn("GH_TOKEN", invocation.kwargs["env"])
+             self.assertNotIn("--sandbox", invocation.args[0])
++            disabled = {flag for before, flag in zip(invocation.args[0], invocation.args[0][1:])
++                        if before == "--disable"}
++            self.assertEqual(disabled, {
++                "code_mode", "code_mode_host", "code_mode_only",
++                "apps", "plugins", "remote_plugin", "enable_mcp_apps", "tool_suggest", "skill_mcp_dependency_install",
++                "browser_use", "computer_use", "in_app_browser", "multi_agent_v2", "goals", "image_generation",
++                "send_message_to_user_async", "default_mode_request_user_input",
++            })
++            self.assertIn("agents.enabled=false", invocation.args[0])
++            self.assertIn("tools.experimental_request_user_input.enabled=false", invocation.args[0])
+             self.assertIn('default_permissions="review-inputs"', invocation.args[0])
+             profile, = [arg for arg in invocation.args[0] if arg.startswith("permissions.review-inputs=")]
+             permissions = tomllib.loads(profile)["permissions"]["review-inputs"]
+@@ -336,6 +1808,32 @@ class ReviewGateTests(unittest.TestCase):
                  "filesystem": {":minimal": "read", str(root / "inputs"): "read", str(root / "codex"): "read"},
              })
  
@@ -2908,7 +2951,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..6432fe0d19b675f1c77fd6b4d901f7b0
      def test_protected_rehearsal_records_a_review_without_reading_a_token_or_writing_a_check(self):
          with TemporaryDirectory() as directory:
              root = Path(directory)
-@@ -352,7 +1814,8 @@ class ReviewGateTests(unittest.TestCase):
+@@ -352,7 +1850,8 @@ class ReviewGateTests(unittest.TestCase):
                  token = json.loads((input_dir / "review-input.json").read_bytes())["inspection_token"]
                  return make_trace(token)
  
@@ -2918,7 +2961,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..6432fe0d19b675f1c77fd6b4d901f7b0
                    patch("tools.review_gate.GitHub", return_value=github),
                    patch("tools.review_gate.capture_diff", return_value=("e" * 40, PATCH)) as capture,
                    patch("tools.review_gate.protected_staging", return_value=root),
-@@ -363,7 +1826,7 @@ class ReviewGateTests(unittest.TestCase):
+@@ -363,7 +1862,7 @@ class ReviewGateTests(unittest.TestCase):
                    patch("tools.review_gate.sys.stdin", stdin)):
                  self.assertEqual(main(["review", "1", "--rehearsal-config", str(config), "--queue-admission"]), 0)
  
@@ -2927,7 +2970,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..6432fe0d19b675f1c77fd6b4d901f7b0
              self.assertTrue(capture.call_args.kwargs["linear_head"])
              self.assertEqual(share.call_args.args[1], reviewer.gid)
              self.assertEqual(launch.call_args.kwargs["reviewer"], reviewer)
-@@ -378,6 +1841,69 @@ class ReviewGateTests(unittest.TestCase):
+@@ -378,6 +1877,69 @@ class ReviewGateTests(unittest.TestCase):
              self.assertEqual(result["decision_sha256"], sha256(decision).hexdigest())
              self.assertFalse((Path(result["audit"]) / "issued-check.json").exists())
  
@@ -2997,7 +3040,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..6432fe0d19b675f1c77fd6b4d901f7b0
      @unittest.skipUnless(os.name == "posix", "issuer deployment requires POSIX permissions")
      def test_protected_issuer_config_rejects_unpinned_runner_and_shared_permissions(self):
          with TemporaryDirectory() as directory:
-@@ -387,6 +1913,7 @@ class ReviewGateTests(unittest.TestCase):
+@@ -387,6 +1949,7 @@ class ReviewGateTests(unittest.TestCase):
              config = root / "review.json"
              settings = {
                  "app_id": 123, "audit_dir": str(root), "codex": str(codex), "model": "fixture",
@@ -3005,7 +3048,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..6432fe0d19b675f1c77fd6b4d901f7b0
                  "codex_sha256": sha256(codex.read_bytes()).hexdigest(),
                  "reviewer_uid": 4001, "reviewer_gid": 4002, "reviewer_home": str(root / "reviewer-home"),
              }
-@@ -394,9 +1921,50 @@ class ReviewGateTests(unittest.TestCase):
+@@ -394,9 +1957,50 @@ class ReviewGateTests(unittest.TestCase):
              config.chmod(0o600)
              reviewer = Reviewer(4001, 4002, root / "reviewer-home")
              with patch("tools.review_gate.load_reviewer", return_value=reviewer):
@@ -3057,7 +3100,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..6432fe0d19b675f1c77fd6b4d901f7b0
                  config.chmod(0o640)
                  with self.assertRaisesRegex(DataError, "must be private"):
                      load_issuer(config)
-@@ -410,8 +1978,10 @@ class ReviewGateTests(unittest.TestCase):
+@@ -410,8 +2014,10 @@ class ReviewGateTests(unittest.TestCase):
                      load_issuer(config)
                  codex.write_bytes(b"synthetic executable")
                  del settings["app_id"]
@@ -4566,7 +4609,7 @@ index 0000000000000000000000000000000000000000..2ba0cd0022e8dce50b7d96e471e4d0e3
 +            raise
 +        raise DataError(f"could not capture the SCES publication evidence: {error}") from error
 diff --git a/tools/review_gate.py b/tools/review_gate.py
-index 46c36046f0bc7015d9fef4bb287659a424941a21..b1506059d5657ec92c89b646de9204085bfeb7d8 100644
+index 46c36046f0bc7015d9fef4bb287659a424941a21..7f904591a20001350dbe39f6d49fe0ec23af38f2 100644
 --- a/tools/review_gate.py
 +++ b/tools/review_gate.py
 @@ -3,27 +3,43 @@
@@ -4616,17 +4659,20 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..b1506059d5657ec92c89b646de920408
  ACTIONS_APP_ID = 15368
  CI_CONTEXTS = ("Evidence / SCES validation", "Registry validation")
  VERDICT_KEYS = {"decision", "inspection_token", "merge_sha", "diff_sha256", "findings", "rationale"}
-@@ -46,6 +62,9 @@ REVIEWER_ENV = {
+@@ -46,6 +62,12 @@ REVIEWER_ENV = {
      "SYSTEMROOT", "TEMP", "TMP", "TMPDIR", "USERPROFILE", "WINDIR",
  }
  MAX_TRACE_BYTES = 32 * 1024 * 1024
 +MAX_REVIEW_STDERR_BYTES = 1024 * 1024
 +REVIEW_TIMEOUT = 1800
 +EVIDENCE_PROOF_BATCH = 128
++PROTECTED_ITEM_EVENTS = ("item.started", "item.updated", "item.completed")
++PROTECTED_TRACE_EVENTS = ("thread.started", "turn.started", "turn.completed", *PROTECTED_ITEM_EVENTS)
++PROTECTED_TRACE_ITEMS = ("agent_message", "reasoning", "command_execution", "todo_list")
  APP_TOKEN = re.compile(r"ghs_[A-Za-z0-9._-]{36,}")
  RUNTIME_KEYS = {"audit_dir", "codex", "codex_sha256", "model", "reviewer_uid", "reviewer_gid", "reviewer_home"}
  
-@@ -57,6 +76,12 @@ class Reviewer:
+@@ -57,6 +79,12 @@ class Reviewer:
      home: Path
  
  
@@ -4639,7 +4685,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..b1506059d5657ec92c89b646de920408
  def save(path, data):
      with path.open("xb") as file:
          file.write(data)
-@@ -69,7 +94,39 @@ def valid_execution(value):
+@@ -69,10 +97,50 @@ def valid_execution(value):
          return False
  
  
@@ -4676,11 +4722,22 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..b1506059d5657ec92c89b646de920408
 +    return changed or text or binary or metadata
 +
 +
-+def review_result(trace, binding, inspection_token, diff, evidence_files=None):
++def review_result(trace, binding, inspection_token, diff, evidence_files=None, *, protected=False):
      """Accept a verdict only from one complete captured Codex execution."""
      require(len(trace) <= MAX_TRACE_BYTES, "review trace exceeds the configured limit")
      events = [decode(line) for line in trace.splitlines() if line.strip()]
-@@ -85,10 +142,13 @@ def review_result(trace, binding, inspection_token, diff):
++    if protected:
++        for event in events:
++            require(isinstance(event, dict) and event.get("type") in PROTECTED_TRACE_EVENTS,
++                    "protected review trace contains an unsupported event")
++            if event["type"] in PROTECTED_ITEM_EVENTS:
++                item = event.get("item")
++                require(isinstance(item, dict) and item.get("type") in PROTECTED_TRACE_ITEMS,
++                        "protected review trace contains an unsupported item")
+     kinds = [event["type"] for event in events]
+     require(kinds.count("thread.started") == kinds.count("turn.started") == kinds.count("turn.completed") == 1
+             and "turn.failed" not in kinds and "error" not in kinds
+@@ -85,10 +153,13 @@ def review_result(trace, binding, inspection_token, diff):
      require(messages, "Codex review did not return a verdict")
      final_position = messages[-1]
      verdict = decode(items[final_position]["text"].encode("utf-8"))
@@ -4696,7 +4753,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..b1506059d5657ec92c89b646de920408
              "review verdict does not bind the exact inspected inputs")
      require(verdict["decision"] in {"approve", "changes-required", "inconclusive"}
              and isinstance(verdict["findings"], list)
-@@ -96,22 +156,76 @@ def review_result(trace, binding, inspection_token, diff):
+@@ -96,22 +167,76 @@ def review_result(trace, binding, inspection_token, diff):
              and isinstance(verdict["rationale"], str) and verdict["rationale"].strip(), "invalid review verdict")
      if verdict["decision"] == "inconclusive":
          return execution, verdict
@@ -4782,8 +4839,29 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..b1506059d5657ec92c89b646de920408
  def launch_review(codex, model, input_dir, schema, audit_dir, *, reviewer=None):
      arguments = [str(codex), "exec", "--ignore-user-config", "--ignore-rules", "--skip-git-repo-check",
                   "--json", "--color", "never", "--model", model,
-@@ -139,36 +253,52 @@ def launch_review(codex, model, input_dir, schema, audit_dir, *, reviewer=None):
+@@ -128,7 +253,15 @@ def launch_review(codex, model, input_dir, schema, audit_dir, *, reviewer=None):
+                        f'{executable_key}="read"}}, '
+                        'network={enabled=false}}')
+         arguments.extend((
+-            "--strict-config", "--ephemeral", "-c", 'default_permissions="review-inputs"',
++            "--strict-config", "--ephemeral",
++            "--disable", "code_mode", "--disable", "code_mode_host", "--disable", "code_mode_only",
++            "--disable", "apps", "--disable", "plugins", "--disable", "remote_plugin",
++            "--disable", "enable_mcp_apps", "--disable", "tool_suggest", "--disable", "skill_mcp_dependency_install",
++            "--disable", "browser_use", "--disable", "computer_use", "--disable", "in_app_browser",
++            "--disable", "multi_agent_v2", "--disable", "goals", "--disable", "image_generation",
++            "--disable", "send_message_to_user_async", "--disable", "default_mode_request_user_input",
++            "-c", "agents.enabled=false", "-c", "tools.experimental_request_user_input.enabled=false",
++            "-c", 'default_permissions="review-inputs"',
+             "-c", permissions,
+         ))
+         environment = {"PATH": os.defpath, "HOME": str(reviewer.home), "CODEX_HOME": str(reviewer.home / ".codex")}
+@@ -137,38 +270,56 @@ def launch_review(codex, model, input_dir, schema, audit_dir, *, reviewer=None):
+     prompt = (
+         "Perform an independent technical review for a protected public GitHub pull request. "
          "Open review-input.json and inspect the exact patch through read-only tools. "
++        "Use only sandboxed read-only shell commands and return the verdict in this execution. "
++        "Do not send user messages, modify files, or contact external services. "
          "In a successful command mentioning review.diff, read its exact bytes and print the lowercase SHA-256 "
          "of the ASCII inspection_token concatenated with the complete review.diff bytes. "
 -        "Use read-only commands mentioning review.diff to display actual patch bodies and relevant hunks. "
@@ -4847,7 +4925,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..b1506059d5657ec92c89b646de920408
                        headers={"Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json",
                                 "Content-Type": "application/json", "User-Agent": "Software-Commons-Review-Gate",
                                 "X-GitHub-Api-Version": "2022-11-28"})
-@@ -179,8 +309,9 @@ def write_check(token, payload, *, check_id=None):
+@@ -179,8 +330,9 @@ def write_check(token, payload, *, check_id=None):
          raise DataError(f"GitHub check API failed: {error.reason}") from None
  
  
@@ -4859,7 +4937,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..b1506059d5657ec92c89b646de920408
      require(isinstance(rules, list) and len(rules) < 100 and all(isinstance(item, dict) for item in rules),
              "GitHub did not return a complete active branch rules view")
      by_type = {}
-@@ -188,6 +319,9 @@ def require_queue_rules(github, app_id):
+@@ -188,6 +340,9 @@ def require_queue_rules(github, app_id):
          by_type.setdefault(item.get("type"), []).append(item)
      require({"pull_request", "deletion", "non_fast_forward"} <= by_type.keys(),
              "mandatory pull requests, branch deletion protection and force-push protection are required")
@@ -4869,7 +4947,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..b1506059d5657ec92c89b646de920408
      queue = by_type.get("merge_queue", [])
      require(len(queue) == 1, "App issuance requires a mandatory merge queue")
      parameters = queue[0].get("parameters")
-@@ -212,17 +346,29 @@ def require_queue_rules(github, app_id):
+@@ -212,17 +367,29 @@ def require_queue_rules(github, app_id):
                  bindings[name].append(integration if strict and type(integration) is int else None)
      require(all(bindings[name] == [source] for name, source in expected.items()),
              "required review and CI contexts must each bind their exact integration and enforce strict checks")
@@ -4900,7 +4978,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..b1506059d5657ec92c89b646de920408
      pending = publisher(token, {"name": CHECK_NAME, "head_sha": target,
                                  "status": "in_progress", "external_id": decision_digest})
      verify_issued_check(pending, target, app_id, decision_digest, "in_progress")
-@@ -236,7 +382,7 @@ def create_check(snapshot, app_id, token, decision, publisher, verify_fresh, *,
+@@ -236,7 +403,7 @@ def create_check(snapshot, app_id, token, decision, publisher, verify_fresh, *,
              "summary": (
                  f"PR #{snapshot.number}\n\nHead: `{snapshot.head}`\n\nBase: `{snapshot.base}`\n\n"
                  f"Reviewed merge: `{snapshot.merge}`\n\nExecution: `{decision['execution']}`\n\n"
@@ -4909,7 +4987,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..b1506059d5657ec92c89b646de920408
              ),
          },
      }, check_id=check_id)
-@@ -245,7 +391,86 @@ def create_check(snapshot, app_id, token, decision, publisher, verify_fresh, *,
+@@ -245,7 +412,86 @@ def create_check(snapshot, app_id, token, decision, publisher, verify_fresh, *,
      return result
  
  
@@ -4997,7 +5075,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..b1506059d5657ec92c89b646de920408
      state = args.state_dir.resolve()
      require(state.is_dir(), "configure an existing issuer-owned state directory")
      reviewer = getattr(args, "reviewer", None)
-@@ -253,46 +478,248 @@ def run(args, github, *, token_input=None, publisher=write_check):
+@@ -253,46 +499,248 @@ def run(args, github, *, token_input=None, publisher=write_check):
      rehearsal = reviewer is not None and args.app_id is None
      admission = getattr(args, "queue_admission", False)
      run_id = getattr(args, "queue_run", None)
@@ -5255,11 +5333,11 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..b1506059d5657ec92c89b646de920408
          trace = launch_review(args.codex, args.model, input_dir, schema, audit, reviewer=reviewer)
          completed_at = datetime.now(timezone.utc).isoformat()
 -    execution, verdict = review_result(trace, binding, token, diff)
-+    execution, verdict = review_result(trace, binding, token, diff, evidence_files)
++    execution, verdict = review_result(trace, binding, token, diff, evidence_files, protected=reviewer is not None)
      decision = {"binding": binding, "execution": execution, "model": args.model,
                  "started_at": started_at, "completed_at": completed_at,
                  "trace_sha256": sha256(trace).hexdigest(), "decision": verdict["decision"],
-@@ -307,19 +734,13 @@ def run(args, github, *, token_input=None, publisher=write_check):
+@@ -307,19 +755,13 @@ def run(args, github, *, token_input=None, publisher=write_check):
          result["rehearsal"] = True
      if verdict["decision"] != "approve":
          return {**result, "status": verdict["decision"], "findings": verdict["findings"], "rationale": verdict["rationale"]}
@@ -5281,7 +5359,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..b1506059d5657ec92c89b646de920408
          check = create_check(snapshot, args.app_id, installation_token, decision, publisher, verify_fresh,
                               admission=admission)
          save(audit / "issued-check.json", encode(check))
-@@ -373,18 +794,41 @@ def trusted_executable(path):
+@@ -373,18 +815,41 @@ def trusted_executable(path):
      trusted_parents(path)
  
  
@@ -5326,7 +5404,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..b1506059d5657ec92c89b646de920408
      audit = Path(settings["audit_dir"])
      protected_path(audit, directory=True)
      reviewer = load_reviewer(settings)
-@@ -393,7 +837,7 @@ def load_issuer(path, *, rehearsal=False):
+@@ -393,7 +858,7 @@ def load_issuer(path, *, rehearsal=False):
      with codex.open("rb") as executable:
          require(file_digest(executable, "sha256").hexdigest() == settings["codex_sha256"],
                  "Codex executable differs from the protected issuer pin")
@@ -5335,7 +5413,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..b1506059d5657ec92c89b646de920408
  
  
  def load_reviewer(settings):
-@@ -413,6 +857,24 @@ def load_reviewer(settings):
+@@ -413,6 +878,24 @@ def load_reviewer(settings):
      return Reviewer(uid, gid, home)
  
  
@@ -5360,7 +5438,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..b1506059d5657ec92c89b646de920408
  def main(argv=None):
      parser = argparse.ArgumentParser(description=__doc__)
      parser.add_argument("mode", choices=("inspect", "review"))
-@@ -423,27 +885,51 @@ def main(argv=None):
+@@ -423,27 +906,51 @@ def main(argv=None):
      phase = parser.add_mutually_exclusive_group()
      phase.add_argument("--queue-admission", action="store_true", help="review the test merge for queue admission")
      phase.add_argument("--queue-run", type=int, help="review the exact candidate for a GitHub merge-group Actions run")
