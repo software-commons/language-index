@@ -1078,7 +1078,7 @@ index 0000000000000000000000000000000000000000..a3ab865bf88ed33971996a78ea7623ec
 +            with self.assertRaisesRegex(DataError, "retrieval could not complete"):
 +                _fetch_frozen_records(REPOSITORY, commit, expected, len(raw))
 diff --git a/tests/test_review_gate.py b/tests/test_review_gate.py
-index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..ba5fc5e54445b671ad0b5557c83b07c2245677f0 100644
+index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..8a3be2332fb12a18c40a4d6d8b0d5ba2a0b2baa1 100644
 --- a/tests/test_review_gate.py
 +++ b/tests/test_review_gate.py
 @@ -2,45 +2,73 @@
@@ -1939,7 +1939,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..ba5fc5e54445b671ad0b5557c83b07c2
              credential = Mock()
              publisher = Mock()
              for disposition in ("changes-required", "inconclusive"):
-@@ -305,18 +890,328 @@ class ReviewGateTests(unittest.TestCase):
+@@ -305,18 +890,369 @@ class ReviewGateTests(unittest.TestCase):
              credential.assert_not_called()
              publisher.assert_not_called()
  
@@ -1965,6 +1965,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..ba5fc5e54445b671ad0b5557c83b07c2
 +                return make_trace(token, verdict={"decision": "changes-required", "findings": ["Fixture finding"]})
 +
 +            with (patch("tools.review_gate.capture_admission_head", return_value="e" * 40) as head,
++                  patch("tools.review_gate.capture_candidate_tree", return_value="f" * 40) as merge_tree,
 +                  patch("tools.review_gate.capture_diff", return_value=("e" * 40, PATCH)) as tree,
 +                  patch("tools.review_gate.protected_staging", return_value=state),
 +                  patch("tools.review_gate.share_reviewer_inputs"),
@@ -1973,8 +1974,15 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..ba5fc5e54445b671ad0b5557c83b07c2
 +                result = run(args, github, token_input=lambda: LEGACY_TOKEN, publisher=publisher)
 +            self.assertEqual(tree.call_args.kwargs, {"linear_head": True})
 +            self.assertEqual(head.call_args.args[0], github.get_admission_head.return_value)
++            self.assertEqual(merge_tree.call_count, 2)
++            for call in merge_tree.call_args_list:
++                self.assertEqual(call.args[0], SNAPSHOT)
++                self.assertEqual(call.kwargs, {"linear_head": True})
 +            self.assertEqual(result["status"], "changes-required")
 +            self.assertEqual(json.loads((Path(result["audit"]) / "superseded-checks.json").read_bytes()), [prior])
++            proof = json.loads((Path(result["audit"]) / "revocation-target.json").read_bytes())
++            self.assertEqual((proof["base"], proof["test_merge"], proof["test_merge_tree"]),
++                             (SNAPSHOT.base, SNAPSHOT.merge, "f" * 40))
 +            self.assertFalse((Path(result["audit"]) / "issued-check.json").exists())
 +
 +    def test_explicit_head_only_denial_works_while_test_merge_is_unready(self):
@@ -1993,6 +2001,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..ba5fc5e54445b671ad0b5557c83b07c2
 +                    publisher = Mock(return_value={**prior, "conclusion": "failure"})
 +                    credential = Mock(return_value=LEGACY_TOKEN)
 +                    with (patch("tools.review_gate.capture_admission_head", return_value="e" * 40) as capture,
++                          patch("tools.review_gate.capture_candidate_tree") as merge_tree,
 +                          patch("tools.review_gate.token_is_target_only", return_value=True),
 +                          patch("tools.review_gate.require_queue_rules") as rules,
 +                          patch("tools.review_gate.launch_review") as launch):
@@ -2014,6 +2023,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..ba5fc5e54445b671ad0b5557c83b07c2
 +                            publisher.assert_not_called()
 +                    launch.assert_not_called()
 +                    rules.assert_not_called()
++                    merge_tree.assert_not_called()
 +
 +    def test_both_admission_pins_reject_stale_merge_before_any_check_write(self):
 +        with TemporaryDirectory() as directory:
@@ -2028,12 +2038,14 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..ba5fc5e54445b671ad0b5557c83b07c2
 +            publisher = Mock()
 +            credential = Mock(return_value=LEGACY_TOKEN)
 +            with (patch("tools.review_gate.capture_admission_head", return_value="e" * 40) as capture,
++                  patch("tools.review_gate.capture_candidate_tree", return_value="f" * 40) as merge_tree,
 +                  patch("tools.review_gate.token_is_target_only", return_value=True),
 +                  patch("tools.review_gate.launch_review") as launch):
 +                with self.assertRaisesRegex(DataError, "differs from the expected review merge"):
 +                    run(args, github, token_input=credential, publisher=publisher)
 +                self.successful_checks.assert_not_called()
 +                capture.assert_not_called()
++                merge_tree.assert_not_called()
 +                credential.assert_not_called()
 +                publisher.assert_not_called()
 +                github.get_pull.reset_mock(side_effect=True)
@@ -2045,8 +2057,36 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..ba5fc5e54445b671ad0b5557c83b07c2
 +            self.assertEqual(github.get_pull.call_count, 2)
 +            self.assertEqual(github.get_admission_head.call_count, 2)
 +            capture.assert_called_once()
++            merge_tree.assert_called_once()
 +            publisher.assert_not_called()
 +            launch.assert_not_called()
++
++    def test_admission_merges_must_bind_fresh_git_ref_and_ordered_parents_before_revocation(self):
++        for captures, expected_token_reads in (
++            ([SnapshotError("Test merge commit does not have the exact ordered base and head parents")], 0),
++            (["f" * 40, SnapshotError("GitHub merge candidate changed during capture")], 1),
++        ):
++            with self.subTest(captures=captures), TemporaryDirectory() as directory:
++                state = Path(directory)
++                args = SimpleNamespace(state_dir=state, mode="review", pull=1, app_id=123, queue_admission=True,
++                                       reviewer=Reviewer(4001, 4002, state), expected_head=SNAPSHOT.head,
++                                       expected_merge=SNAPSHOT.merge, commissioning_policy=LICENSE_POLICY)
++                github = mock_review_pull()
++                prior = api_check({"name": CHECK_NAME, "head_sha": SNAPSHOT.head,
++                                   "status": "completed", "conclusion": "success"})
++                self.successful_checks.side_effect = [[prior], [prior]]
++                publisher = Mock()
++                credential = Mock(return_value=LEGACY_TOKEN)
++                with (patch("tools.review_gate.capture_admission_head", return_value="e" * 40),
++                      patch("tools.review_gate.capture_candidate_tree", side_effect=captures) as merge_tree,
++                      patch("tools.review_gate.token_is_target_only", return_value=True),
++                      patch("tools.review_gate.launch_review") as launch):
++                    with self.assertRaisesRegex(SnapshotError, str(captures[-1])):
++                        run(args, github, token_input=credential, publisher=publisher)
++                self.assertEqual(merge_tree.call_count, len(captures))
++                self.assertEqual(credential.call_count, expected_token_reads)
++                publisher.assert_not_called()
++                launch.assert_not_called()
 +
 +    def test_head_only_revocation_never_updates_a_different_head(self):
 +        with TemporaryDirectory() as directory:
@@ -2125,7 +2165,8 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..ba5fc5e54445b671ad0b5557c83b07c2
 +                        run(args, github, token_input=lambda: LEGACY_TOKEN, publisher=publisher)
 +                if admission:
 +                    head.assert_called_once()
-+                    tree.assert_not_called()
++                    self.assertEqual(tree.call_count, 2)
++                    self.assertEqual(tree.call_args.kwargs, {"linear_head": True})
 +                else:
 +                    head.assert_not_called()
 +                    tree.assert_called_once()
@@ -2272,7 +2313,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..ba5fc5e54445b671ad0b5557c83b07c2
                  trace = launch_review(root / "codex", "fixture", root / "inputs", root / "schema.json", root,
                                        reviewer=reviewer)
              self.assertEqual(trace, b"fixture trace")
-@@ -336,6 +1231,32 @@ class ReviewGateTests(unittest.TestCase):
+@@ -336,6 +1272,32 @@ class ReviewGateTests(unittest.TestCase):
                  "filesystem": {":minimal": "read", str(root / "inputs"): "read", str(root / "codex"): "read"},
              })
  
@@ -2305,7 +2346,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..ba5fc5e54445b671ad0b5557c83b07c2
      def test_protected_rehearsal_records_a_review_without_reading_a_token_or_writing_a_check(self):
          with TemporaryDirectory() as directory:
              root = Path(directory)
-@@ -352,7 +1273,8 @@ class ReviewGateTests(unittest.TestCase):
+@@ -352,7 +1314,8 @@ class ReviewGateTests(unittest.TestCase):
                  token = json.loads((input_dir / "review-input.json").read_bytes())["inspection_token"]
                  return make_trace(token)
  
@@ -2315,7 +2356,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..ba5fc5e54445b671ad0b5557c83b07c2
                    patch("tools.review_gate.GitHub", return_value=github),
                    patch("tools.review_gate.capture_diff", return_value=("e" * 40, PATCH)) as capture,
                    patch("tools.review_gate.protected_staging", return_value=root),
-@@ -363,7 +1285,7 @@ class ReviewGateTests(unittest.TestCase):
+@@ -363,7 +1326,7 @@ class ReviewGateTests(unittest.TestCase):
                    patch("tools.review_gate.sys.stdin", stdin)):
                  self.assertEqual(main(["review", "1", "--rehearsal-config", str(config), "--queue-admission"]), 0)
  
@@ -2324,7 +2365,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..ba5fc5e54445b671ad0b5557c83b07c2
              self.assertTrue(capture.call_args.kwargs["linear_head"])
              self.assertEqual(share.call_args.args[1], reviewer.gid)
              self.assertEqual(launch.call_args.kwargs["reviewer"], reviewer)
-@@ -378,6 +1300,69 @@ class ReviewGateTests(unittest.TestCase):
+@@ -378,6 +1341,69 @@ class ReviewGateTests(unittest.TestCase):
              self.assertEqual(result["decision_sha256"], sha256(decision).hexdigest())
              self.assertFalse((Path(result["audit"]) / "issued-check.json").exists())
  
@@ -2394,7 +2435,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..ba5fc5e54445b671ad0b5557c83b07c2
      @unittest.skipUnless(os.name == "posix", "issuer deployment requires POSIX permissions")
      def test_protected_issuer_config_rejects_unpinned_runner_and_shared_permissions(self):
          with TemporaryDirectory() as directory:
-@@ -387,6 +1372,7 @@ class ReviewGateTests(unittest.TestCase):
+@@ -387,6 +1413,7 @@ class ReviewGateTests(unittest.TestCase):
              config = root / "review.json"
              settings = {
                  "app_id": 123, "audit_dir": str(root), "codex": str(codex), "model": "fixture",
@@ -2402,7 +2443,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..ba5fc5e54445b671ad0b5557c83b07c2
                  "codex_sha256": sha256(codex.read_bytes()).hexdigest(),
                  "reviewer_uid": 4001, "reviewer_gid": 4002, "reviewer_home": str(root / "reviewer-home"),
              }
-@@ -394,9 +1380,50 @@ class ReviewGateTests(unittest.TestCase):
+@@ -394,9 +1421,50 @@ class ReviewGateTests(unittest.TestCase):
              config.chmod(0o600)
              reviewer = Reviewer(4001, 4002, root / "reviewer-home")
              with patch("tools.review_gate.load_reviewer", return_value=reviewer):
@@ -2454,7 +2495,7 @@ index 7cc8a3fa0cf68accfa82c672deb9cb6ce0de72d9..ba5fc5e54445b671ad0b5557c83b07c2
                  config.chmod(0o640)
                  with self.assertRaisesRegex(DataError, "must be private"):
                      load_issuer(config)
-@@ -410,8 +1437,10 @@ class ReviewGateTests(unittest.TestCase):
+@@ -410,8 +1478,10 @@ class ReviewGateTests(unittest.TestCase):
                      load_issuer(config)
                  codex.write_bytes(b"synthetic executable")
                  del settings["app_id"]
@@ -3954,7 +3995,7 @@ index 0000000000000000000000000000000000000000..d31da0a3ce58b516d065fc9af66ce2f6
 +            raise
 +        raise DataError(f"could not capture the SCES publication evidence: {error}") from error
 diff --git a/tools/review_gate.py b/tools/review_gate.py
-index 46c36046f0bc7015d9fef4bb287659a424941a21..7c855ebb09eefc8a96e2dee0a6e2bc29a4dfac43 100644
+index 46c36046f0bc7015d9fef4bb287659a424941a21..0e85ff7454a2a1b775f8b8f3daa1043464b9eff0 100644
 --- a/tools/review_gate.py
 +++ b/tools/review_gate.py
 @@ -3,25 +3,39 @@
@@ -4376,7 +4417,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..7c855ebb09eefc8a96e2dee0a6e2bc29
      state = args.state_dir.resolve()
      require(state.is_dir(), "configure an existing issuer-owned state directory")
      reviewer = getattr(args, "reviewer", None)
-@@ -253,46 +472,218 @@ def run(args, github, *, token_input=None, publisher=write_check):
+@@ -253,46 +472,225 @@ def run(args, github, *, token_input=None, publisher=write_check):
      rehearsal = reviewer is not None and args.app_id is None
      admission = getattr(args, "queue_admission", False)
      run_id = getattr(args, "queue_run", None)
@@ -4433,15 +4474,22 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..7c855ebb09eefc8a96e2dee0a6e2bc29
 +        if previous:
 +            with TemporaryDirectory(prefix="head-", dir=state) as directory:
 +                head_tree = capture_admission_head(admission_identity, Path(directory))
++            proof = {"tree": head_tree, "phase": "queue-admission"}
++            if pinned_pull is not None:
++                with TemporaryDirectory(prefix="test-merge-", dir=state) as directory:
++                    pinned_tree = capture_candidate_tree(pinned_pull, Path(directory), linear_head=True)
++                proof.update(base=pinned_pull.base, test_merge=pinned_pull.merge, test_merge_tree=pinned_tree)
 +
 +            def verify_admission_target():
 +                require(github.get_admission_head(args.pull) == admission_identity,
 +                        "live admission head changed before revocation")
 +                if pinned_pull is not None:
 +                    require(github.get_pull(args.pull) == pinned_pull, "live test merge changed before revocation")
++                    with TemporaryDirectory(prefix="test-merge-", dir=state) as directory:
++                        require(capture_candidate_tree(pinned_pull, Path(directory), linear_head=True) == pinned_tree,
++                                "live test merge tree changed before revocation")
 +
-+            installation_token = retire_previous(admission_identity, admission_identity.head, previous,
-+                                                 {"tree": head_tree, "phase": "queue-admission"},
++            installation_token = retire_previous(admission_identity, admission_identity.head, previous, proof,
 +                                                 verify_admission_target)
 +        if revoke_only:
 +            return denial_result(admission_identity.head, previous)
@@ -4608,7 +4656,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..7c855ebb09eefc8a96e2dee0a6e2bc29
      decision = {"binding": binding, "execution": execution, "model": args.model,
                  "started_at": started_at, "completed_at": completed_at,
                  "trace_sha256": sha256(trace).hexdigest(), "decision": verdict["decision"],
-@@ -307,19 +698,13 @@ def run(args, github, *, token_input=None, publisher=write_check):
+@@ -307,19 +705,13 @@ def run(args, github, *, token_input=None, publisher=write_check):
          result["rehearsal"] = True
      if verdict["decision"] != "approve":
          return {**result, "status": verdict["decision"], "findings": verdict["findings"], "rationale": verdict["rationale"]}
@@ -4630,7 +4678,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..7c855ebb09eefc8a96e2dee0a6e2bc29
          check = create_check(snapshot, args.app_id, installation_token, decision, publisher, verify_fresh,
                               admission=admission)
          save(audit / "issued-check.json", encode(check))
-@@ -373,18 +758,41 @@ def trusted_executable(path):
+@@ -373,18 +765,41 @@ def trusted_executable(path):
      trusted_parents(path)
  
  
@@ -4675,7 +4723,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..7c855ebb09eefc8a96e2dee0a6e2bc29
      audit = Path(settings["audit_dir"])
      protected_path(audit, directory=True)
      reviewer = load_reviewer(settings)
-@@ -393,7 +801,7 @@ def load_issuer(path, *, rehearsal=False):
+@@ -393,7 +808,7 @@ def load_issuer(path, *, rehearsal=False):
      with codex.open("rb") as executable:
          require(file_digest(executable, "sha256").hexdigest() == settings["codex_sha256"],
                  "Codex executable differs from the protected issuer pin")
@@ -4684,7 +4732,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..7c855ebb09eefc8a96e2dee0a6e2bc29
  
  
  def load_reviewer(settings):
-@@ -413,6 +821,23 @@ def load_reviewer(settings):
+@@ -413,6 +828,23 @@ def load_reviewer(settings):
      return Reviewer(uid, gid, home)
  
  
@@ -4708,7 +4756,7 @@ index 46c36046f0bc7015d9fef4bb287659a424941a21..7c855ebb09eefc8a96e2dee0a6e2bc29
  def main(argv=None):
      parser = argparse.ArgumentParser(description=__doc__)
      parser.add_argument("mode", choices=("inspect", "review"))
-@@ -423,27 +848,51 @@ def main(argv=None):
+@@ -423,27 +855,51 @@ def main(argv=None):
      phase = parser.add_mutually_exclusive_group()
      phase.add_argument("--queue-admission", action="store_true", help="review the test merge for queue admission")
      phase.add_argument("--queue-run", type=int, help="review the exact candidate for a GitHub merge-group Actions run")
