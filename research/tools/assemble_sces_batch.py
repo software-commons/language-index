@@ -146,6 +146,8 @@ def assemble(batch, review, primary, independent, label, held):
                         reason=("The two executions recorded support for each exact scoped binding." if accepted else
                                 "Independent verification was inconclusive. See the exact assessment and challenge."),
                         research=refs["research"], review=refs["independent-review"]))
+    missing = sorted(claims.keys() - concluded)
+    require(not missing, f"Independent review is missing frozen claims: {missing}")
     require(held <= {row["id"] for row in claims.values()}, "A withheld claim was not present in the batch")
     return planned
 
