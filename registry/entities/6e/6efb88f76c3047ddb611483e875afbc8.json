@@ -1,0 +1,1 @@
+{"aliases":[],"id":"6efb88f76c3047ddb611483e875afbc8","identity_claim":{"id":"prolog-iv-historical-identity","kind":"claim","revision":2},"kind":"dialect","name":"Prolog IV","relations":[{"claim":{"id":"prolog-iv-dialect-of-prolog","kind":"claim","revision":1},"target":{"id":"65697a2cdfb84857a14a634f3398a4b0"},"type":"dialect-of"}],"state":"active"}
