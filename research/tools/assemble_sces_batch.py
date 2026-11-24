@@ -11,6 +11,9 @@ import sys
 from export_codex_receipts import TRACE_PATH, require
 
 
+ASSESSMENT_CHECKS = {"applicability", "authenticity", "contradiction", "integrity", "interpretation", "relevance"}
+
+
 def read(path):
     return json.loads(path.read_bytes())
 
@@ -50,6 +53,11 @@ def phase_input(run_file, trace_file):
     return run, (path, trace), receipts
 
 
+def complete_assessment_checks(assessment):
+    checks = assessment.get("checks")
+    return isinstance(checks, dict) and checks.keys() == ASSESSMENT_CHECKS
+
+
 def assessments_support_claim(assessments, edges):
     if not any(edges[key(assessment["dependency"])]["relation"] == "support" for assessment in assessments):
         return False
@@ -57,6 +65,8 @@ def assessments_support_claim(assessments, edges):
     for assessment in assessments:
         relation = edges[key(assessment["dependency"])]["relation"]
         outcome = assessment["outcome"]
+        if not complete_assessment_checks(assessment):
+            return False
         checks = assessment["checks"].values()
         if relation in {"support", "context"} and outcome == "supports" and all(check == "pass" for check in checks):
             continue
@@ -118,8 +128,10 @@ def assemble(batch, review, primary, independent, label, held):
         reviewed = row.get("assessments") or [row["assessment"]]
         conclusion = row["conclusion"]
         require(conclusion in {"supported", "rejected", "inconclusive"}, "Unknown independent-review verdict")
+        require(isinstance(claim["limitations"], list), "Frozen claim limitations must be an array")
         claim_edges = edges[claim_id]
         refs = {}
+        phase_conclusions = {}
         for role, run, receipts, assessments in (
             ("research", research_run, research_receipts, research[claim_id]),
             ("independent-review", review_run, review_receipts, reviewed),
@@ -127,6 +139,8 @@ def assemble(batch, review, primary, independent, label, held):
             assessment_refs = [key(assessment["dependency"]) for assessment in assessments]
             require(assessment_refs and len(set(assessment_refs)) == len(assessment_refs) and
                     set(assessment_refs) == claim_edges.keys(), "Assessment coverage differs from frozen dependencies")
+            require(all(complete_assessment_checks(assessment) for assessment in assessments),
+                    "Every assessment must record all six SCES checks")
             acquisitions = []
             for assessment in assessments:
                 edge = claim_edges[key(assessment["dependency"])]
@@ -143,10 +157,11 @@ def assemble(batch, review, primary, independent, label, held):
             supported = assessments_support_claim(assessments, claim_edges)
             phase_conclusion = conclusion if role == "independent-review" else ("supported" if supported else "inconclusive")
             require(phase_conclusion != "supported" or supported, "Supported verdict contains a failed binding")
+            phase_conclusions[role] = phase_conclusion
             identifier = f"{label}-{role}-{claim['id']}-r{claim['revision']}"
             refs[role] = make_ref("verification", identifier)
             limitations = row["limitations"] if role == "independent-review" else (
-                claim["limitations"] or list(dict.fromkeys(research_limitations[claim_id]))
+                [*claim["limitations"], *research_limitations[claim_id]]
             )
             require(isinstance(limitations, list) and limitations and
                     all(isinstance(limit, str) and limit.strip() for limit in limitations),
@@ -154,18 +169,17 @@ def assemble(batch, review, primary, independent, label, held):
             verification = dict(refs[role], claim=reference(claim), claim_sha256=digest, phase=role, run=run,
                                 acquisitions=acquisitions, assessments=assessments, conclusion=phase_conclusion,
                                 reasoning="\n\n".join(item["reasoning"] for item in assessments),
-                                limitations=limitations)
+                                limitations=list(dict.fromkeys(limitations)) if role == "research" else limitations)
             if role == "independent-review":
                 verification["challenge"] = row["challenge"]
                 if "reproduction" in row:
                     verification["reproduction"] = row["reproduction"]
-            else:
-                require(phase_conclusion == "supported" or conclusion != "supported", "Review cannot override primary findings")
             record(verification)
 
+        accepted = phase_conclusions["research"] == phase_conclusions["independent-review"] == "supported"
+        require(conclusion != "supported" or accepted, "Review cannot override primary findings")
         if conclusion in {"supported", "inconclusive"} and claim["id"] not in held:
             identifier = f"{label}-{claim['id']}-r{claim['revision']}"
-            accepted = conclusion == "supported"
             decisive_bindings = all(item["outcome"] == "supports" for item in [*research[claim_id], *reviewed])
             if not accepted:
                 reason = "Independent verification was inconclusive. See the exact assessment and challenge."

@@ -8,7 +8,7 @@ import unittest
 
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "research/tools"))
-from assemble_sces_batch import assemble, encode, key, make_ref
+from assemble_sces_batch import ASSESSMENT_CHECKS, assemble, encode, key, make_ref
 from export_codex_receipts import ReceiptError
 
 
@@ -19,7 +19,9 @@ class AssessmentCoverage(unittest.TestCase):
         source = dict(source_ref, locator="https://example.invalid/evidence", captured_sha256="0" * 64)
         edge_ref = make_ref("dependency", "fixture")
         edge = dict(edge_ref, claim=make_ref("claim", "fixture"), basis=source_ref, relation="support")
-        assessment = dict(dependency=edge_ref, outcome="insufficient", checks={"applicability": "fail"},
+        self.passing_checks = dict.fromkeys(ASSESSMENT_CHECKS, "pass")
+        assessment = dict(dependency=edge_ref, outcome="insufficient",
+                          checks={**self.passing_checks, "applicability": "fail"},
                           reasoning="The source does not establish this claim.")
         self.assessment = dict(claim=edge["claim"], claim_sha256=sha256(encode(self.claim)).hexdigest(),
                                assessment=assessment)
@@ -38,6 +40,7 @@ class AssessmentCoverage(unittest.TestCase):
                 assemble(self.batch, {"independent_assessments": []}, self.research, self.review, "test", held)
 
     def test_rejected_claim_retains_both_phases(self):
+        self.assessment["limitations"] = ["New research restriction.", "Synthetic scope."]
         adverse = dict(self.assessment, conclusion="rejected", limitations=["Synthetic scope."],
                        challenge={"reasoning": "Attempted to disprove support."})
         planned = assemble(self.batch, {"independent_assessments": [adverse]},
@@ -48,4 +51,19 @@ class AssessmentCoverage(unittest.TestCase):
         self.assertEqual({phase: record["conclusion"] for phase, record in records.items()},
                          {"research": "inconclusive", "independent-review": "rejected"})
         self.assertEqual(records["research"]["assessments"], [self.assessment["assessment"]])
+        self.assertEqual(records["research"]["limitations"], ["Synthetic scope.", "New research restriction."])
         self.assertFalse(any(path.startswith("sces/records/disposition/") for path in planned))
+
+    def test_independent_support_cannot_override_inconclusive_research(self):
+        favorable = dict(self.assessment, conclusion="supported", limitations=["Synthetic scope."],
+                         challenge={"reasoning": "Attempted to disprove support."},
+                         assessment={**self.assessment["assessment"], "outcome": "supports", "checks": self.passing_checks})
+        with self.assertRaisesRegex(ReceiptError, "Review cannot override primary findings"):
+            assemble(self.batch, {"independent_assessments": [favorable]}, self.research, self.review, "test", set())
+
+    def test_assembly_rejects_malformed_negative_assessment(self):
+        adverse = dict(self.assessment, conclusion="rejected", limitations=["Synthetic scope."],
+                       challenge={"reasoning": "Attempted to disprove support."})
+        self.assessment["assessment"]["checks"] = {"applicability": "fail"}
+        with self.assertRaisesRegex(ReceiptError, "all six SCES checks"):
+            assemble(self.batch, {"independent_assessments": [adverse]}, self.research, self.review, "test", set())
